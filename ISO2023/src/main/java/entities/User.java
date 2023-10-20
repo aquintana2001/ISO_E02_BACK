@@ -1,6 +1,6 @@
 package entities;
 
-import java.util.UUID;
+import java.util.UUID; 
 
 import javax.validation.constraints.NotEmpty;
 
