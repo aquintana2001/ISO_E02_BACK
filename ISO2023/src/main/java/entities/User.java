@@ -33,7 +33,16 @@ public class User {
 	@Column(length=100) 
 	private int intentos;
 	
-	public User() {
+	
+
+	public User(String nombre, String apellidos, String email, String password, boolean activo, int intentos) {
+		
+		this.nombre = nombre;
+		this.apellidos = apellidos;
+		this.email = email;
+		this.password = password;
+		this.activo = activo;
+		this.intentos = intentos;
 	}
 
 	public String getNombre() {

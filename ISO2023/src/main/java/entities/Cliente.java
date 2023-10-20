@@ -13,13 +13,17 @@ public class Cliente extends User{
 	private String dni;
 	
 	
-	public Cliente(String ciudad, boolean carnet, String telefono, String dni) 
-	{super();
+	
+
+
+	public Cliente(String nombre, String apellidos, String email, String password, boolean activo, int intentos) {
+		super(nombre, apellidos, email, password, activo, intentos);
+		// TODO Auto-generated constructor stub
 		
-		this.ciudad = ciudad;
+		this.ciudad = "Ciudad Real"; 
 		this.carnet = carnet;
-		this.telefono = telefono;
-		this.dni = dni;
+		this.telefono=telefono;
+		this.dni=dni;
 	}
 
 
@@ -28,9 +32,6 @@ public class Cliente extends User{
 	}
 
 
-	public void setCiudad(String ciudad) {
-		this.ciudad = "Ciudad Real";
-	}
 
 
 	public boolean isCarnet() {
