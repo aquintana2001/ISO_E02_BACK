@@ -92,4 +92,42 @@ public class User {
 	public void setIntentos(int intentos) {
 		this.intentos = intentos;
 	}
+	
+	
+	
+	
+	public boolean pwdSecure(String pwd) {
+		
+		boolean seguro = false;
+		char key;
+		int nNumeros = 0;
+		int nMayusculas = 0;
+		int nMinisculas = 0;
+		int nCaracterRaro = 0;
+		
+		for(int i = 0 ; i < pwd.length();i++) {
+			key= pwd.charAt(i);
+			String conversion = String.valueOf(key);
+			if(conversion.matches("[A-Z]")) {
+				nMayusculas+=1;
+			}else if (conversion.matches("[a-z]")) {
+				nMinisculas+=1;
+			}else if (conversion.matches("[0-9]")) {
+				nNumeros+=1;
+			}else if (conversion.matches("[^A-Za-z0-9]")) {
+				nCaracterRaro+=1;
+			}
+		}
+		if(nMayusculas > 0 && nMinisculas > 0 && nNumeros > 0 && nCaracterRaro >0 && pwd.length() >=8) {
+			seguro = true;
+		}
+		return seguro;
+	}
+	
+	
+	
 }
+
+
+
+
