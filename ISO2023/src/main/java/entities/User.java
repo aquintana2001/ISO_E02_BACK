@@ -1,6 +1,5 @@
 package entities;
 
-import java.util.UUID;
 
 import javax.validation.constraints.NotEmpty;
 
@@ -20,17 +19,17 @@ import jakarta.persistence.Table;
 
 
 public class User {
-	@Column(length = 100) @NotEmpty
-	private String nombre;
-	@Column(length=100) @NotEmpty
-	private String apellidos;
-	@Column(length=100) @NotEmpty
+	@Id @Column(length=50) @NotEmpty
 	private String email;
-	@Column(length=100) @NotEmpty
+	@Column(length = 50) @NotEmpty
+	private String nombre;
+	@Column(length=50) @NotEmpty
+	private String apellidos;
+	@Column(length=32) @NotEmpty
 	private String password;
-	@Column(length=100) 
+	@Column(length=1) 
 	private boolean activo;
-	@Column(length=100) 
+	@Column(length=1) 
 	private int intentos;
 	
 	public User() {
