@@ -1,6 +1,8 @@
 package entities;
 
 
+import java.util.UUID; 
+
 import javax.validation.constraints.NotEmpty;
 
 import jakarta.persistence.Column;
@@ -32,7 +34,16 @@ public class User {
 	@Column(length=1) 
 	private int intentos;
 	
-	public User() {
+	
+
+	public User(String nombre, String apellidos, String email, String password, boolean activo, int intentos) {
+		
+		this.nombre = nombre;
+		this.apellidos = apellidos;
+		this.email = email;
+		this.password = password;
+		this.activo = activo;
+		this.intentos = intentos;
 	}
 
 	public String getNombre() {
