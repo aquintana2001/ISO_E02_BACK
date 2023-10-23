@@ -22,7 +22,7 @@ public class UserController {
 		private UserService userService;
 		
 		@PostMapping("/register")
-		public void register(@RequestBody Map<String, Object> info) {
+		public void registrarse(@RequestBody Map<String, Object> info) {
 			String password1 = info.get("password1").toString();
 			String passwordd2 = info.get("password").toString();
 			if (!password1.equals(passwordd2))
@@ -31,8 +31,13 @@ public class UserController {
 			String nombre= info.get("nombre").toString();
 			String apellidos = info.get("apellidos").toString();
 			String email = info.get("email").toString();
+			String ciudad = info.get("ciudad").toString();
+			boolean carnet = Boolean.parseBoolean(info.get("carnet").toString());
+			String telefono = info.get("telefono").toString();
+			String dni = info.get("dni").toString();
+			
 			try {
-				this.userService.registrarse(nombre, apellidos, email, password1);
+				this.userService.registrarse(nombre, apellidos, email, password1, ciudad, carnet, telefono, dni);
 			}catch (Exception e) {
 				throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 			}
