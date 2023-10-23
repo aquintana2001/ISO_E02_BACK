@@ -22,37 +22,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import dao.AdminDAO;
 
+import org.springframework.web.bind.annotation.RestController;
+
+import entities.Vehiculo;
+import entities.User;
 
 @RestController
 
 public class AdministradorController {
-	
-	@Autowired
-	private AdminDAO adminRepositorio;
-	
-	
-	@GetMapping("")
-	public
-	Optional<Administrador> cogerAdmin(@PathVariable String email) {
-		return adminRepositorio.findByEmail(email);
-		
-	}
-	
-	@PostMapping("")
-	public 
-	Administrador createAdmin(@RequestBody Administrador admin) {
-		if(admin.pwdSecure(admin.getPassword())) {
-			String passwordAdmin = admin.getPassword();
-			admin.setPassword(org.apache.commons.codec.digest.DigestUtils.sha512Hex(passwordAdmin));
-			return adminRepositorio.save(admin);
-		}
-		else {
-			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Ha sucedido un error, no se cumple con los requisitos de nuestra politica de contraseñas");
-		}
-	}
-	
-
-	
 	@PutMapping("")
 	public Administrador updateAdmin(@PathVariable String email, @RequestBody Administrador admin) {
 		if(admin.pwdSecure(admin.getPassword())) {
@@ -90,5 +67,5 @@ public class AdministradorController {
 
 	}
 	
-	
+	*/
 }
