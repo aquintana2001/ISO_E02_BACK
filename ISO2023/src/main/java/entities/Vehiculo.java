@@ -1,13 +1,23 @@
 package entities;
 
-import org.springframework.data.annotation.Id; 
+import javax.validation.constraints.NotEmpty;
+
+import org.springframework.data.annotation.Id;
+
+import jakarta.persistence.Column; 
 
 public class Vehiculo {
-	private String tipo;
+	@Id @Column(length=7) @NotEmpty
 	private String matricula;
+	@Column(length=50) @NotEmpty
+	private String tipo;
+	@Column(length=3) @NotEmpty
 	private String bateria;
+	@Column(length=50) @NotEmpty
 	private String modelo;
+	@Column(length=50) @NotEmpty
 	private String estado;
+	@Column(length=50) @NotEmpty
 	private String direccion;
 	
 	
