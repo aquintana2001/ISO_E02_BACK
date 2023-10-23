@@ -9,15 +9,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import dao.UserDAO;
+import dao.AdminDAO;
 import dao.TokenDAO;
-import entities.User;
+import entities.Administrador;
 import entities.Cliente;
 import entities.Token;
+import entities.User;
+import entities.Cliente;
 
-public class UserService {
+public class AdminService {
+	
 	@Autowired
-	private UserDAO userDAO;
+	private AdminDAO adminDAO;
 	@Autowired
 	private TokenDAO tokenDAO;
 	
@@ -25,8 +28,8 @@ public class UserService {
 			boolean carnet, String telefono, String dni) {
 		Cliente cliente = new Cliente(nombre, apellidos, email, password, true, 5, "Ciudad Real", carnet, telefono, dni);
 		
-		Optional<User> userExist = this.userDAO.findByName(email);
-		if(userExist.isPresent()) {
+		Optional<Administrador> adminExist = this.adminDAO.findByEmail(email);
+		if(adminExist.isPresent()) {
 			Optional<Token> tokenExist = this.tokenDAO.findByUser(cliente);
 			if (tokenExist.isPresent()) {
 				long hora = System.currentTimeMillis();
@@ -37,13 +40,20 @@ public class UserService {
 				token.setUser(cliente);
 				this.tokenDAO.save(token);
 			}
-		}else if(!userExist.isPresent()) {
+		}else if(!adminExist.isPresent()) {
 			Token token= new Token();
 			token.setUser(cliente);
-			this.userDAO.save(cliente);
+			this.adminDAO.save(cliente);
 			this.tokenDAO.save(token);
-		}else if(userExist.isPresent()) {
+		}else if(adminExist.isPresent()) {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Esos credenciales no pueden ser usados");
 		}
 	}
+	
+	
+	
+	public void actualizar() {
+		
+	}
+	
 }
