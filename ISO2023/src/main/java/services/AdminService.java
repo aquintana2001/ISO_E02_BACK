@@ -12,6 +12,8 @@ import dao.AdminDAO;
 import dao.ClienteDAO;
 import dao.TokenDAO;
 import dao.VehiculoDAO;
+import eda.service.Administrator;
+import eda.service.NonAdminValidationException;
 import entities.Administrador;
 import entities.Cliente;
 import entities.Token;
@@ -75,5 +77,18 @@ public class AdminService {
 			throw new formatoIncompleto("Rellena todos los campos obligatorios");
 		adminDAO.save(admin);
 	}
+	
+	public void actualizarIntentosAdmin(String email, int intentos) throws formatoIncompleto {
+		
+		Optional<Administrador> admin = adminDAO.findByEmail(email);
+		
+		if(!admin.isPresent())
+			throw new formatoIncompleto("Imposible encontrar al admin");
+		
+		admin.get().setIntentos(intentos);
+		
+		adminDAO.save(admin.get());
+	}
+		
 	
 }
