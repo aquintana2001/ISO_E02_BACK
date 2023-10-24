@@ -24,7 +24,10 @@ public class Cliente extends User{
 	}
 
 
+
+  
 	public String getCarnet() {
+
 		return carnet;
 	}
 
