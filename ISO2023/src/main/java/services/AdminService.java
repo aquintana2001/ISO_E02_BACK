@@ -76,4 +76,25 @@ public class AdminService {
 		adminDAO.save(admin);
 	}
 	
+	public void actualizarIntentosAdmin(String email, int intentos) throws formatoIncompleto {
+		
+		Optional<Administrador> admin = adminDAO.findByEmail(email);
+		
+		if(!admin.isPresent())
+			throw new formatoIncompleto("Imposible encontrar al admin");
+		
+		admin.get().setIntentos(intentos);
+		
+		adminDAO.save(admin.get());
+	}
+	
+	public void actualizarCliente(Cliente cliente) throws contraseñaIncorrecta, formatoIncompleto{
+		if (cliente.getNombre().equals("") || cliente.getApellidos().equals("") || cliente.getPassword().equals("")
+			|| cliente.getEmail().equals("") || cliente.getActivo().equals("") || cliente.getDni().equals("") 
+			|| cliente.getTelefono().equals("") || cliente.getCarnet().equals(""))
+			throw new formatoIncompleto("Rellena todos los campos obligatorios");
+		clienteDAO.save(cliente);
+	}
+		
+	
 }
