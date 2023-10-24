@@ -1,19 +1,15 @@
 package entities;
 
 
-import org.hibernate.annotations.DialectOverride.OverridesAnnotation;
-import org.springframework.data.annotation.Id;
-
-
 public class Cliente extends User{
 
 	private String ciudad;
-	private boolean carnet;
+	private String carnet;
 	private String telefono;
 	private String dni;
 	
 	public Cliente(String nombre, String apellidos, String email, String password, boolean activo, int intentos, String ciudad,
-			boolean carnet, String telefono, String dni) {
+			String carnet, String telefono, String dni) {
 		super(nombre, apellidos, email, password, activo, intentos);
 		// TODO Auto-generated constructor stub
 		
@@ -28,12 +24,15 @@ public class Cliente extends User{
 	}
 
 
-	public boolean isCarnet() {
+
+  
+	public String getCarnet() {
+
 		return carnet;
 	}
 
 
-	public void setCarnet(boolean carnet) {
+	public void setCarnet(String carnet) {
 		this.carnet = carnet;
 	}
 

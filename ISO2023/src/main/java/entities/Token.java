@@ -1,20 +1,11 @@
 package entities;
 
 import java.util.UUID;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
 
-@Entity
-@Table(name = "Tokens")
 public class Token {
-	@Id @Column(length=36)
 	private String id;
 	private Long horaCreacion;
 	private Long horaConfirmacion;
-	@ManyToOne
 	private User user;
 	
 	public Token() {
