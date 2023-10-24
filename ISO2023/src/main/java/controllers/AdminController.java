@@ -20,6 +20,8 @@ import entities.Administrador;
 import entities.Cliente;
 import entities.User;
 import entities.Vehiculo;
+import exceptions.contraseñaIncorrecta;
+import exceptions.formatoIncompleto;
 import services.AdminService;
 
 @RestController
@@ -85,7 +87,7 @@ public class AdminController {
 
 	@PutMapping("/modificarAdminstrador")
 	public Administrador updateAdmin(@PathVariable String email, @RequestBody Map<String, Object> info) {
-		User admin;
+		User admin = null;
 		if(admin.pwdSecure(admin.getPassword())) {
 			Administrador administradorBBDD = adminDAO.findByEmail(email).get();
 			administradorBBDD.setNombre(admin.getNombre());
@@ -96,7 +98,12 @@ public class AdminController {
 		}else {
 			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Ha sucedido un error, no se cumple con los requisitos de nuestra politica de contraseñas");
 		}
-		this.adminService.actualizarAdmin(Nombre, Apellidos, Email, Password, Activo);
+		try {
+			adminService.actualizarAdmin(admin);
+		} catch(Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+		}
+		return null;
 	}
 	
 	
