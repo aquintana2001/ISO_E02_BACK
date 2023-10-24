@@ -91,7 +91,7 @@ public class AdminService {
 	public void actualizarCliente(Cliente cliente) throws contraseñaIncorrecta, formatoIncompleto{
 		if (cliente.getNombre().equals("") || cliente.getApellidos().equals("") || cliente.getPassword().equals("")
 			|| cliente.getEmail().equals("") || cliente.getActivo().equals("") || cliente.getDni().equals("") 
-			|| cliente.getTelefono().equals("") || cliente.getCarnet().equals(""))
+			|| cliente.getTelefono().equals(""))
 			throw new formatoIncompleto("Rellena todos los campos obligatorios");
 		clienteDAO.save(cliente);
 	}
