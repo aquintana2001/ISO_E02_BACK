@@ -1,10 +1,6 @@
 package entities;
 
 
-import org.hibernate.annotations.DialectOverride.OverridesAnnotation; 
-import org.springframework.data.annotation.Id;
-
-
 public class Cliente extends User{
 
 	private String ciudad;
