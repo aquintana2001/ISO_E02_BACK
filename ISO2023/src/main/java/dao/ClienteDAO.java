@@ -8,5 +8,5 @@ import entities.Cliente;
 
 
 public interface ClienteDAO extends MongoRepository<Cliente,String>{
-	Optional<Cliente> findByName(String name);
+	Optional<Cliente> findByEmail(String email);
 }

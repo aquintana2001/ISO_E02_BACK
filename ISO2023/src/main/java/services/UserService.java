@@ -22,10 +22,10 @@ public class UserService {
 	private TokenDAO tokenDAO;
 	
 	public void registrarse(String nombre, String apellidos, String email, String password, String ciudad,
-			boolean carnet, String telefono, String dni) {
+			String carnet, String telefono, String dni) {
 		Cliente cliente = new Cliente(nombre, apellidos, email, password, true, 5, "Ciudad Real", carnet, telefono, dni);
 		
-		Optional<Cliente> userExist = this.clienteDAO.findByName(email);
+		Optional<Cliente> userExist = this.clienteDAO.findByEmail(email);
 		
 		if(!cliente.pwdSecure(password))
 			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "La contraseña no es segura");
@@ -50,4 +50,6 @@ public class UserService {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Esos credenciales no pueden ser usados");
 		}
 	}
+	
+	
 }
