@@ -1,7 +1,7 @@
 package entities;
 
 
-import org.hibernate.annotations.DialectOverride.OverridesAnnotation;
+import org.hibernate.annotations.DialectOverride.OverridesAnnotation; 
 import org.springframework.data.annotation.Id;
 
 
