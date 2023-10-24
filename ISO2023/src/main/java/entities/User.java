@@ -5,33 +5,14 @@ import java.util.UUID;
 
 import javax.validation.constraints.NotEmpty;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import jakarta.persistence.Table;
-
-
-@Entity 
-@Table(
-		name = "users", 
-		indexes = {
-				@Index(columnList = "email", unique=true)
-		})
 
 
 public class User {
-	@Id @Column(length=50) @NotEmpty
 	private String email;
-	@Column(length = 50) @NotEmpty
 	private String nombre;
-	@Column(length=50) @NotEmpty
 	private String apellidos;
-	@Column(length=32) @NotEmpty
 	private String password;
-	@Column(length=1) 
 	private boolean activo;
-	@Column(length=1) 
 	private int intentos;
 	
 	
