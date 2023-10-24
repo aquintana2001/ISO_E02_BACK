@@ -24,7 +24,7 @@ public class Cliente extends User{
 	}
 
 
-	public boolean isCarnet() {
+	public boolean getCarnet() {
 		return carnet;
 	}
 
