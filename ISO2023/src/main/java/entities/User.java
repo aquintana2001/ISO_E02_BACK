@@ -95,7 +95,9 @@ public class User {
 	}
 	
 	
-	
+	public String toString() {
+		return "User [nombre=" + nombre+",apellidos="+apellidos+",email="+email+",password="+password+",activo="+activo+",intentos="+intentos+"]";
+	}
 	
 	public boolean pwdSecure(String pwd) {
 		
