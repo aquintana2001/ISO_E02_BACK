@@ -33,7 +33,7 @@ public class UserController {
 			String apellidos = info.get("apellidos").toString();
 			String email = info.get("email").toString();
 			String ciudad = info.get("ciudad").toString();
-			boolean carnet = Boolean.parseBoolean(info.get("carnet").toString());
+			String carnet = info.get("carnet").toString();
 			String telefono = info.get("telefono").toString();
 			String dni = info.get("dni").toString();
 			
