@@ -4,12 +4,12 @@ package entities;
 public class Cliente extends User{
 
 	private String ciudad;
-	private String carnet;
+	private boolean carnet;
 	private String telefono;
 	private String dni;
 	
 	public Cliente(String nombre, String apellidos, String email, String password, boolean activo, int intentos, String ciudad,
-			String carnet, String telefono, String dni) {
+			boolean carnet, String telefono, String dni) {
 		super(nombre, apellidos, email, password, activo, intentos);
 		// TODO Auto-generated constructor stub
 		
@@ -24,12 +24,12 @@ public class Cliente extends User{
 	}
 
 
-	public String getCarnet() {
+	public boolean getCarnet() {
 		return carnet;
 	}
 
 
-	public void setCarnet(String carnet) {
+	public void setCarnet(boolean carnet) {
 		this.carnet = carnet;
 	}
 
