@@ -1,10 +1,13 @@
 package dao;
 
-import java.util.Optional;
-import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.Optional; 
+
+import org.springframework.data.mongodb.repository.MongoRepository;
+
+import entities.Administrador;
 import entities.Vehiculo;
 
 
-public interface VehiculoDAO extends JpaRepository<Vehiculo, String>{
+public interface VehiculoDAO extends MongoRepository<Vehiculo,String>{
 	Optional<Vehiculo> findByMatricula(String matricula);
 }
