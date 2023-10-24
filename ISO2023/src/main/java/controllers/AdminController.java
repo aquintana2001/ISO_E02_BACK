@@ -20,8 +20,7 @@ import entities.Administrador;
 import entities.Cliente;
 import entities.User;
 import entities.Vehiculo;
-import exceptions.contraseñaIncorrecta;
-import exceptions.formatoIncompleto;
+import exceptions.*;
 import services.AdminService;
 
 @RestController
