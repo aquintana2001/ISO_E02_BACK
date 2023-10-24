@@ -1,6 +1,6 @@
 package services;
 
-import java.io.IOException;
+import java.io.IOException; 
 import java.util.Optional;
 import java.util.UUID;
 
@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import dao.UserDAO;
+import dao.ClienteDAO;
 import dao.TokenDAO;
 import entities.User;
 import entities.Cliente;
@@ -17,7 +17,7 @@ import entities.Token;
 
 public class UserService {
 	@Autowired
-	private UserDAO userDAO;
+	private ClienteDAO clienteDAO;
 	@Autowired
 	private TokenDAO tokenDAO;
 	
@@ -25,7 +25,11 @@ public class UserService {
 			boolean carnet, String telefono, String dni) {
 		Cliente cliente = new Cliente(nombre, apellidos, email, password, true, 5, "Ciudad Real", carnet, telefono, dni);
 		
-		Optional<User> userExist = this.userDAO.findByName(email);
+		Optional<Cliente> userExist = this.clienteDAO.findByName(email);
+		
+		if(!cliente.pwdSecure(password))
+			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "La contraseña no es segura");
+		
 		if(userExist.isPresent()) {
 			Optional<Token> tokenExist = this.tokenDAO.findByUser(cliente);
 			if (tokenExist.isPresent()) {
@@ -40,7 +44,7 @@ public class UserService {
 		}else if(!userExist.isPresent()) {
 			Token token= new Token();
 			token.setUser(cliente);
-			this.userDAO.save(cliente);
+			this.clienteDAO.save(cliente);
 			this.tokenDAO.save(token);
 		}else if(userExist.isPresent()) {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Esos credenciales no pueden ser usados");

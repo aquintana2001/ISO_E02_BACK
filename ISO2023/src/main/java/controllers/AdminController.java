@@ -5,8 +5,6 @@ import java.util.*;
 import org.springframework.web.bind.annotation.RestController;
 
 import entities.Administrador;
-import java.util.Optional;
-
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,31 +23,40 @@ import dao.AdminDAO;
 import org.springframework.web.bind.annotation.RestController;
 
 import entities.Vehiculo;
+import services.AdminService;
 import entities.User;
+import dao.AdminDAO;
 
 @RestController
-
-public class AdministradorController {
+public class AdminController {
+	@Autowired
+	private AdminService adminService;
+	private AdminDAO adminDAO;
 	@PutMapping("")
 	public Administrador updateAdmin(@PathVariable String email, @RequestBody Administrador admin) {
 		if(admin.pwdSecure(admin.getPassword())) {
-			Administrador administradorBBDD = adminRepositorio.findByEmail(email);
-			administradorBBDD.setEmail(admin.getEmail());
+			Administrador administradorBBDD = adminDAO.findByEmail(email);
 			administradorBBDD.setNombre(admin.getNombre());
 			administradorBBDD.setApellidos(admin.getApellidos());
+			administradorBBDD.setEmail(admin.getEmail());
+			administradorBBDD.setCiudad(admin.getCiudad());
+			administradorBBDD.setCarnet(admin.getCarnet());
+			administradorBBDD.setTelefono(admin.getTelefono());
+			administradorBBDD.setDni(admin.getDni());
+			
 			administradorBBDD.setPassword(admin.getPassword());
 			
-			return adminRepositorio.save(administradorBBDD);
 		}else {
 			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Ha sucedido un error, no se cumple con los requisitos de nuestra politica de contraseñas");
 		}
+		this.adminService.actualizar(nombre, Apellidos, Email, Password, Ciudad, Carnet, Telefono, Dni);
 	}
 	
 	
 	@DeleteMapping("")
 	public void deleteAdmin(@PathVariable String email) {
-		Administrador admin = adminRepositorio.findByEmail(email);
-		adminRepositorio.delete(admin);
+		Administrador admin = adminDAO.findByEmail(email);
+		adminDAO.delete(admin);
 	}
 	
 	
