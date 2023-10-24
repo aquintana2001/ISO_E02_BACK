@@ -12,8 +12,6 @@ import dao.AdminDAO;
 import dao.ClienteDAO;
 import dao.TokenDAO;
 import dao.VehiculoDAO;
-import eda.service.Administrator;
-import eda.service.NonAdminValidationException;
 import entities.Administrador;
 import entities.Cliente;
 import entities.Token;
@@ -88,6 +86,14 @@ public class AdminService {
 		admin.get().setIntentos(intentos);
 		
 		adminDAO.save(admin.get());
+	}
+	
+	public void actualizarCliente(Cliente cliente) throws contraseñaIncorrecta, formatoIncompleto{
+		if (cliente.getNombre().equals("") || cliente.getApellidos().equals("") || cliente.getPassword().equals("")
+			|| cliente.getEmail().equals("") || cliente.getActivo().equals("") || cliente.getDni().equals("") 
+			|| cliente.getTelefono().equals("") || cliente.getCarnet().equals(""))
+			throw new formatoIncompleto("Rellena todos los campos obligatorios");
+		clienteDAO.save(cliente);
 	}
 		
 	
