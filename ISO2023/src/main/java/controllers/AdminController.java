@@ -143,5 +143,14 @@ public class AdminController {
 		return null;
 	}
 	
+	@PostMapping("/updateAdminIntentos")
+	public void updateAdminIntentos(String email, int intentos) {
+		try {
+			adminService.actualizarIntentosAdmin(email,intentos);
+		}catch(Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+		}
+	}
+	
 	
 }

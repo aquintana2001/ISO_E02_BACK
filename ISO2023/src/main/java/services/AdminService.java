@@ -16,6 +16,7 @@ import entities.Administrador;
 import entities.Cliente;
 import entities.Token;
 import entities.Vehiculo;
+import exceptions.*;
 
 public class AdminService {
 	@Autowired
@@ -68,8 +69,32 @@ public class AdminService {
         return vehiculoDAO.findAll();
     }
 	
-	public void actualizar() {
-		
+	public void actualizarAdmin(Administrador admin) throws contraseñaIncorrecta, formatoIncompleto{
+		if (admin.getNombre().equals("") || admin.getApellidos().equals("") || admin.getPassword().equals("")
+			|| admin.getEmail().equals("") || admin.getActivo().equals(""))
+			throw new formatoIncompleto("Rellena todos los campos obligatorios");
+		adminDAO.save(admin);
 	}
+	
+	public void actualizarIntentosAdmin(String email, int intentos) throws formatoIncompleto {
+		
+		Optional<Administrador> admin = adminDAO.findByEmail(email);
+		
+		if(!admin.isPresent())
+			throw new formatoIncompleto("Imposible encontrar al admin");
+		
+		admin.get().setIntentos(intentos);
+		
+		adminDAO.save(admin.get());
+	}
+	
+	public void actualizarCliente(Cliente cliente) throws contraseñaIncorrecta, formatoIncompleto{
+		if (cliente.getNombre().equals("") || cliente.getApellidos().equals("") || cliente.getPassword().equals("")
+			|| cliente.getEmail().equals("") || cliente.getActivo().equals("") || cliente.getDni().equals("") 
+			|| cliente.getTelefono().equals("") || cliente.getCarnet().equals(""))
+			throw new formatoIncompleto("Rellena todos los campos obligatorios");
+		clienteDAO.save(cliente);
+	}
+		
 	
 }
