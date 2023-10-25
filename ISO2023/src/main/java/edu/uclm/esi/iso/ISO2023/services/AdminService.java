@@ -30,14 +30,15 @@ public class AdminService {
 	@Autowired
 	private ClienteDAO clienteDAO;
 	
+	private SeguridadService comprobarSeguridad = new SeguridadService();
 	
 	
-	public void registrarse(String nombre, String apellidos, String email, String password1) {
+	public void registrarse(String nombre, String apellidos, String email, String password1) throws contraseñaIncorrecta {
 		Administrador administrador = new Administrador(nombre, apellidos, email, password1, true, 5);
 		
 		Optional<Administrador> adminExist = this.adminDAO.findByEmail(email);
 		
-		if(!administrador.pwdSecure(password1))
+		if(!comprobarSeguridad.restriccionesPassword(administrador))
 			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "La contraseña no es segura");
 		
 		if(adminExist.isPresent()) {
