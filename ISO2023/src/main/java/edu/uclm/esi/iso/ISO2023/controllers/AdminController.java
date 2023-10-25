@@ -115,8 +115,6 @@ public class AdminController {
 	public ResponseEntity<String> deleteAdmin(@PathVariable String email) {
 		Administrador admin = adminDAO.findByEmail(email).get();
 		adminDAO.delete(admin);
-		
-	return ResponseEntity.ok("Administrador elimnado correctamente");
 	
 		
 	}

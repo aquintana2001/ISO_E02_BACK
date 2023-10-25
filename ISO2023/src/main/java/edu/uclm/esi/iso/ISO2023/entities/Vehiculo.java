@@ -7,14 +7,12 @@ import javax.validation.constraints.NotEmpty;
 public class Vehiculo {
 	private String matricula;
 	private String tipo;
-	private String bateria;
 	private String modelo;
 	private String estado;
 	private String direccion;
 	
 	
 	
-	public Vehiculo(String tipo, String matricula, String bateria, String modelo, String estado, String direccion) {
 		
 		this.tipo = tipo;
 		this.matricula = matricula;
@@ -50,13 +48,11 @@ public class Vehiculo {
 
 
 
-	public String getBateria() {
 		return bateria;
 	}
 
 
 
-	public void setBateria(String bateria) {
 		this.bateria = bateria;
 	}
 
