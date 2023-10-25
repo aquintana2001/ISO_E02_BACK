@@ -42,7 +42,8 @@ public class AdminController {
 	@Autowired
 	private VehiculoDAO vehiculoDAO;
 	
-	
+	private SeguridadService comprobarSeguridad = new SeguridadService();
+
 	
 	
 	@PostMapping("/register")
@@ -95,9 +96,9 @@ public class AdminController {
 //	}
 
 	@PutMapping("/modificarAdminstrador")
-	public Administrador updateAdmin(@PathVariable String email, @RequestBody Map<String, Object> info) {
+	public Administrador updateAdmin(@PathVariable String email, @RequestBody Map<String, Object> info) throws contraseñaIncorrecta {
 		User admin = null;
-		if(admin.pwdSecure(admin.getPassword())) {
+		if(comprobarSeguridad.restriccionesPassword(admin)) {
 			Administrador administradorBBDD = adminDAO.findByEmail(email).get();
 			administradorBBDD.setNombre(admin.getNombre());
 			administradorBBDD.setApellidos(admin.getApellidos());
