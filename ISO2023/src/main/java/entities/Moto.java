@@ -8,7 +8,7 @@ public class Moto extends Vehiculo{
 
 	private boolean casco;
 
-	public Moto(String tipo, String matricula, String bateria, String modelo, String estado, String direccion) {
+	public Moto(String tipo, String matricula, int bateria, String modelo, String estado, String direccion) {
 		super(tipo, matricula, bateria, modelo, estado, direccion);
 		// TODO Auto-generated constructor stub
 	}

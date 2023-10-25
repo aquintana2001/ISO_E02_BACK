@@ -9,5 +9,5 @@ import entities.Vehiculo;
 
 
 public interface VehiculoDAO extends MongoRepository<Vehiculo,String>{
-	Optional<Vehiculo> findByMatricula(String matricula);
+	Optional<Vehiculo> findById(int id);
 }

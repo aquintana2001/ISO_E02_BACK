@@ -16,8 +16,12 @@ import org.springframework.web.server.ResponseStatusException;
 
 import dao.AdminDAO;
 import dao.ClienteDAO;
+import dao.VehiculoDAO;
 import entities.Administrador;
 import entities.Cliente;
+import entities.Coche;
+import entities.Moto;
+import entities.Patinete;
 import entities.User;
 import entities.Vehiculo;
 import exceptions.*;
@@ -31,6 +35,10 @@ public class AdminController {
 	private AdminDAO adminDAO;
 	@Autowired
 	private ClienteDAO clienteDAO;
+	@Autowired
+	private VehiculoService vehiculoService;
+	@Autowired
+	private VehiculoDAO vehiculoDAO;
 	
 	
 	
@@ -111,8 +119,7 @@ public class AdminController {
 	public ResponseEntity<String> deleteAdmin(@PathVariable String email) {
 		Administrador admin = adminDAO.findByEmail(email).get();
 		adminDAO.delete(admin);
-		
-	return ResponseEntity.ok("Administrador elimnado correctamente");
+		return ResponseEntity.ok("Administrador elimnado correctamente");
 	
 		
 	}
@@ -135,14 +142,91 @@ public class AdminController {
 	}
 	
 	
-	
 
-	public Vehiculo darAltaV() {
-		return null;
+	@PostMapping("/darAltaVehiculo")
+	public ResponseEntity<String> darAltaVehiculo( @RequestBody Map<String, Object> info) {
+
+		String email =info.get("email").toString();
+		Optional<Administrador> adminExist = adminDAO.findByEmail(email);
+
+
+		if (adminExist.isPresent()) {
+			String tipoVehiculo = (String) info.get("tipo");
+
+
+			switch (tipoVehiculo) {
+			case "coche":
+				darAltaCoche(info);
+				break;
+			case "moto":
+				darAltaMoto(info);
+				break;
+			case "patinete":
+				darAltaPatinete(info);
+				break;
+			default:
+				return ResponseEntity.badRequest().body("Tipo de vehículo desconocido.");
+			}
+			return ResponseEntity.ok("Vehículo dado de alta con éxito.");
+		} else {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tienes permiso para dar de alta vehículos.");
+		}
+	} 
+
+
+	private  void darAltaCoche(Map<String, Object> info) {
+
+		
+		String matricula = info.get("matricula").toString();
+		String tipo = info.get("tipo").toString();
+		int bateria = Integer.parseInt(info.get("bateria").toString());
+		String modelo = info.get("modelo").toString();
+		String estado = info.get("estado").toString();
+		String direccion = info.get("direccion").toString();
+		int nPlazas = Integer.parseInt(info.get("nPlazas").toString());
+		
+		this.vehiculoService.darAltaCoche();		
+		
 	}
 
-	public Vehiculo darBajaV() {
-		return null;
+
+	private void darAltaMoto(Map<String, Object> info) {
+		
+		
+		String matricula = info.get("matricula").toString();
+		String tipo = info.get("tipo").toString();
+		int bateria = Integer.parseInt(info.get("bateria").toString());
+		String modelo = info.get("modelo").toString();
+		String estado = info.get("estado").toString();
+		String direccion = info.get("direccion").toString();
+		String casco = info.get("casco").toString();
+		
+		this.vehiculoService.darAltaMoto();
+	}
+
+
+	private void darAltaPatinete(Map<String, Object> info) {
+		
+		String matricula = info.get("matricula").toString();
+		String tipo = info.get("tipo").toString();
+		int bateria = Integer.parseInt(info.get("bateria").toString());
+		String modelo = info.get("modelo").toString();
+		String estado = info.get("estado").toString();
+		String direccion = info.get("direccion").toString();
+		String color = info.get("color").toString();
+		
+		this.vehiculoService.darAltaPatinete();
+	}
+	
+	
+	
+	
+	
+	
+	@DeleteMapping
+	public ResponseEntity<String>  darBajaVehiculo(@PathVariable String id) {
+		Vehiculo vehiculo = vehiculoDAO.findById(id).get();
+		vehiculoService.delete(vehiculo);
 	}
 
 	public Vehiculo consultarVehiculos() {
