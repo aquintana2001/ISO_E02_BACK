@@ -1,11 +1,12 @@
-package edu.uclm.esi.iso.ISO2023.dao;
+package dao;
 
 import java.util.Optional;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import edu.uclm.esi.iso.ISO2023.entities.Administrador;
-import edu.uclm.esi.iso.ISO2023.entities.User;
+
+import entities.Administrador;
+import entities.User;
 
 
 

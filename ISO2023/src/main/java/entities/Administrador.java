@@ -1,8 +1,6 @@
-package edu.uclm.esi.iso.ISO2023.entities;
+package entities;
 
 import org.springframework.data.annotation.Id;
-
-import edu.uclm.esi.iso.ISO2023.entities.User;
 
 public class Administrador extends User{
 

@@ -1,4 +1,4 @@
-package edu.uclm.esi.iso.ISO2023.entities;
+package entities;
 
 
 import java.util.UUID; 

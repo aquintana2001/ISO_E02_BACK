@@ -1,4 +1,4 @@
-package edu.uclm.esi.iso.ISO2023.controllers;
+package controllers;
 
 import java.util.*;    
 
@@ -7,16 +7,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.server.ResponseStatusException;
 
-<<<<<<< HEAD:ISO2023/src/main/java/edu/uclm/esi/iso/ISO2023/controllers/AdminController.java
 import edu.uclm.esi.iso.ISO2023.dao.AdminDAO;
 import edu.uclm.esi.iso.ISO2023.dao.ClienteDAO;
 import edu.uclm.esi.iso.ISO2023.entities.Administrador;
@@ -25,24 +22,7 @@ import edu.uclm.esi.iso.ISO2023.entities.User;
 import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
 import edu.uclm.esi.iso.ISO2023.exceptions.*;
 import edu.uclm.esi.iso.ISO2023.services.AdminService;
-=======
-import dao.AdminDAO;
-import dao.ClienteDAO;
-import dao.VehiculoDAO;
-import entities.Administrador;
-import entities.Cliente;
-import entities.Coche;
-import entities.Moto;
-import entities.Patinete;
-import entities.User;
-import entities.Vehiculo;
-import exceptions.*;
-import services.AdminService;
->>>>>>> alejandro:ISO2023/src/main/java/controllers/AdminController.java
-
 @RestController
-@RequestMapping("admin")
-@CrossOrigin("*")
 public class AdminController {
 	@Autowired
 	private AdminService adminService;
@@ -140,48 +120,21 @@ public class AdminController {
 	}
 	
 	
-//	@DeleteMapping("")  //cambiar atributo activa a false
-//	public ResponseEntity<String> darDeBajaUserAdmin(@PathVariable String email) {
-//		Cliente cliente = clienteDAO.findByEmail(email).get();
-//		
-//		if(cliente!=null) {
-//			cliente.setActivo(false);
-//			clienteDAO.save(cliente);
-//			return ResponseEntity.ok("Cliente dado de baja corrrectamente.");
-//		}else {
-//			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No hemos detectado ningun cliente.");
-//			
-//		}
-//	
-//	
-//	}
+	@DeleteMapping("")  //cambiar atributo activa a false
+	public ResponseEntity<String> darDeBajaUserAdmin(@PathVariable String email) {
+		Cliente cliente = clienteDAO.findByEmail(email).get();
+		
+		if(cliente!=null) {
+			cliente.setActivo(false);
+			clienteDAO.save(cliente);
+			return ResponseEntity.ok("Cliente dado de baja corrrectamente.");
+		}else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No hemos detectado ningun cliente.");
+			
+		}
 	
 	
-<<<<<<< HEAD:ISO2023/src/main/java/edu/uclm/esi/iso/ISO2023/controllers/AdminController.java
-	
-//
-//	public Vehiculo darAltaV() {
-//		return null;
-//	}
-//
-//	public Vehiculo darBajaV() {
-//		return null;
-//	}
-//
-//	public Vehiculo consultarVehiculos() {
-//		return null;
-//	}
-//	
-//	@PostMapping("/updateAdminIntentos")
-//	public void updateAdminIntentos(String email, int intentos) {
-//		try {
-//			adminService.actualizarIntentosAdmin(email,intentos);
-//		}catch(Exception e) {
-//			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-//		}
-//	}
-//	
-=======
+	}
 
 	@PostMapping("/darAltaVehiculo")
 	public ResponseEntity<String> darAltaVehiculo( @RequestBody Map<String, Object> info) {
@@ -259,15 +212,17 @@ public class AdminController {
 	}
 	
 	
-	
-	
-	
-	
 	@DeleteMapping
 	public ResponseEntity<String>  darBajaVehiculo(@PathVariable String id) {
 		Vehiculo vehiculo = vehiculoDAO.findById(id).get();
 		vehiculoService.delete(vehiculo);
 	}
+	public Vehiculo darAltaV() {
+		return null;
+	}
+
+	public Vehiculo darBajaV() {
+		return null;}
 
 	public Vehiculo consultarVehiculos() {
 		return null;
@@ -281,7 +236,4 @@ public class AdminController {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
-	
->>>>>>> alejandro:ISO2023/src/main/java/controllers/AdminController.java
-	
 }

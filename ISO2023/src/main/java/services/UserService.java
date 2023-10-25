@@ -1,4 +1,4 @@
-package edu.uclm.esi.iso.ISO2023.services;
+package services;
 
 import java.io.IOException; 
 import java.util.Optional;
@@ -9,12 +9,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import edu.uclm.esi.iso.ISO2023.dao.ClienteDAO;
-import edu.uclm.esi.iso.ISO2023.dao.TokenDAO;
-import edu.uclm.esi.iso.ISO2023.entities.Cliente;
-import edu.uclm.esi.iso.ISO2023.entities.Token;
-import edu.uclm.esi.iso.ISO2023.entities.User;
-@Service
+import dao.ClienteDAO;
+import dao.TokenDAO;
+import entities.User;
+import entities.Cliente;
+import entities.Token;
+
 public class UserService {
 	@Autowired
 	private ClienteDAO clienteDAO;
