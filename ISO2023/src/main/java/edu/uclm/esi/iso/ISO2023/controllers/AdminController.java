@@ -18,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import edu.uclm.esi.iso.ISO2023.dao.AdminDAO;
 import edu.uclm.esi.iso.ISO2023.dao.ClienteDAO;
+import edu.uclm.esi.iso.ISO2023.dao.VehiculoDAO;
 import edu.uclm.esi.iso.ISO2023.entities.Administrador;
 import edu.uclm.esi.iso.ISO2023.entities.Cliente;
 import edu.uclm.esi.iso.ISO2023.entities.User;
@@ -35,6 +36,10 @@ public class AdminController {
 	private AdminDAO adminDAO;
 	@Autowired
 	private ClienteDAO clienteDAO;
+//	@Autowired
+//	private VehiculoService vehiculoService;
+	@Autowired
+	private VehiculoDAO vehiculoDAO;
 	
 	
 	
@@ -111,16 +116,15 @@ public class AdminController {
 	
 	
 	
-	@DeleteMapping("")
-	public ResponseEntity<String> deleteAdmin(@PathVariable String email) {
-		Administrador admin = adminDAO.findByEmail(email).get();
-		adminDAO.delete(admin);
-		
-	return ResponseEntity.ok("Administrador elimnado correctamente");
-	
-		
-	}
-	
+//	@DeleteMapping("")
+//	public ResponseEntity<String> deleteAdmin(@PathVariable String email) {
+//		Administrador admin = adminDAO.findByEmail(email).get();
+//		adminDAO.delete(admin);
+//		return ResponseEntity.ok("Administrador elimnado correctamente");
+//	
+//		
+//	}
+//	
 	
 //	@DeleteMapping("")  //cambiar atributo activa a false
 //	public ResponseEntity<String> darDeBajaUserAdmin(@PathVariable String email) {
@@ -139,28 +143,105 @@ public class AdminController {
 //	}
 	
 	
-	
 //
-//	public Vehiculo darAltaV() {
-//		return null;
-//	}
+//	@PostMapping("/darAltaVehiculo")
+//	public ResponseEntity<String> darAltaVehiculo( @RequestBody Map<String, Object> info) {
 //
-//	public Vehiculo darBajaV() {
-//		return null;
-//	}
+//		String email =info.get("email").toString();
+//		Optional<Administrador> adminExist = adminDAO.findByEmail(email);
 //
-//	public Vehiculo consultarVehiculos() {
-//		return null;
-//	}
-//	
-//	@PostMapping("/updateAdminIntentos")
-//	public void updateAdminIntentos(String email, int intentos) {
-//		try {
-//			adminService.actualizarIntentosAdmin(email,intentos);
-//		}catch(Exception e) {
-//			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+//
+//		if (adminExist.isPresent()) {
+//			String tipoVehiculo = (String) info.get("tipo");
+//
+//
+//			switch (tipoVehiculo) {
+//			case "coche":
+//				darAltaCoche(info);
+//				break;
+//			case "moto":
+//				darAltaMoto(info);
+//				break;
+//			case "patinete":
+//				darAltaPatinete(info);
+//				break;
+//			default:
+//				return ResponseEntity.badRequest().body("Tipo de vehículo desconocido.");
+//			}
+//			return ResponseEntity.ok("Vehículo dado de alta con éxito.");
+//		} else {
+//			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tienes permiso para dar de alta vehículos.");
 //		}
+//	} 
+//
+
+//	private  void darAltaCoche(Map<String, Object> info) {
+//
+//		
+//		String matricula = info.get("matricula").toString();
+//		String tipo = info.get("tipo").toString();
+//		int bateria = Integer.parseInt(info.get("bateria").toString());
+//		String modelo = info.get("modelo").toString();
+//		String estado = info.get("estado").toString();
+//		String direccion = info.get("direccion").toString();
+//		int nPlazas = Integer.parseInt(info.get("nPlazas").toString());
+//		
+//		this.vehiculoService.darAltaCoche();		
+//		
+//	}
+//
+//
+//	private void darAltaMoto(Map<String, Object> info) {
+//		
+//		
+//		String matricula = info.get("matricula").toString();
+//		String tipo = info.get("tipo").toString();
+//		int bateria = Integer.parseInt(info.get("bateria").toString());
+//		String modelo = info.get("modelo").toString();
+//		String estado = info.get("estado").toString();
+//		String direccion = info.get("direccion").toString();
+//		String casco = info.get("casco").toString();
+//		
+//		this.vehiculoService.darAltaMoto();
+//	}
+//
+//
+//	private void darAltaPatinete(Map<String, Object> info) {
+//		
+//		String matricula = info.get("matricula").toString();
+//		String tipo = info.get("tipo").toString();
+//		int bateria = Integer.parseInt(info.get("bateria").toString());
+//		String modelo = info.get("modelo").toString();
+//		String estado = info.get("estado").toString();
+//		String direccion = info.get("direccion").toString();
+//		String color = info.get("color").toString();
+//		
+//		this.vehiculoService.darAltaPatinete();
 //	}
 //	
+//	
+//	
+//	
+//	
+//	
+//	@DeleteMapping
+//	public ResponseEntity<String>  darBajaVehiculo(@PathVariable String id) {
+//		Vehiculo vehiculo = vehiculoDAO.findById(id).get();
+//		vehiculoService.delete(vehiculo);
+//	}
+
+	public Vehiculo consultarVehiculos() {
+		return null;
+	}
+	
+	@PostMapping("/updateAdminIntentos")
+	public void updateAdminIntentos(String email, int intentos) {
+		try {
+			adminService.actualizarIntentosAdmin(email,intentos);
+		}catch(Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+		}
+	}
+	
 	
 }
