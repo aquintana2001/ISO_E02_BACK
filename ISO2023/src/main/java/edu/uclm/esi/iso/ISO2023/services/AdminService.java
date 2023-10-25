@@ -1,4 +1,4 @@
-package services;
+package edu.uclm.esi.iso.ISO2023.services;
 
 import java.io.IOException;
 import java.util.List;
@@ -6,19 +6,20 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import dao.AdminDAO;
-import dao.ClienteDAO;
-import dao.TokenDAO;
-import dao.VehiculoDAO;
-import entities.Administrador;
-import entities.Cliente;
-import entities.Token;
-import entities.User;
-import entities.Vehiculo;
-import exceptions.*;
-
+import edu.uclm.esi.iso.ISO2023.dao.AdminDAO;
+import edu.uclm.esi.iso.ISO2023.dao.ClienteDAO;
+import edu.uclm.esi.iso.ISO2023.dao.TokenDAO;
+import edu.uclm.esi.iso.ISO2023.dao.VehiculoDAO;
+import edu.uclm.esi.iso.ISO2023.entities.Administrador;
+import edu.uclm.esi.iso.ISO2023.entities.Cliente;
+import edu.uclm.esi.iso.ISO2023.entities.Token;
+import edu.uclm.esi.iso.ISO2023.entities.User;
+import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
+import edu.uclm.esi.iso.ISO2023.exceptions.*;
+@Service
 public class AdminService {
 	@Autowired
 	private AdminDAO adminDAO;

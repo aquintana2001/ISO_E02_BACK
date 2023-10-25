@@ -1,4 +1,4 @@
-package exceptions;
+package edu.uclm.esi.iso.ISO2023.exceptions;
 
 @SuppressWarnings("serial")
 public class formatoIncompleto extends Exception{
