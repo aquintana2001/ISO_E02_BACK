@@ -14,20 +14,22 @@ import edu.uclm.esi.iso.ISO2023.dao.TokenDAO;
 import edu.uclm.esi.iso.ISO2023.entities.Cliente;
 import edu.uclm.esi.iso.ISO2023.entities.Token;
 import edu.uclm.esi.iso.ISO2023.entities.User;
+import edu.uclm.esi.iso.ISO2023.exceptions.*;
 @Service
 public class UserService {
 	@Autowired
 	private ClienteDAO clienteDAO;
 	@Autowired
 	private TokenDAO tokenDAO;
+	private SeguridadService comprobarSeguridad = new SeguridadService();
 	
 	public void registrarse(String nombre, String apellidos, String email, String password, String ciudad,
-			String carnet, String telefono, String dni) {
+			String carnet, String telefono, String dni) throws contraseñaIncorrecta {
 		Cliente cliente = new Cliente(nombre, apellidos, email, password, true, 5, "Ciudad Real", carnet, telefono, dni);
 		
 		Optional<Cliente> userExist = this.clienteDAO.findByEmail(email);
 		
-		if(!cliente.pwdSecure(password))
+		if(!comprobarSeguridad.restriccionesPassword(cliente))
 			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "La contraseña no es segura");
 		
 		if(userExist.isPresent()) {
