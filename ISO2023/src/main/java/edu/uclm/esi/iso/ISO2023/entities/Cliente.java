@@ -2,7 +2,7 @@ package edu.uclm.esi.iso.ISO2023.entities;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document
+@Document(collection="cliente")
 public class Cliente extends User{
 
 	private String fechaNacimiento;
