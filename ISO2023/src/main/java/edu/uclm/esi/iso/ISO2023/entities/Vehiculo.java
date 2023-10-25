@@ -1,5 +1,7 @@
 package edu.uclm.esi.iso.ISO2023.entities;
 
+import java.util.UUID;
+
 import javax.validation.constraints.NotEmpty;
 
 
@@ -16,7 +18,7 @@ public class Vehiculo {
 	
 	
 	public Vehiculo(String tipo, String matricula, int bateria, String modelo, String estado, String direccion) {
-		
+		this.id = Integer.valueOf(UUID.randomUUID().toString());
 		this.tipo = tipo;
 		this.matricula = matricula;
 		this.bateria = bateria;
@@ -24,7 +26,6 @@ public class Vehiculo {
 		this.estado = estado;
 		this.direccion = direccion;
 	}
-
 
 
 	public int getId() {
