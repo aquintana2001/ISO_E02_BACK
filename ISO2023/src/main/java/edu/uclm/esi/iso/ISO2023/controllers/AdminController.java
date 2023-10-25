@@ -1,6 +1,6 @@
 package edu.uclm.esi.iso.ISO2023.controllers;
 
-import java.util.*;    
+import java.util.*;     
 
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,6 +25,7 @@ import edu.uclm.esi.iso.ISO2023.entities.User;
 import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
 import edu.uclm.esi.iso.ISO2023.exceptions.*;
 import edu.uclm.esi.iso.ISO2023.services.AdminService;
+import edu.uclm.esi.iso.ISO2023.services.ClienteService;
 import edu.uclm.esi.iso.ISO2023.services.SeguridadService;
 
 @RestController
@@ -34,6 +35,8 @@ public class AdminController {
 	@Autowired
 	private AdminService adminService;
 	@Autowired
+	private ClienteService clienteService;
+	@Autowired
 	private AdminDAO adminDAO;
 	@Autowired
 	private ClienteDAO clienteDAO;
@@ -41,6 +44,7 @@ public class AdminController {
 //	private VehiculoService vehiculoService;
 	@Autowired
 	private VehiculoDAO vehiculoDAO;
+	
 	
 	private SeguridadService comprobarSeguridad = new SeguridadService();
 
@@ -57,7 +61,7 @@ public class AdminController {
 		String nombre= info.get("nombre").toString();
 		String apellidos = info.get("apellidos").toString();
 		String email = info.get("email").toString();
-		String ciudad = info.get("ciudad").toString();
+		String fechaNacimiento = info.get("fechaNacimiento").toString();
 		boolean carnet = Boolean.parseBoolean(info.get("carnet").toString());
 		String telefono = info.get("telefono").toString();
 		String dni = info.get("dni").toString();
@@ -71,50 +75,45 @@ public class AdminController {
 	}
 	
 
-//@PutMapping("/modificarCliente")
-//	public Cliente updateCliente(@PathVariable String email, @RequestBody Map<String, Object> info) {
-//		Cliente cliente;
-//		if(cliente.pwdSecure(cliente.getPassword())) {
-//			if(cliente.comprobarDni(cliente.getDni())) {
-//				if(cliente.comprobarNumero(cliente.getTelefono())) {
-//					Cliente clienteBBDD = clienteDAO.findByEmail(email).get();
-//					clienteBBDD.setNombre(cliente.getNombre());
-//					clienteBBDD.setApellidos(cliente.getApellidos());
-//					clienteBBDD.setEmail(cliente.getEmail());
-//					clienteBBDD.setPassword(cliente.getPassword());
-//					clienteBBDD.setActivo(cliente.getActivo());
-//					clienteBBDD.setIntentos(cliente.getIntentos());
-//					clienteBBDD.setCarnet(cliente.getCarnet());
-//					clienteBBDD.setTelefono(cliente.getTelefono());
-//					clienteBBDD.setDni(cliente.getDni());
-//				}
-//			}
+	@PutMapping("/modificarCliente")
+	public void updateCliente(@RequestBody Map<String, Object> info) {
+		String nombre= info.get("nombre").toString();
+		String apellidos = info.get("apellidos").toString();
+		String email = info.get("email").toString();
+		String password = info.get("password").toString();
+		boolean activo = Boolean.parseBoolean(info.get("activo").toString());
+		int intentos = Integer.parseInt(info.get("intentos").toString());
+		String fechaNacimiento = info.get("fechaNacimiento").toString();
+		String carnet = info.get("carnet").toString();
+		String telefono = info.get("telefono").toString();
+		String dni = info.get("dni").toString();
+		try {
+			this.clienteService.actualizarCliente(nombre, apellidos, email, password, activo, intentos, fechaNacimiento, carnet, telefono, dni);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+		}
+	}
+
+//	@PutMapping("/modificarAdministrador")
+//	public Administrador updateAdmin(@PathVariable String email, @RequestBody Map<String, Object> info) throws contraseñaIncorrecta {
+//		User admin = null;
+//		if(comprobarSeguridad.restriccionesPassword(admin)) {
+//			Administrador administradorBBDD = adminDAO.findByEmail(email).get();
+//			administradorBBDD.setNombre(admin.getNombre());
+//			administradorBBDD.setApellidos(admin.getApellidos());
+//			administradorBBDD.setEmail(admin.getEmail());
+//			administradorBBDD.setPassword(admin.getPassword());
+//			
 //		}else {
 //			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Ha sucedido un error, no se cumple con los requisitos de nuestra politica de contraseñas");
 //		}
-//		this.ClientService.actualizar(nombre, Apellidos, Email, Password, Ciudad, Carnet, Telefono, Dni);
+//		try {
+//			adminService.actualizarAdmin(admin);
+//		} catch(Exception e) {
+//			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+//		}
+//		return null;
 //	}
-
-	@PutMapping("/modificarAdminstrador")
-	public Administrador updateAdmin(@PathVariable String email, @RequestBody Map<String, Object> info) throws contraseñaIncorrecta {
-		User admin = null;
-		if(comprobarSeguridad.restriccionesPassword(admin)) {
-			Administrador administradorBBDD = adminDAO.findByEmail(email).get();
-			administradorBBDD.setNombre(admin.getNombre());
-			administradorBBDD.setApellidos(admin.getApellidos());
-			administradorBBDD.setEmail(admin.getEmail());
-			administradorBBDD.setPassword(admin.getPassword());
-			
-		}else {
-			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Ha sucedido un error, no se cumple con los requisitos de nuestra politica de contraseñas");
-		}
-		try {
-			adminService.actualizarAdmin(admin);
-		} catch(Exception e) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-		}
-		return null;
-	}
 	
 	
 	
