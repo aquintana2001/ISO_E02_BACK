@@ -1,6 +1,6 @@
 package edu.uclm.esi.iso.ISO2023.services;
 
-import java.io.IOException;
+import java.io.IOException; 
 import java.util.List;
 import java.util.Optional;
 
@@ -30,14 +30,15 @@ public class AdminService {
 	@Autowired
 	private ClienteDAO clienteDAO;
 	
+	private SeguridadService comprobarSeguridad = new SeguridadService();
 	
 	
-	public void registrarse(String nombre, String apellidos, String email, String password1) {
+	public void registrarse(String nombre, String apellidos, String email, String password1) throws contraseñaIncorrecta {
 		Administrador administrador = new Administrador(nombre, apellidos, email, password1, true, 5);
 		
 		Optional<Administrador> adminExist = this.adminDAO.findByEmail(email);
 		
-		if(!administrador.pwdSecure(password1))
+		if(!comprobarSeguridad.restriccionesPassword(administrador))
 			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "La contraseña no es segura");
 		
 		if(adminExist.isPresent()) {
@@ -45,7 +46,7 @@ public class AdminService {
 			if (tokenExist.isPresent()) {
 				long hora = System.currentTimeMillis();
 				if (hora - tokenExist.get().getHoraCreacion() < 1000*60*60*24)
-					throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Debes validar tu cuenta");
+					//throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Debes validar tu cuenta");
 				this.tokenDAO.delete(tokenExist.get());
 				Token token= new Token();
 				token.setUser(administrador);
@@ -56,12 +57,12 @@ public class AdminService {
 			token.setUser(administrador);
 			this.adminDAO.save(administrador);
 			this.tokenDAO.save(token);
+			System.out.println("CREADO");
+
 		}else if(adminExist.isPresent()) {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Esos credenciales no pueden ser usados");
 		}
 	}
-	
-	
 	
 	public List<Cliente> listarClientes() {
         return clienteDAO.findAll();
