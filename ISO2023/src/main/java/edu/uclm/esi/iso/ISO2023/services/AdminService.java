@@ -46,7 +46,7 @@ public class AdminService {
 			if (tokenExist.isPresent()) {
 				long hora = System.currentTimeMillis();
 				if (hora - tokenExist.get().getHoraCreacion() < 1000*60*60*24)
-					throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Debes validar tu cuenta");
+					//throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Debes validar tu cuenta");
 				this.tokenDAO.delete(tokenExist.get());
 				Token token= new Token();
 				token.setUser(administrador);
@@ -57,12 +57,12 @@ public class AdminService {
 			token.setUser(administrador);
 			this.adminDAO.save(administrador);
 			this.tokenDAO.save(token);
+			System.out.println("CREADO");
+
 		}else if(adminExist.isPresent()) {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Esos credenciales no pueden ser usados");
 		}
 	}
-	
-	
 	
 	public List<Cliente> listarClientes() {
         return clienteDAO.findAll();
