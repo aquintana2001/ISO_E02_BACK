@@ -1,6 +1,8 @@
 package edu.uclm.esi.iso.ISO2023.entities;
 
+import org.springframework.data.mongodb.core.mapping.Document;
 
+@Document
 public class Cliente extends User{
 
 	private String fechaNacimiento;
@@ -22,6 +24,7 @@ public class Cliente extends User{
 
 	public String getFechaNacimiento() {
 		return fechaNacimiento;
+	}
 
 	public void setFechaNacimiento(String fechaNacimiento) {
 		this.fechaNacimiento = fechaNacimiento;

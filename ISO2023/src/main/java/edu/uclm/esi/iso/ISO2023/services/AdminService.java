@@ -16,9 +16,9 @@ import edu.uclm.esi.iso.ISO2023.dao.VehiculoDAO;
 import edu.uclm.esi.iso.ISO2023.entities.Administrador;
 import edu.uclm.esi.iso.ISO2023.entities.Cliente;
 import edu.uclm.esi.iso.ISO2023.entities.Token;
-import edu.uclm.esi.iso.ISO2023.entities.User;
-import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
 import edu.uclm.esi.iso.ISO2023.exceptions.*;
+
+
 @Service
 public class AdminService {
 	@Autowired
@@ -33,8 +33,9 @@ public class AdminService {
 	private SeguridadService comprobarSeguridad = new SeguridadService();
 	
 	
-	public void registrarse(String nombre, String apellidos, String email, String password1) throws contraseñaIncorrecta {
-		Administrador administrador = new Administrador(nombre, apellidos, email, password1, true, 5);
+	
+	public void registrarse(String nombre, String apellidos, String email, String password) throws contraseñaIncorrecta {
+		Administrador administrador = new Administrador(nombre, apellidos, email, password, true, 5);
 		
 		Optional<Administrador> adminExist = this.adminDAO.findByEmail(email);
 		
@@ -57,7 +58,6 @@ public class AdminService {
 			token.setUser(administrador);
 			this.adminDAO.save(administrador);
 			this.tokenDAO.save(token);
-			System.out.println("CREADO");
 
 		}else if(adminExist.isPresent()) {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Esos credenciales no pueden ser usados");
@@ -68,36 +68,66 @@ public class AdminService {
         return clienteDAO.findAll();
     }
 	
-	public List<Vehiculo>listarVehiculos() {
-        return vehiculoDAO.findAll();
-    }
+// TDD
+//	public List<Vehiculo>listarVehiculos() {
+//        return vehiculoDAO.findAll();
+//    }
 	
-	public void actualizarAdmin(User admin) throws contraseñaIncorrecta, formatoIncompleto{
-		if (admin.getNombre().equals("") || admin.getApellidos().equals("") || admin.getPassword().equals("")
-			|| admin.getEmail().equals("") || admin.getActivo().equals(""))
-			throw new formatoIncompleto("Rellena todos los campos obligatorios");
-		adminDAO.save(admin);
+	public void actualizarAdmin(String nombre, String apellidos, String email, String password, boolean activo, int intentos) throws contraseñaIncorrecta, formatoIncompleto{
+		Optional<Administrador> adminExiste = adminDAO.findByEmail(email);
+		if(adminExiste.isPresent()) {
+			Administrador admin = adminExiste.get();
+			admin.setNombre(nombre);
+			admin.setApellidos(apellidos);
+			admin.setEmail(email);
+			admin.setPassword(password);
+			admin.setActivo(activo);
+			admin.setIntentos(intentos);
+			this.adminDAO.save(admin);
+		}else{
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Ese cliente no existe");
+		}
 	}
 	
-	public void actualizarIntentosAdmin(String email, int intentos) throws formatoIncompleto {
+	
+	public void actualizarCliente(String nombre, String apellidos, String email, String password, boolean activo, int intentos, String fechaNacimiento,
+ String carnet, String telefono, String dni) throws contraseñaIncorrecta, formatoIncompleto{
+		Optional<Cliente> clienteExiste = clienteDAO.findByEmail(email);
+		if(clienteExiste.isPresent()) {
+			Cliente cliente = clienteExiste.get();
+			cliente.setNombre(nombre);
+			cliente.setApellidos(apellidos);
+			cliente.setEmail(email);
+			cliente.setPassword(password);
+			cliente.setActivo(activo);
+			cliente.setIntentos(intentos);
+			cliente.setFechaNacimiento(fechaNacimiento);
+			cliente.setCarnet(carnet);
+			cliente.setTelefono(telefono);
+			cliente.setDni(dni);
+			this.clienteDAO.save(cliente);
+			
+		}else{
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Ese cliente no existe");
+		}
+	}
 		
-		Optional<Administrador> admin = adminDAO.findByEmail(email);
-		
-		if(!admin.isPresent())
-			throw new formatoIncompleto("Imposible encontrar al admin");
-		
-		admin.get().setIntentos(intentos);
-		
-		adminDAO.save(admin.get());
+	public void eliminarAdmin(String email) {
+		Optional<Administrador> adminExiste = adminDAO.findByEmail(email);
+		if(adminExiste.isPresent()) {
+			adminDAO.deleteById(email);
+		}else{
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Ese cliente no existe");
+		}
 	}
 	
-	public void actualizarCliente(Cliente cliente) throws contraseñaIncorrecta, formatoIncompleto{
-		if (cliente.getNombre().equals("") || cliente.getApellidos().equals("") || cliente.getPassword().equals("")
-			|| cliente.getEmail().equals("") || cliente.getActivo().equals("") || cliente.getDni().equals("") 
-			|| cliente.getTelefono().equals(""))
-			throw new formatoIncompleto("Rellena todos los campos obligatorios");
-		clienteDAO.save(cliente);
+	public void eliminarCliente(String email) {
+		Optional<Cliente> clienteExiste = clienteDAO.findByEmail(email);
+		if(clienteExiste.isPresent()) {
+			adminDAO.deleteById(email);
+		}else{
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Ese cliente no existe");
+		}
 	}
-		
 	
 }
