@@ -21,9 +21,9 @@ public class UserService {
 	@Autowired
 	private TokenDAO tokenDAO;
 	
-	public void registrarse(String nombre, String apellidos, String email, String password, String ciudad,
+	public void registrarse(String nombre, String apellidos, String email, String password, String fechaNacimiento,
 			String carnet, String telefono, String dni) {
-		Cliente cliente = new Cliente(nombre, apellidos, email, password, true, 5, "Ciudad Real", carnet, telefono, dni);
+		Cliente cliente = new Cliente(nombre, apellidos, email, password, true, 5, fechaNacimiento, carnet, telefono, dni);
 		
 		Optional<Cliente> userExist = this.clienteDAO.findByEmail(email);
 		
