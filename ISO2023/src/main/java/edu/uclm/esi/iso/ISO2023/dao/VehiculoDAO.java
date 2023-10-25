@@ -7,6 +7,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
 
 
-public interface VehiculoDAO extends MongoRepository<Vehiculo,String>{
+public interface VehiculoDAO extends MongoRepository<Vehiculo,Integer>{
 	Optional<Vehiculo> findById(int id);
 }

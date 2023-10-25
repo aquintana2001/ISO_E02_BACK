@@ -4,19 +4,19 @@ import org.springframework.data.annotation.Id;
 
 public class Coche extends Vehiculo{
 	
-	private int nPlaza;
+	private int nPlazas;
 
-	public Coche(String tipo, String matricula, int bateria, String modelo, String estado, String direccion) {
+	public Coche(String tipo, String matricula, int bateria, String modelo, String estado, String direccion, int nPlazas) {
 		super(tipo, matricula, bateria, modelo, estado, direccion);
-		// TODO Auto-generated constructor stub
+		this.nPlazas = nPlazas;
 	}
 
 	public int getnPlaza() {
-		return nPlaza;
+		return nPlazas;
 	}
 
-	public void setnPlaza(int nPlaza) {
-		this.nPlaza = nPlaza;
+	public void setnPlaza(int nPlazas) {
+		this.nPlazas = nPlazas;
 	}
 	
 	

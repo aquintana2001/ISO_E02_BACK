@@ -6,9 +6,9 @@ public class Patinete extends Vehiculo{
 
 	private String color;
 
-	public Patinete(String tipo, String matricula, int bateria, String modelo, String estado, String direccion) {
+	public Patinete(String tipo, String matricula, int bateria, String modelo, String estado, String direccion, String color) {
 		super(tipo, matricula, bateria, modelo, estado, direccion);
-		// TODO Auto-generated constructor stub
+		this.color = color;
 	}
 
 	public String getColor() {
