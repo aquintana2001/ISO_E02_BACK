@@ -1,11 +1,12 @@
 package edu.uclm.esi.iso.ISO2023.services;
 
-import java.io.IOException;
+import java.io.IOException; 
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import edu.uclm.esi.iso.ISO2023.dao.AdminDAO;
@@ -19,6 +20,9 @@ import edu.uclm.esi.iso.ISO2023.entities.User;
 import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
 import edu.uclm.esi.iso.ISO2023.exceptions.*;
 
+
+
+@Service
 public class ClienteService {
 	@Autowired
 	private AdminDAO adminDAO;
@@ -31,8 +35,9 @@ public class ClienteService {
 	
 	private SeguridadService comprobarSeguridad = new SeguridadService();
 	
-	public void actualizarCliente(Cliente cliente) throws contraseñaIncorrecta, formatoIncompleto, numeroInvalido {
-		
+	public void actualizarCliente(String nombre, String apellidos, String email, String password, boolean activo,
+			int intentos, String fechaNacimiento, String carnet, String telefono, String dni) throws contraseñaIncorrecta, formatoIncompleto, numeroInvalido {
+		Cliente cliente = new Cliente(nombre, apellidos, email, password, activo, intentos, fechaNacimiento, carnet, telefono, dni);
 		if (cliente.getNombre().equals("") || cliente.getApellidos().equals("")
 				|| cliente.getEmail().equals("") || cliente.getPassword().equals("")
 				|| cliente.getActivo().equals("") || cliente.getCarnet().equals("")
@@ -53,4 +58,6 @@ public class ClienteService {
 		
 		clienteDAO.save(cliente);
 	}
+
+	
 }

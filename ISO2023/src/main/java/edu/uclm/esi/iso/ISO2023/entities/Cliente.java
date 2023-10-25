@@ -9,6 +9,7 @@ public class Cliente extends User{
 	private String dni;
 	
 	public Cliente(String nombre, String apellidos, String email, String password, boolean activo, int intentos, String fechaNacimiento,
+
 			String carnet, String telefono, String dni) {
 		super(nombre, apellidos, email, password, activo, intentos);
 		// TODO Auto-generated constructor stub
@@ -21,13 +22,12 @@ public class Cliente extends User{
 
 	public String getFechaNacimiento() {
 		return fechaNacimiento;
-	}
 
-	public void setFechaNacimiento() {
+	public void setFechaNacimiento(String fechaNacimiento) {
 		this.fechaNacimiento = fechaNacimiento;
+
 	}
 
-  
 	public String getCarnet() {
 		return carnet;
 	}
