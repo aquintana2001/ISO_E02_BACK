@@ -1,4 +1,4 @@
-package controllers;
+package edu.uclm.esi.iso.ISO2023.controllers;
 
 import java.util.*;    
 
@@ -7,22 +7,28 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.server.ResponseStatusException;
 
 import edu.uclm.esi.iso.ISO2023.dao.AdminDAO;
 import edu.uclm.esi.iso.ISO2023.dao.ClienteDAO;
+import edu.uclm.esi.iso.ISO2023.dao.VehiculoDAO;
 import edu.uclm.esi.iso.ISO2023.entities.Administrador;
 import edu.uclm.esi.iso.ISO2023.entities.Cliente;
 import edu.uclm.esi.iso.ISO2023.entities.User;
 import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
 import edu.uclm.esi.iso.ISO2023.exceptions.*;
 import edu.uclm.esi.iso.ISO2023.services.AdminService;
+
 @RestController
+@RequestMapping("admin")
+@CrossOrigin("*")
 public class AdminController {
 	@Autowired
 	private AdminService adminService;
@@ -135,6 +141,8 @@ public class AdminController {
 	
 	
 	}
+	
+	
 
 	@PostMapping("/darAltaVehiculo")
 	public ResponseEntity<String> darAltaVehiculo( @RequestBody Map<String, Object> info) {
@@ -212,17 +220,15 @@ public class AdminController {
 	}
 	
 	
+	
+	
+	
+	
 	@DeleteMapping
 	public ResponseEntity<String>  darBajaVehiculo(@PathVariable String id) {
 		Vehiculo vehiculo = vehiculoDAO.findById(id).get();
 		vehiculoService.delete(vehiculo);
 	}
-	public Vehiculo darAltaV() {
-		return null;
-	}
-
-	public Vehiculo darBajaV() {
-		return null;}
 
 	public Vehiculo consultarVehiculos() {
 		return null;
@@ -236,4 +242,6 @@ public class AdminController {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
+	
+	
 }
