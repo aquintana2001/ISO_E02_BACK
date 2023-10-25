@@ -5,11 +5,14 @@ import java.util.UUID;
 
 import javax.validation.constraints.NotEmpty;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 
 
+@Document
 public class User {
+	@Id
 	private String email;
 	private String nombre;
 	private String apellidos;

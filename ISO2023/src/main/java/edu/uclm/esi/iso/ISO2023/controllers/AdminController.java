@@ -69,9 +69,8 @@ public class AdminController {
 
 	}
 
-
-	@PutMapping("/modificarCliente")
-	public void updateCliente(@RequestBody Map<String, Object> info) {
+	@PutMapping("/actualizarCliente")
+	public void actualizarCliente(@RequestBody Map<String, Object> info) {
 		String nombre= info.get("nombre").toString();
 		String apellidos = info.get("apellidos").toString();
 		String email = info.get("email").toString();
@@ -82,6 +81,7 @@ public class AdminController {
 		String carnet = info.get("carnet").toString();
 		String telefono = info.get("telefono").toString();
 		String dni = info.get("dni").toString();
+
 		try {
 			this.clienteService.actualizarCliente(nombre, apellidos, email, password, activo, intentos, fechaNacimiento, carnet, telefono, dni);
 		} catch (Exception e) {
@@ -89,72 +89,42 @@ public class AdminController {
 		}
 	}
 
-//	@PutMapping("/modificarAdministrador")
-//	public Administrador updateAdmin(@PathVariable String email, @RequestBody Map<String, Object> info) throws contraseñaIncorrecta {
-//		User admin = null;
-//		if(comprobarSeguridad.restriccionesPassword(admin)) {
-//			Administrador administradorBBDD = adminDAO.findByEmail(email).get();
-//			administradorBBDD.setNombre(admin.getNombre());
-//			administradorBBDD.setApellidos(admin.getApellidos());
-//			administradorBBDD.setEmail(admin.getEmail());
-//			administradorBBDD.setPassword(admin.getPassword());
-//			
-//		}else {
-//			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Ha sucedido un error, no se cumple con los requisitos de nuestra politica de contraseñas");
-//		}
-//		try {
-//			adminService.actualizarAdmin(admin);
-//		} catch(Exception e) {
-//			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-//		}
-//		return null;
-//	}
+	@PutMapping("/actualizarAdminstrador")
+	public void actualizarAdmin(@RequestBody Map<String, Object> info){
+		String nombre= info.get("nombre").toString();
+		String apellidos = info.get("apellidos").toString();
+		String email = info.get("email").toString();
+		String password = info.get("password").toString();
+		boolean activo = Boolean.parseBoolean(info.get("activo").toString());
+		int intentos = Integer.parseInt(info.get("intentos").toString());
 
-
-	/*@PutMapping("/modificarAdminstrador")
-	public Administrador updateAdmin(@PathVariable String email, @RequestBody Map<String, Object> info)
-			throws contraseñaIncorrecta {
-		User admin = null;
-		if (comprobarSeguridad.restriccionesPassword(admin)) {
-			Administrador administradorBBDD = adminDAO.findByEmail(email).get();
-			administradorBBDD.setNombre(admin.getNombre());
-			administradorBBDD.setApellidos(admin.getApellidos());
-			administradorBBDD.setEmail(admin.getEmail());
-			administradorBBDD.setPassword(admin.getPassword());
-
-		} else {
-			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE,
-					"Ha sucedido un error, no se cumple con los requisitos de nuestra politica de contraseñas");
-		}
 		try {
-			adminService.actualizarAdmin(admin);
+			this.adminService.actualizarAdmin(nombre, apellidos, email, password, activo, intentos);
 		} catch (Exception e) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
-		return null;
 	}
 
-	@DeleteMapping("")
-	public ResponseEntity<String> deleteAdmin(@PathVariable String email) {
-		Administrador admin = adminDAO.findByEmail(email).get();
-		adminDAO.delete(admin);
-		return ResponseEntity.ok("Administrador elimnado correctamente");
-
-	}*/
-
+	@DeleteMapping("/eliminarAdmin")
+	public void eliminarAdmin(@RequestBody Map<String, Object> info) {
+		String email = info.get("email").toString();
+		try {
+			this.adminService.eliminarAdmin(email);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+		}
+	}
 	
-//	@DeleteMapping("")  //cambiar atributo activa a false
-//	public ResponseEntity<String> darDeBajaUserAdmin(@PathVariable String email) {
-//		Cliente cliente = clienteDAO.findByEmail(email).get();
-//			cliente.setActivo(false);
-//			clienteDAO.save(cliente);
-//			return ResponseEntity.ok("Cliente dado de baja corrrectamente.");
-//		} else {
-//			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No hemos detectado ningun cliente.");
-//
-//		}
-//
-//	}
+	@DeleteMapping("/eliminarCliente")
+	public void eliminarCliente(@RequestBody Map<String, Object> info) {
+		String email = info.get("email").toString();
+		try {
+			this.adminService.eliminarCliente(email);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+		}
+	}
+
 
 	@PostMapping("/darAltaVehiculo")
 	public ResponseEntity<String> darAltaVehiculo(@RequestBody Map<String, Object> info) {
@@ -233,13 +203,5 @@ public class AdminController {
 		return null;
 	}
 
-	@PostMapping("/updateAdminIntentos")
-	public void updateAdminIntentos(String email, int intentos) {
-		try {
-			adminService.actualizarIntentosAdmin(email, intentos);
-		} catch (Exception e) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-		}
-	}
 
 }
