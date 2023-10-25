@@ -1,9 +1,11 @@
 package edu.uclm.esi.iso.ISO2023.controllers;
 
+import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import edu.uclm.esi.iso.ISO2023.entities.Cliente;
+import edu.uclm.esi.iso.ISO2023.services.ClienteService;
 import edu.uclm.esi.iso.ISO2023.services.UserService;
 
 @RestController
@@ -19,7 +22,13 @@ import edu.uclm.esi.iso.ISO2023.services.UserService;
 public class UserController {
 
 	@Autowired
+	private ClienteService clienteService;
 	private UserService userService;
+	
+	@GetMapping("/cliente")
+	public List<Cliente> listaCliente(){
+		return clienteService.listaClientes();
+	}
 
 	@PostMapping("/register")
 	public void registrarse(@RequestBody Map<String, Object> info) {

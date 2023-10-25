@@ -35,6 +35,10 @@ public class ClienteService {
 	
 	private SeguridadService comprobarSeguridad = new SeguridadService();
 	
+	public List <Cliente> listaClientes() {
+		return this.clienteDAO.findAll();
+	}
+
 	public void actualizarCliente(String nombre, String apellidos, String email, String password, boolean activo,
 			int intentos, String fechaNacimiento, String carnet, String telefono, String dni) throws contraseñaIncorrecta, formatoIncompleto, numeroInvalido {
 		Cliente cliente = new Cliente(nombre, apellidos, email, password, activo, intentos, fechaNacimiento, carnet, telefono, dni);
@@ -58,6 +62,7 @@ public class ClienteService {
 		
 		clienteDAO.save(cliente);
 	}
+
 
 	
 }
