@@ -1,6 +1,6 @@
 package edu.uclm.esi.iso.ISO2023.controllers;
 
-import java.util.*;    
+import java.util.*;
 
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,6 +25,7 @@ import edu.uclm.esi.iso.ISO2023.entities.User;
 import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
 import edu.uclm.esi.iso.ISO2023.exceptions.*;
 import edu.uclm.esi.iso.ISO2023.services.AdminService;
+import edu.uclm.esi.iso.ISO2023.services.SeguridadService;
 import edu.uclm.esi.iso.ISO2023.services.VehiculoService;
 
 @RestController
@@ -38,38 +39,31 @@ public class AdminController {
 	@Autowired
 	private ClienteDAO clienteDAO;
 	@Autowired
-		private VehiculoService vehiculoService;
+	private VehiculoService vehiculoService;
 	@Autowired
 	private VehiculoDAO vehiculoDAO;
-	
+
 	private SeguridadService comprobarSeguridad = new SeguridadService();
 
-	
-	
 	@PostMapping("/register")
 	public void registrarse(@RequestBody Map<String, Object> info) {
-		String tipo = info.get("tipo").toString();
 		String password1 = info.get("password1").toString();
 		String passwordd2 = info.get("password2").toString();
 		if (!password1.equals(passwordd2))
 			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Las contraseñas no coinciden");
-		
-		String nombre= info.get("nombre").toString();
+
+		String nombre = info.get("nombre").toString();
 		String apellidos = info.get("apellidos").toString();
 		String email = info.get("email").toString();
-		String ciudad = info.get("ciudad").toString();
-		boolean carnet = Boolean.parseBoolean(info.get("carnet").toString());
-		String telefono = info.get("telefono").toString();
-		String dni = info.get("dni").toString();
-		
+
 		try {
 			this.adminService.registrarse(nombre, apellidos, email, password1);
-		}catch (Exception e) {
+		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
-		
+
 	}
-	
+
 
 //@PutMapping("/modificarCliente")
 //	public Cliente updateCliente(@PathVariable String email, @RequestBody Map<String, Object> info) {
@@ -96,66 +90,57 @@ public class AdminController {
 //	}
 
 	@PutMapping("/modificarAdminstrador")
-	public Administrador updateAdmin(@PathVariable String email, @RequestBody Map<String, Object> info) throws contraseñaIncorrecta {
+	public Administrador updateAdmin(@PathVariable String email, @RequestBody Map<String, Object> info)
+			throws contraseñaIncorrecta {
 		User admin = null;
-		if(comprobarSeguridad.restriccionesPassword(admin)) {
+		if (comprobarSeguridad.restriccionesPassword(admin)) {
 			Administrador administradorBBDD = adminDAO.findByEmail(email).get();
 			administradorBBDD.setNombre(admin.getNombre());
 			administradorBBDD.setApellidos(admin.getApellidos());
 			administradorBBDD.setEmail(admin.getEmail());
 			administradorBBDD.setPassword(admin.getPassword());
-			
-		}else {
-			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Ha sucedido un error, no se cumple con los requisitos de nuestra politica de contraseñas");
+
+		} else {
+			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE,
+					"Ha sucedido un error, no se cumple con los requisitos de nuestra politica de contraseñas");
 		}
 		try {
 			adminService.actualizarAdmin(admin);
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 		return null;
 	}
-	
-	
-	
+
 	@DeleteMapping("")
 	public ResponseEntity<String> deleteAdmin(@PathVariable String email) {
 		Administrador admin = adminDAO.findByEmail(email).get();
 		adminDAO.delete(admin);
 		return ResponseEntity.ok("Administrador elimnado correctamente");
-	
-		
+
 	}
-	
-	
-	@DeleteMapping("")  //cambiar atributo activa a false
-	public ResponseEntity<String> darDeBajaUserAdmin(@PathVariable String email) {
-		Cliente cliente = clienteDAO.findByEmail(email).get();
-		
-		if(cliente!=null) {
-			cliente.setActivo(false);
-			clienteDAO.save(cliente);
-			return ResponseEntity.ok("Cliente dado de baja corrrectamente.");
-		}else {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No hemos detectado ningun cliente.");
-			
-		}
-	
-	
-	}
-	
-	
+
+//	@DeleteMapping("") // cambiar atributo activa a false
+//	public ResponseEntity<String> darDeBajaUserAdmin(@PathVariable String email) {
+//		Cliente cliente = clienteDAO.findByEmail(email).get();
+//			cliente.setActivo(false);
+//			clienteDAO.save(cliente);
+//			return ResponseEntity.ok("Cliente dado de baja corrrectamente.");
+//		} else {
+//			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No hemos detectado ningun cliente.");
+//
+//		}
+//
+//	}
 
 	@PostMapping("/darAltaVehiculo")
-	public ResponseEntity<String> darAltaVehiculo( @RequestBody Map<String, Object> info) {
+	public ResponseEntity<String> darAltaVehiculo(@RequestBody Map<String, Object> info) {
 
-		String email =info.get("email").toString();
+		String email = info.get("email").toString();
 		Optional<Administrador> adminExist = adminDAO.findByEmail(email);
-
 
 		if (adminExist.isPresent()) {
 			String tipoVehiculo = (String) info.get("tipo");
-
 
 			switch (tipoVehiculo) {
 			case "coche":
@@ -174,12 +159,10 @@ public class AdminController {
 		} else {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tienes permiso para dar de alta vehículos.");
 		}
-	} 
+	}
 
+	private void darAltaCoche(Map<String, Object> info) {
 
-	private  void darAltaCoche(Map<String, Object> info) {
-
-		
 		String matricula = info.get("matricula").toString();
 		String tipo = info.get("tipo").toString();
 		int bateria = Integer.parseInt(info.get("bateria").toString());
@@ -187,15 +170,13 @@ public class AdminController {
 		String estado = info.get("estado").toString();
 		String direccion = info.get("direccion").toString();
 		int nPlazas = Integer.parseInt(info.get("nPlazas").toString());
-		
-		this.vehiculoService.darAltaCoche(matricula, tipo, bateria, modelo, estado, direccion, nPlazas);		
-		
+
+		this.vehiculoService.darAltaCoche(matricula, tipo, bateria, modelo, estado, direccion, nPlazas);
+
 	}
 
-
 	private void darAltaMoto(Map<String, Object> info) {
-		
-		
+
 		String matricula = info.get("matricula").toString();
 		String tipo = info.get("tipo").toString();
 		int bateria = Integer.parseInt(info.get("bateria").toString());
@@ -203,13 +184,12 @@ public class AdminController {
 		String estado = info.get("estado").toString();
 		String direccion = info.get("direccion").toString();
 		boolean casco = Boolean.parseBoolean(info.get("casco").toString());
-		
+
 		this.vehiculoService.darAltaMoto(matricula, tipo, bateria, modelo, estado, direccion, casco);
 	}
 
-
 	private void darAltaPatinete(Map<String, Object> info) {
-		
+
 		String matricula = info.get("matricula").toString();
 		String tipo = info.get("tipo").toString();
 		int bateria = Integer.parseInt(info.get("bateria").toString());
@@ -217,32 +197,26 @@ public class AdminController {
 		String estado = info.get("estado").toString();
 		String direccion = info.get("direccion").toString();
 		String color = info.get("color").toString();
-		
+
 		this.vehiculoService.darAltaPatinete(matricula, tipo, bateria, modelo, estado, direccion, color);
 	}
-	
-	
-	
-	
-	
-	
-	@DeleteMapping
-	public void darBajaVehiculo(@PathVariable int id) {
-		vehiculoService.darBajaVehiculo(id);
-	}
+
+//	@DeleteMapping
+//	public void darBajaVehiculo(@PathVariable int id) {
+//		vehiculoService.darBajaVehiculo(id);
+//	}
 
 	public Vehiculo consultarVehiculos() {
 		return null;
 	}
-	
+
 	@PostMapping("/updateAdminIntentos")
 	public void updateAdminIntentos(String email, int intentos) {
 		try {
-			adminService.actualizarIntentosAdmin(email,intentos);
-		}catch(Exception e) {
+			adminService.actualizarIntentosAdmin(email, intentos);
+		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
 		}
 	}
-	
-	
+
 }
