@@ -2,8 +2,6 @@ package edu.uclm.esi.iso.ISO2023.entities;
 
 import java.util.UUID;
 
-import edu.uclm.esi.iso.ISO2023.entities.User;
-
 public class Token {
 	private String id;
 	private Long horaCreacion;

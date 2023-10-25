@@ -10,14 +10,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import edu.uclm.esi.iso.ISO2023.entities.Cliente;
 import edu.uclm.esi.iso.ISO2023.services.UserService;
 
 @RestController
 @RequestMapping("users")
 @CrossOrigin("*")
 public class UserController {
+
 	@Autowired
 	private UserService userService;
+
 	@PostMapping("/register")
 	public void registrarse(@RequestBody Map<String, Object> info) {
 		String password1 = info.get("password1").toString();
@@ -40,5 +43,4 @@ public class UserController {
 		}
 
 	}
-
 }

@@ -17,8 +17,14 @@ public class Vehiculo {
 	
 	
 	
-	public Vehiculo() {
+	public Vehiculo(String tipo, String matricula, int bateria, String modelo, String estado, String direccion) {
 		this.id = Integer.valueOf(UUID.randomUUID().toString());
+		this.tipo = tipo;
+		this.matricula = matricula;
+		this.bateria = bateria;
+		this.modelo = modelo;
+		this.estado = estado;
+		this.direccion = direccion;
 	}
 
 
@@ -26,10 +32,14 @@ public class Vehiculo {
 		return id;
 	}
 
+
+
 	public void setId(int id) {
 		this.id = id;
 	}
-	
+
+
+
 	public String getTipo() {
 		return tipo;
 	}
