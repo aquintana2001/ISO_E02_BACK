@@ -1,7 +1,9 @@
-package entities;
+package edu.uclm.esi.iso.ISO2023.entities;
 
 
-import org.springframework.data.annotation.Id; 
+import org.springframework.data.annotation.Id;
+
+import edu.uclm.esi.iso.ISO2023.entities.Vehiculo; 
 
 
 public class Moto extends Vehiculo{

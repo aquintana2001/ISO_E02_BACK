@@ -1,4 +1,4 @@
-package entities;
+package edu.uclm.esi.iso.ISO2023.entities;
 
 import javax.validation.constraints.NotEmpty;
 

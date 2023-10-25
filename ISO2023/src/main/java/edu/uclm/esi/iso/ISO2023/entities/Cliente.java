@@ -1,5 +1,6 @@
-package entities;
+package edu.uclm.esi.iso.ISO2023.entities;
 
+import edu.uclm.esi.iso.ISO2023.entities.User;
 
 public class Cliente extends User{
 
@@ -24,10 +25,8 @@ public class Cliente extends User{
 	}
 
 
-
   
 	public String getCarnet() {
-
 		return carnet;
 	}
 
