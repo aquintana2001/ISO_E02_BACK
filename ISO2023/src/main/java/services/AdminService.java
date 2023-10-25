@@ -15,6 +15,7 @@ import dao.VehiculoDAO;
 import entities.Administrador;
 import entities.Cliente;
 import entities.Token;
+import entities.User;
 import entities.Vehiculo;
 import exceptions.*;
 
@@ -69,7 +70,7 @@ public class AdminService {
         return vehiculoDAO.findAll();
     }
 	
-	public void actualizarAdmin(Administrador admin) throws contraseñaIncorrecta, formatoIncompleto{
+	public void actualizarAdmin(User admin) throws contraseñaIncorrecta, formatoIncompleto{
 		if (admin.getNombre().equals("") || admin.getApellidos().equals("") || admin.getPassword().equals("")
 			|| admin.getEmail().equals("") || admin.getActivo().equals(""))
 			throw new formatoIncompleto("Rellena todos los campos obligatorios");
@@ -91,7 +92,7 @@ public class AdminService {
 	public void actualizarCliente(Cliente cliente) throws contraseñaIncorrecta, formatoIncompleto{
 		if (cliente.getNombre().equals("") || cliente.getApellidos().equals("") || cliente.getPassword().equals("")
 			|| cliente.getEmail().equals("") || cliente.getActivo().equals("") || cliente.getDni().equals("") 
-			|| cliente.getTelefono().equals("") || cliente.getCarnet().equals(""))
+			|| cliente.getTelefono().equals(""))
 			throw new formatoIncompleto("Rellena todos los campos obligatorios");
 		clienteDAO.save(cliente);
 	}
