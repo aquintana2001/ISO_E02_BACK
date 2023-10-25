@@ -8,6 +8,6 @@ import edu.uclm.esi.iso.ISO2023.entities.Administrador;
 import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
 
 
-public interface VehiculoDAO extends MongoRepository<Vehiculo,String>{
-	Optional<Vehiculo> findByMatricula(String matricula);
+public interface VehiculoDAO extends MongoRepository<Vehiculo,Integer>{
+	Optional<Vehiculo> findById(int id);
 }

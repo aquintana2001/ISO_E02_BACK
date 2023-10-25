@@ -64,7 +64,7 @@ public class AdminController {
 	}
 	
 
-//	@PutMapping("/modificarCliente")
+//@PutMapping("/modificarCliente")
 //	public Cliente updateCliente(@PathVariable String email, @RequestBody Map<String, Object> info) {
 //		Cliente cliente;
 //		if(cliente.pwdSecure(cliente.getPassword())) {
