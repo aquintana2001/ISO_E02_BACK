@@ -3,28 +3,34 @@ package edu.uclm.esi.iso.ISO2023.entities;
 
 public class Cliente extends User{
 
-	private String ciudad;
+
 	private String carnet;
 	private String telefono;
 	private String dni;
+	private String fechaNacimiento;
 	
-	public Cliente(String nombre, String apellidos, String email, String password, boolean activo, int intentos, String ciudad,
+	public Cliente(String nombre, String apellidos, String email, String password, boolean activo, int intentos, String fechaNacimiento, 
 			String carnet, String telefono, String dni) {
 		super(nombre, apellidos, email, password, activo, intentos);
 		// TODO Auto-generated constructor stub
 		
-		this.ciudad = "Ciudad Real"; 
+		this.fechaNacimiento = fechaNacimiento; 
 		this.carnet = carnet;
 		this.telefono=telefono;
 		this.dni=dni;
 	}
 
-	public String getCiudad() {
-		return ciudad;
+  
+	public String getFechaNacimiento() {
+		return fechaNacimiento;
 	}
 
 
-  
+	public void setFechaNacimiento(String fechaNacimiento) {
+		this.fechaNacimiento = fechaNacimiento;
+	}
+
+
 	public String getCarnet() {
 		return carnet;
 	}
@@ -56,7 +62,7 @@ public class Cliente extends User{
 
 	@Override
 	public String toString() {
-		return "Cliente [dni=" + dni +", ciudad=" + ciudad + ", telefono=" + telefono +"]";
+		return "Cliente [dni=" + dni +", fechaNacimiento=" + fechaNacimiento + ", telefono=" + telefono +"]";
 	}
 
 //	//Comprobar longitud telefono

@@ -31,7 +31,7 @@ public class SeguridadService {
 				contieneMayus = true;
 			
 			if(Character.isLowerCase(usuario.getPassword().charAt(i)))
-				contieneMayus = true;
+				contieneMinus = true;
 			
 			if(Character.isDigit(usuario.getPassword().charAt(i)))
 				contieneNumero = true;	
