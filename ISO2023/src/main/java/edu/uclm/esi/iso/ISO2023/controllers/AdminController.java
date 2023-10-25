@@ -25,6 +25,7 @@ import edu.uclm.esi.iso.ISO2023.entities.User;
 import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
 import edu.uclm.esi.iso.ISO2023.exceptions.*;
 import edu.uclm.esi.iso.ISO2023.services.AdminService;
+import edu.uclm.esi.iso.ISO2023.services.SeguridadService;
 
 @RestController
 @RequestMapping("admin")
@@ -41,7 +42,8 @@ public class AdminController {
 	@Autowired
 	private VehiculoDAO vehiculoDAO;
 	
-	
+	private SeguridadService comprobarSeguridad = new SeguridadService();
+
 	
 	
 	@PostMapping("/register")
@@ -69,7 +71,7 @@ public class AdminController {
 	}
 	
 
-//	@PutMapping("/modificarCliente")
+//@PutMapping("/modificarCliente")
 //	public Cliente updateCliente(@PathVariable String email, @RequestBody Map<String, Object> info) {
 //		Cliente cliente;
 //		if(cliente.pwdSecure(cliente.getPassword())) {
@@ -94,9 +96,9 @@ public class AdminController {
 //	}
 
 	@PutMapping("/modificarAdminstrador")
-	public Administrador updateAdmin(@PathVariable String email, @RequestBody Map<String, Object> info) {
+	public Administrador updateAdmin(@PathVariable String email, @RequestBody Map<String, Object> info) throws contraseñaIncorrecta {
 		User admin = null;
-		if(admin.pwdSecure(admin.getPassword())) {
+		if(comprobarSeguridad.restriccionesPassword(admin)) {
 			Administrador administradorBBDD = adminDAO.findByEmail(email).get();
 			administradorBBDD.setNombre(admin.getNombre());
 			administradorBBDD.setApellidos(admin.getApellidos());
