@@ -1,4 +1,4 @@
-package entities;
+package edu.uclm.esi.iso.ISO2023.entities;
 
 
 public class Cliente extends User{

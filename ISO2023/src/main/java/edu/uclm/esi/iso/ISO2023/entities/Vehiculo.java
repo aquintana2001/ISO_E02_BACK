@@ -1,10 +1,11 @@
-package entities;
+package edu.uclm.esi.iso.ISO2023.entities;
 
 import javax.validation.constraints.NotEmpty;
 
 
 
 public class Vehiculo {
+	private int id;
 	private String matricula;
 	private String tipo;
 	private int bateria;
@@ -22,6 +23,18 @@ public class Vehiculo {
 		this.modelo = modelo;
 		this.estado = estado;
 		this.direccion = direccion;
+	}
+
+
+
+	public int getId() {
+		return id;
+	}
+
+
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 
