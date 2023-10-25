@@ -5,6 +5,8 @@ import java.util.UUID;
 
 import javax.validation.constraints.NotEmpty;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
 
 
 public class User {
