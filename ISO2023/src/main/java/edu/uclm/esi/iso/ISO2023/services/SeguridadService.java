@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 
+
 public class SeguridadService {
 	public boolean restriccionesPassword(User usuario) throws contraseñaIncorrecta {
 		
@@ -64,42 +65,45 @@ public class SeguridadService {
 	    return matcher.matches();
 	}
 	
-	public Boolean comprobarDni(String dni) {
+	public Boolean comprobarDni(String dni) throws numeroInvalido {
 		 
 		// El DNI debe tener 9 caracteres
-		if (dni.length() != 9) {
-			return false;
-		}
+		if (dni.length() != 9) 
+			throw new numeroInvalido("El nÃºmero de dni introducido no es vÃ¡lido. Introduzca nueve dÃ­gitos");
+			
+		
 
 		// Comprobar que los primeros 8 caracteres son dígitos
 		for (int i = 0; i < 8; i++) {
 			if (!Character.isDigit(dni.charAt(i))) {
-				return false;
+				throw new numeroInvalido("El nÃºmero de dni introducido no es vÃ¡lido. Los 8 primeros digitos deben ser numeros");
 			}
 		}
 
 		// Comprobar que el último carácter es una letra
 		char letra = dni.charAt(8);
 		if (!Character.isLetter(letra)) {
-			return false;
+			throw new numeroInvalido("El nÃºmero de dni introducido no es vÃ¡lido. El ultimo caracter debe ser una letra.");
+			
 		}
 
 		return true;
 	}
 	
-	public Boolean comprobarNumero(String telefono) {
-		if(telefono.length() != 9)
-			return false;
+	public Boolean comprobarNumero(String telefono) throws numeroInvalido {
+		if(telefono.length() != 13)
+			throw new numeroInvalido("El nÃºmero de telÃ©fono introducido no es vÃ¡lido. Introduzca nueve dÃ­gitos");
 		
 		//Evitar numeros extranjeros
 		//if(telefono.charAt(0) != '6' && telefono.charAt(0) != '7' && telefono.charAt(0)!= '8' && telefono.charAt(0)!='9')
 		//	return false;
 		
 		//Evitar letras en el numero
-		for(int i=0;i< telefono.length();i++)
+		for(int i=0;i< telefono.length();i++) {
 			if(!Character.isDigit(telefono.charAt(i)))
-				return false;
-		
+				throw new numeroInvalido("El nÃºmero de telÃ©fono introducido no es vÃ¡lido. Introduzca nueve dÃ­gitos");
+
+		}
 		return true;
 	}
 	
@@ -115,5 +119,10 @@ public class SeguridadService {
 	
 	public PasswordEncoder codificador() {
 		return new BCryptPasswordEncoder();
+	}
+	
+	public boolean decodificador(String password, String passwordMongo) {
+		PasswordEncoder ncoder = codificador();
+		return ncoder.matches(password, passwordMongo);
 	}
 }
