@@ -1,6 +1,8 @@
 package edu.uclm.esi.iso.ISO2023.controllers;
 
-import java.util.*;     
+
+import java.util.*;
+
 
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,6 +29,7 @@ import edu.uclm.esi.iso.ISO2023.exceptions.*;
 import edu.uclm.esi.iso.ISO2023.services.AdminService;
 import edu.uclm.esi.iso.ISO2023.services.ClienteService;
 import edu.uclm.esi.iso.ISO2023.services.SeguridadService;
+import edu.uclm.esi.iso.ISO2023.services.VehiculoService;
 
 @RestController
 @RequestMapping("admin")
@@ -40,43 +43,34 @@ public class AdminController {
 	private AdminDAO adminDAO;
 	@Autowired
 	private ClienteDAO clienteDAO;
-//	@Autowired
-//	private VehiculoService vehiculoService;
+	@Autowired
+	private VehiculoService vehiculoService;
 	@Autowired
 	private VehiculoDAO vehiculoDAO;
-	
-	
+
 	private SeguridadService comprobarSeguridad = new SeguridadService();
 
-	
-	
 	@PostMapping("/register")
 	public void registrarse(@RequestBody Map<String, Object> info) {
-		String tipo = info.get("tipo").toString();
 		String password1 = info.get("password1").toString();
-		String passwordd2 = info.get("password2").toString();
-		if (!password1.equals(passwordd2))
+		String password2 = info.get("password2").toString();
+		if (!password1.equals(password2))
 			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Las contraseñas no coinciden");
-		
-		String nombre= info.get("nombre").toString();
+
+		String nombre = info.get("nombre").toString();
 		String apellidos = info.get("apellidos").toString();
 		String email = info.get("email").toString();
-		String fechaNacimiento = info.get("fechaNacimiento").toString();
-		boolean carnet = Boolean.parseBoolean(info.get("carnet").toString());
-		String telefono = info.get("telefono").toString();
-		String dni = info.get("dni").toString();
-		
+
 		try {
 			this.adminService.registrarse(nombre, apellidos, email, password1);
-		}catch (Exception e) {
+		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
-		
-	}
-	
 
-	@PutMapping("/modificarCliente")
-	public void updateCliente(@RequestBody Map<String, Object> info) {
+	}
+
+	@PutMapping("/actualizarCliente")
+	public void actualizarCliente(@RequestBody Map<String, Object> info) {
 		String nombre= info.get("nombre").toString();
 		String apellidos = info.get("apellidos").toString();
 		String email = info.get("email").toString();
@@ -87,6 +81,7 @@ public class AdminController {
 		String carnet = info.get("carnet").toString();
 		String telefono = info.get("telefono").toString();
 		String dni = info.get("dni").toString();
+
 		try {
 			this.clienteService.actualizarCliente(nombre, apellidos, email, password, activo, intentos, fechaNacimiento, carnet, telefono, dni);
 		} catch (Exception e) {
@@ -94,155 +89,119 @@ public class AdminController {
 		}
 	}
 
-//	@PutMapping("/modificarAdministrador")
-//	public Administrador updateAdmin(@PathVariable String email, @RequestBody Map<String, Object> info) throws contraseñaIncorrecta {
-//		User admin = null;
-//		if(comprobarSeguridad.restriccionesPassword(admin)) {
-//			Administrador administradorBBDD = adminDAO.findByEmail(email).get();
-//			administradorBBDD.setNombre(admin.getNombre());
-//			administradorBBDD.setApellidos(admin.getApellidos());
-//			administradorBBDD.setEmail(admin.getEmail());
-//			administradorBBDD.setPassword(admin.getPassword());
-//			
-//		}else {
-//			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Ha sucedido un error, no se cumple con los requisitos de nuestra politica de contraseñas");
-//		}
-//		try {
-//			adminService.actualizarAdmin(admin);
-//		} catch(Exception e) {
-//			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-//		}
-//		return null;
-//	}
-	
-	
-	
-//	@DeleteMapping("")
-//	public ResponseEntity<String> deleteAdmin(@PathVariable String email) {
-//		Administrador admin = adminDAO.findByEmail(email).get();
-//		adminDAO.delete(admin);
-//		return ResponseEntity.ok("Administrador elimnado correctamente");
-//	
-//		
-//	}
-//	
-	
-//	@DeleteMapping("")  //cambiar atributo activa a false
-//	public ResponseEntity<String> darDeBajaUserAdmin(@PathVariable String email) {
-//		Cliente cliente = clienteDAO.findByEmail(email).get();
-//		
-//		if(cliente!=null) {
-//			cliente.setActivo(false);
-//			clienteDAO.save(cliente);
-//			return ResponseEntity.ok("Cliente dado de baja corrrectamente.");
-//		}else {
-//			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No hemos detectado ningun cliente.");
-//			
-//		}
-//	
-//	
-//	}
-	
-	
-//
-//	@PostMapping("/darAltaVehiculo")
-//	public ResponseEntity<String> darAltaVehiculo( @RequestBody Map<String, Object> info) {
-//
-//		String email =info.get("email").toString();
-//		Optional<Administrador> adminExist = adminDAO.findByEmail(email);
-//
-//
-//		if (adminExist.isPresent()) {
-//			String tipoVehiculo = (String) info.get("tipo");
-//
-//
-//			switch (tipoVehiculo) {
-//			case "coche":
-//				darAltaCoche(info);
-//				break;
-//			case "moto":
-//				darAltaMoto(info);
-//				break;
-//			case "patinete":
-//				darAltaPatinete(info);
-//				break;
-//			default:
-//				return ResponseEntity.badRequest().body("Tipo de vehículo desconocido.");
-//			}
-//			return ResponseEntity.ok("Vehículo dado de alta con éxito.");
-//		} else {
-//			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tienes permiso para dar de alta vehículos.");
-//		}
-//	} 
-//
+	@PutMapping("/actualizarAdminstrador")
+	public void actualizarAdmin(@RequestBody Map<String, Object> info){
+		String nombre= info.get("nombre").toString();
+		String apellidos = info.get("apellidos").toString();
+		String email = info.get("email").toString();
+		String password = info.get("password").toString();
+		boolean activo = Boolean.parseBoolean(info.get("activo").toString());
+		int intentos = Integer.parseInt(info.get("intentos").toString());
 
-//	private  void darAltaCoche(Map<String, Object> info) {
-//
-//		
-//		String matricula = info.get("matricula").toString();
-//		String tipo = info.get("tipo").toString();
-//		int bateria = Integer.parseInt(info.get("bateria").toString());
-//		String modelo = info.get("modelo").toString();
-//		String estado = info.get("estado").toString();
-//		String direccion = info.get("direccion").toString();
-//		int nPlazas = Integer.parseInt(info.get("nPlazas").toString());
-//		
-//		this.vehiculoService.darAltaCoche();		
-//		
-//	}
-//
-//
-//	private void darAltaMoto(Map<String, Object> info) {
-//		
-//		
-//		String matricula = info.get("matricula").toString();
-//		String tipo = info.get("tipo").toString();
-//		int bateria = Integer.parseInt(info.get("bateria").toString());
-//		String modelo = info.get("modelo").toString();
-//		String estado = info.get("estado").toString();
-//		String direccion = info.get("direccion").toString();
-//		String casco = info.get("casco").toString();
-//		
-//		this.vehiculoService.darAltaMoto();
-//	}
-//
-//
-//	private void darAltaPatinete(Map<String, Object> info) {
-//		
-//		String matricula = info.get("matricula").toString();
-//		String tipo = info.get("tipo").toString();
-//		int bateria = Integer.parseInt(info.get("bateria").toString());
-//		String modelo = info.get("modelo").toString();
-//		String estado = info.get("estado").toString();
-//		String direccion = info.get("direccion").toString();
-//		String color = info.get("color").toString();
-//		
-//		this.vehiculoService.darAltaPatinete();
-//	}
-//	
-//	
-//	
-//	
-//	
-//	
+		try {
+			this.adminService.actualizarAdmin(nombre, apellidos, email, password, activo, intentos);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+		}
+	}
+
+	@DeleteMapping("/eliminarAdmin")
+	public void eliminarAdmin(@RequestBody Map<String, Object> info) {
+		String email = info.get("email").toString();
+		try {
+			this.adminService.eliminarAdmin(email);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+		}
+	}
+	
+	@DeleteMapping("/eliminarCliente")
+	public void eliminarCliente(@RequestBody Map<String, Object> info) {
+		String email = info.get("email").toString();
+		try {
+			this.adminService.eliminarCliente(email);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+		}
+	}
+
+
+	@PostMapping("/darAltaVehiculo")
+	public ResponseEntity<String> darAltaVehiculo(@RequestBody Map<String, Object> info) {
+
+		String email = info.get("email").toString();
+		Optional<Administrador> adminExist = adminDAO.findByEmail(email);
+
+		if (adminExist.isPresent()) {
+			String tipoVehiculo = (String) info.get("tipo");
+
+			switch (tipoVehiculo) {
+			case "coche":
+				darAltaCoche(info);
+				break;
+			case "moto":
+				darAltaMoto(info);
+				break;
+			case "patinete":
+				darAltaPatinete(info);
+				break;
+			default:
+				return ResponseEntity.badRequest().body("Tipo de vehículo desconocido.");
+			}
+			return ResponseEntity.ok("Vehículo dado de alta con éxito.");
+		} else {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tienes permiso para dar de alta vehículos.");
+		}
+	}
+
+	private void darAltaCoche(Map<String, Object> info) {
+
+		String matricula = info.get("matricula").toString();
+		String tipo = info.get("tipo").toString();
+		int bateria = Integer.parseInt(info.get("bateria").toString());
+		String modelo = info.get("modelo").toString();
+		String estado = info.get("estado").toString();
+		String direccion = info.get("direccion").toString();
+		int nPlazas = Integer.parseInt(info.get("nPlazas").toString());
+
+		this.vehiculoService.darAltaCoche(matricula, tipo, bateria, modelo, estado, direccion, nPlazas);
+
+	}
+
+	private void darAltaMoto(Map<String, Object> info) {
+
+		String matricula = info.get("matricula").toString();
+		String tipo = info.get("tipo").toString();
+		int bateria = Integer.parseInt(info.get("bateria").toString());
+		String modelo = info.get("modelo").toString();
+		String estado = info.get("estado").toString();
+		String direccion = info.get("direccion").toString();
+		boolean casco = Boolean.parseBoolean(info.get("casco").toString());
+
+		this.vehiculoService.darAltaMoto(matricula, tipo, bateria, modelo, estado, direccion, casco);
+	}
+
+	private void darAltaPatinete(Map<String, Object> info) {
+
+		String matricula = info.get("matricula").toString();
+		String tipo = info.get("tipo").toString();
+		int bateria = Integer.parseInt(info.get("bateria").toString());
+		String modelo = info.get("modelo").toString();
+		String estado = info.get("estado").toString();
+		String direccion = info.get("direccion").toString();
+		String color = info.get("color").toString();
+
+		this.vehiculoService.darAltaPatinete(matricula, tipo, bateria, modelo, estado, direccion, color);
+	}
+
 //	@DeleteMapping
-//	public ResponseEntity<String>  darBajaVehiculo(@PathVariable String id) {
-//		Vehiculo vehiculo = vehiculoDAO.findById(id).get();
-//		vehiculoService.delete(vehiculo);
+//	public void darBajaVehiculo(@PathVariable int id) {
+//		vehiculoService.darBajaVehiculo(id);
 //	}
 
 	public Vehiculo consultarVehiculos() {
 		return null;
 	}
-	
-	@PostMapping("/updateAdminIntentos")
-	public void updateAdminIntentos(String email, int intentos) {
-		try {
-			adminService.actualizarIntentosAdmin(email,intentos);
-		}catch(Exception e) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-		}
-	}
-	
-	
+
+
 }

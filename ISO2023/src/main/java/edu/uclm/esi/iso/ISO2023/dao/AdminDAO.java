@@ -11,7 +11,4 @@ import edu.uclm.esi.iso.ISO2023.entities.User;
 
 public interface AdminDAO extends MongoRepository<Administrador,String>{
 	Optional<Administrador> findByEmail(String email);
-
-	void save(User admin);
-	
 }
