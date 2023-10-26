@@ -34,33 +34,28 @@ public class AdminService {
 	
 	
 	
-	public void registrarse(String nombre, String apellidos, String email, String password) throws contraseñaIncorrecta {
-		Administrador administrador = new Administrador(nombre, apellidos, email, password, true, 5);
+	public void registrarse(String nombre, String apellidos, String email, String password) throws contraseñaIncorrecta, formatoIncompleto, numeroInvalido {
+		Administrador admin = new Administrador(nombre, apellidos, email, password, true, 5);
 		
 		Optional<Administrador> adminExist = this.adminDAO.findByEmail(email);
 		
-		if(!comprobarSeguridad.restriccionesPassword(administrador))
+		if(!comprobarSeguridad.restriccionesPassword(admin))
 			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "La contraseña no es segura");
 		
 		if(adminExist.isPresent()) {
-			Optional<Token> tokenExist = this.tokenDAO.findByUser(administrador);
-			if (tokenExist.isPresent()) {
-				long hora = System.currentTimeMillis();
-				if (hora - tokenExist.get().getHoraCreacion() < 1000*60*60*24)
-					//throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Debes validar tu cuenta");
-				this.tokenDAO.delete(tokenExist.get());
-				Token token= new Token();
-				token.setUser(administrador);
-				this.tokenDAO.save(token);
-			}
-		}else if(!adminExist.isPresent()) {
+			throw new formatoIncompleto("Error.No puedes usar esos credenciales.");
+		
+		}else{
 			Token token= new Token();
-			token.setUser(administrador);
-			this.adminDAO.save(administrador);
+			token.setUser(admin);
+			comprobarSeguridad.restriccionesPassword(admin);
+			comprobarSeguridad.validarEmail(admin.getEmail());
+			
+			if(admin.getPassword().length() != 60) {
+				admin.setPassword(comprobarSeguridad.cifrarPassword(admin.getPassword()));
+			}
+			this.adminDAO.save(admin);
 			this.tokenDAO.save(token);
-
-		}else if(adminExist.isPresent()) {
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Esos credenciales no pueden ser usados");
 		}
 	}
 	
