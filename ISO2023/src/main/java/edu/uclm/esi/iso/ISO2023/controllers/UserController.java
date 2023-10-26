@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +24,7 @@ public class UserController {
 
 	@Autowired
 	private ClienteService clienteService;
+	@Autowired
 	private UserService userService;
 	
 	@GetMapping("/cliente")
@@ -31,10 +33,10 @@ public class UserController {
 	}
 
 	@PostMapping("/register")
-	public void registrarse(@RequestBody Map<String, Object> info) {
+	public ResponseEntity<String> registrarse(@RequestBody Map<String, Object> info) {
 		String password1 = info.get("password1").toString();
-		String passwordd2 = info.get("password2").toString();
-		if (!password1.equals(passwordd2))
+		String password2 = info.get("password2").toString();
+		if (!password1.equals(password2))
 			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Las contraseñas no coinciden");
 
 		String nombre = info.get("nombre").toString();
@@ -50,6 +52,6 @@ public class UserController {
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
-
+		return ResponseEntity.ok("Registro realizado con éxito.");
 	}
 }
