@@ -10,8 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import edu.uclm.esi.iso.ISO2023.dao.AdminDAO;
 import edu.uclm.esi.iso.ISO2023.dao.ClienteDAO;
 import edu.uclm.esi.iso.ISO2023.dao.TokenDAO;
+import edu.uclm.esi.iso.ISO2023.entities.Administrador;
 import edu.uclm.esi.iso.ISO2023.entities.Cliente;
 import edu.uclm.esi.iso.ISO2023.entities.Token;
 import edu.uclm.esi.iso.ISO2023.entities.User;
@@ -20,6 +22,8 @@ import edu.uclm.esi.iso.ISO2023.exceptions.*;
 public class UserService {
 	@Autowired
 	private ClienteDAO clienteDAO;
+	@Autowired 
+	private AdminDAO adminDAO;
 	@Autowired
 	private TokenDAO tokenDAO;
 	private SeguridadService comprobarSeguridad = new SeguridadService();
@@ -55,7 +59,17 @@ public class UserService {
 			this.clienteDAO.save(cliente);
 			this.tokenDAO.save(token);
 		}
+		
 	}
+		
+		public void loginUser(String email, String password) {
+	        Optional<Cliente> cliente = this.clienteDAO.findByEmail(email);
+	        Optional<Administrador> admin = this.adminDAO.findByEmail(email);
+	        if (!cliente.isPresent() || !admin.isPresent()) {
+	            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Credenciales inválidas");
+	        }
+	    
+		}
 	
 	
 }
