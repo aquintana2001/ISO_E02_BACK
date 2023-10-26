@@ -51,7 +51,7 @@ public class AdminController {
 	private SeguridadService comprobarSeguridad = new SeguridadService();
 
 	@PostMapping("/register")
-	public void registrarse(@RequestBody Map<String, Object> info) {
+	public ResponseEntity<String> registrarse(@RequestBody Map<String, Object> info) {
 		String password1 = info.get("password1").toString();
 		String password2 = info.get("password2").toString();
 		if (!password1.equals(password2))
@@ -66,11 +66,11 @@ public class AdminController {
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
-
+		return ResponseEntity.ok("Registro realizado con éxito.");
 	}
 
 	@PutMapping("/actualizarCliente")
-	public void actualizarCliente(@RequestBody Map<String, Object> info) {
+	public ResponseEntity<String> actualizarCliente(@RequestBody Map<String, Object> info) {
 		String nombre= info.get("nombre").toString();
 		String apellidos = info.get("apellidos").toString();
 		String email = info.get("email").toString();
@@ -87,10 +87,11 @@ public class AdminController {
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
+		return ResponseEntity.ok("Actualizacion realizada con éxito.");
 	}
 
 	@PutMapping("/actualizarAdminstrador")
-	public void actualizarAdmin(@RequestBody Map<String, Object> info){
+	public ResponseEntity<String> actualizarAdmin(@RequestBody Map<String, Object> info){
 		String nombre= info.get("nombre").toString();
 		String apellidos = info.get("apellidos").toString();
 		String email = info.get("email").toString();
@@ -103,26 +104,29 @@ public class AdminController {
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
+		return ResponseEntity.ok("Actualizacion realizada con éxito.");
 	}
 
 	@DeleteMapping("/eliminarAdmin")
-	public void eliminarAdmin(@RequestBody Map<String, Object> info) {
+	public ResponseEntity<String> eliminarAdmin(@RequestBody Map<String, Object> info) {
 		String email = info.get("email").toString();
 		try {
 			this.adminService.eliminarAdmin(email);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
+		return ResponseEntity.ok("Administrador eliminado con éxito.");
 	}
 	
 	@DeleteMapping("/eliminarCliente")
-	public void eliminarCliente(@RequestBody Map<String, Object> info) {
+	public ResponseEntity<String> eliminarCliente(@RequestBody Map<String, Object> info) {
 		String email = info.get("email").toString();
 		try {
 			this.adminService.eliminarCliente(email);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
+		return ResponseEntity.ok("Cliente eliminado con éxito.");
 	}
 
 
@@ -155,7 +159,6 @@ public class AdminController {
 	}
 
 	private void darAltaCoche(Map<String, Object> info) {
-
 		String matricula = info.get("matricula").toString();
 		String tipo = info.get("tipo").toString();
 		int bateria = Integer.parseInt(info.get("bateria").toString());
@@ -194,10 +197,18 @@ public class AdminController {
 		this.vehiculoService.darAltaPatinete(matricula, tipo, bateria, modelo, estado, direccion, color);
 	}
 
-//	@DeleteMapping
-//	public void darBajaVehiculo(@PathVariable int id) {
-//		vehiculoService.darBajaVehiculo(id);
-//	}
+	@DeleteMapping("/darBajaVehiculo")
+	public ResponseEntity<String> darBajaVehiculo(@RequestBody Map<String, Object> info) {
+		String email = info.get("email").toString();
+		Optional<Administrador> adminExist = adminDAO.findByEmail(email);
+		String id = info.get("id").toString();
+		if (adminExist.isPresent()) {
+			vehiculoService.darBajaVehiculo(id);
+			return ResponseEntity.ok("Vehículo dado de baja con éxito.");
+		} else {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tienes permiso para dar de baja vehículos.");
+		}
+	}
 
 	public Vehiculo consultarVehiculos() {
 		return null;
