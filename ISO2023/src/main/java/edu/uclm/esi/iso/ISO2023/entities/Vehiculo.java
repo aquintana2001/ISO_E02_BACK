@@ -4,10 +4,14 @@ import java.util.UUID;
 
 import javax.validation.constraints.NotEmpty;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 
+@Document
 public class Vehiculo {
-	private int id;
+	@Id
+	private String id;
 	private String matricula;
 	private String tipo;
 	private int bateria;
@@ -18,7 +22,7 @@ public class Vehiculo {
 	
 	
 	public Vehiculo(String tipo, String matricula, int bateria, String modelo, String estado, String direccion) {
-		this.id = Integer.valueOf(UUID.randomUUID().toString());
+		this.id = UUID.randomUUID().toString();
 		this.tipo = tipo;
 		this.matricula = matricula;
 		this.bateria = bateria;
@@ -28,13 +32,13 @@ public class Vehiculo {
 	}
 
 
-	public int getId() {
+	public String getId() {
 		return id;
 	}
 
 
 
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
