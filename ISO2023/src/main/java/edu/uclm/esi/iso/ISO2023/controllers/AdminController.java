@@ -53,8 +53,8 @@ public class AdminController {
 	@PostMapping("/register")
 	public void registrarse(@RequestBody Map<String, Object> info) {
 		String password1 = info.get("password1").toString();
-		String passwordd2 = info.get("password2").toString();
-		if (!password1.equals(passwordd2))
+		String password2 = info.get("password2").toString();
+		if (!password1.equals(password2))
 			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Las contraseñas no coinciden");
 
 		String nombre = info.get("nombre").toString();
