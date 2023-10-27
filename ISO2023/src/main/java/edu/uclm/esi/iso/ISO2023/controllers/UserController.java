@@ -27,11 +27,7 @@ public class UserController {
 	private ClienteService clienteService;
 	@Autowired
 	private UserService userService;
-	
-	@GetMapping("/cliente")
-	public List<Cliente> listaCliente(){
-		return clienteService.listaClientes();
-	}
+
 
 	@PostMapping("/register")
 	public ResponseEntity<String> registrarse(@RequestBody Map<String, Object> info) {
