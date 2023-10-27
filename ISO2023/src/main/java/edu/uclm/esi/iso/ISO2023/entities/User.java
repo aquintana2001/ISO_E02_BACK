@@ -41,7 +41,7 @@ public class User {
 	}
 	
 	public String getApellidos() {
-		return nombre;
+		return apellidos;
 	}
 
 	public void setApellidos(String apellidos) {

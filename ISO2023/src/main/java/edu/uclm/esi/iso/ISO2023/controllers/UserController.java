@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import edu.uclm.esi.iso.ISO2023.entities.Cliente;
+import edu.uclm.esi.iso.ISO2023.entities.User;
 import edu.uclm.esi.iso.ISO2023.services.ClienteService;
 import edu.uclm.esi.iso.ISO2023.services.UserService;
 
@@ -26,11 +27,7 @@ public class UserController {
 	private ClienteService clienteService;
 	@Autowired
 	private UserService userService;
-	
-	@GetMapping("/cliente")
-	public List<Cliente> listaCliente(){
-		return clienteService.listaClientes();
-	}
+
 
 	@PostMapping("/register")
 	public ResponseEntity<String> registrarse(@RequestBody Map<String, Object> info) {
@@ -54,4 +51,15 @@ public class UserController {
 		}
 		return ResponseEntity.ok("Registro realizado con éxito.");
 	}
+	
+	public void loginUser(String email, String password) {
+       
+        User user;
+        try {
+            this.userService.loginUser(email, password);
+        }catch(Exception e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+        }
+
+    }
 }

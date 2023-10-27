@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -47,9 +48,16 @@ public class AdminController {
 	private VehiculoService vehiculoService;
 	@Autowired
 	private VehiculoDAO vehiculoDAO;
+	
 
 	private SeguridadService comprobarSeguridad = new SeguridadService();
 
+	
+	@GetMapping("/cliente")
+	public List<Cliente> listaCliente(){
+		return clienteService.listaClientes();
+	} 
+	
 	@PostMapping("/register")
 	public ResponseEntity<String> registrarse(@RequestBody Map<String, Object> info) {
 		String password1 = info.get("password1").toString();
@@ -198,7 +206,7 @@ public class AdminController {
 	}
 
 	@DeleteMapping("/darBajaVehiculo")
-	public ResponseEntity<String> darBajaVehiculo(@RequestBody Map<String, Object> info) {
+	/*public ResponseEntity<String> darBajaVehiculo(@RequestBody Map<String, Object> info) {
 		String email = info.get("email").toString();
 		Optional<Administrador> adminExist = adminDAO.findByEmail(email);
 		String id = info.get("id").toString();
@@ -208,7 +216,7 @@ public class AdminController {
 		} else {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tienes permiso para dar de baja vehículos.");
 		}
-	}
+	}*/
 
 	public Vehiculo consultarVehiculos() {
 		return null;
