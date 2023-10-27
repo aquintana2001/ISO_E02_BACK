@@ -211,7 +211,7 @@ public class AdminController {
 	}
 
 	@DeleteMapping("/darBajaVehiculo")
-	/*public ResponseEntity<String> darBajaVehiculo(@RequestBody Map<String, Object> info) {
+	public ResponseEntity<String> darBajaVehiculo(@RequestBody Map<String, Object> info) {
 		String email = info.get("email").toString();
 		Optional<Administrador> adminExist = adminDAO.findByEmail(email);
 		String id = info.get("id").toString();
@@ -221,7 +221,7 @@ public class AdminController {
 		} else {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tienes permiso para dar de baja vehículos.");
 		}
-	}*/
+	}
 
 	public Vehiculo consultarVehiculos() {
 		return null;
