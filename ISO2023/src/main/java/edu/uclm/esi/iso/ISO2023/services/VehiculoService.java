@@ -1,20 +1,28 @@
 package edu.uclm.esi.iso.ISO2023.services;
 
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import edu.uclm.esi.iso.ISO2023.dao.VehiculoDAO;
+import edu.uclm.esi.iso.ISO2023.entities.Cliente;
 import edu.uclm.esi.iso.ISO2023.entities.Coche;
 import edu.uclm.esi.iso.ISO2023.entities.Moto;
 import edu.uclm.esi.iso.ISO2023.entities.Patinete;
+import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
 
 @Service
 public class VehiculoService {
 	@Autowired
 	private VehiculoDAO vehiculoDAO;
+	
+	public List <Vehiculo> listaVehiculo() {
+		return this.vehiculoDAO.findAll();
+	}
 	
 	public void darAltaCoche(String matricula, String tipo, int bateria, String modelo, String estado, String direccion, int nPlazas) {
 		Coche coche = new Coche(tipo, matricula, bateria, modelo, estado, direccion, nPlazas);
