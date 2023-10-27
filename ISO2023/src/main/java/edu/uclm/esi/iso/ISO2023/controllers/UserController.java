@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,7 +28,6 @@ public class UserController {
 	private ClienteService clienteService;
 	@Autowired
 	private UserService userService;
-
 
 	@PostMapping("/register")
 	public ResponseEntity<String> registrarse(@RequestBody Map<String, Object> info) {
@@ -51,15 +51,17 @@ public class UserController {
 		}
 		return ResponseEntity.ok("Registro realizado con éxito.");
 	}
-	
-	public void loginUser(String email, String password) {
-       
-        User user;
-        try {
-            this.userService.loginUser(email, password);
-        }catch(Exception e) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
-        }
 
-    }
+	@PutMapping("/login")
+	public String loginUser(@RequestBody Map<String, Object> info) {
+		String usuario;
+		String email = info.get("email").toString();
+		String password = info.get("password").toString();
+		try {
+			usuario = this.userService.loginUser(email, password);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+		}
+		return usuario;
+	}
 }
