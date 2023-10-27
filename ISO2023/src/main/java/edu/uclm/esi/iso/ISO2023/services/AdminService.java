@@ -125,4 +125,17 @@ public class AdminService {
 		}
 	}
 	
+public void updateAdmnIntentos(String email, int intentos) throws formatoIncompleto {
+		
+		Optional<Administrador> admin = adminDAO.findByEmail(email);
+		
+		if(!admin.isPresent())
+			throw new formatoIncompleto("Imposible encontrar al admin");
+		
+		admin.get().setIntentos(intentos);
+		
+		adminDAO.save(admin.get());
+		
+	}
+	
 }
