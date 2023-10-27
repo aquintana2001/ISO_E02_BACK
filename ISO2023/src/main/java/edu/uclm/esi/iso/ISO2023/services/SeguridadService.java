@@ -9,8 +9,9 @@ import edu.uclm.esi.iso.ISO2023.exceptions.*;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
-
+@Service
 public class SeguridadService {
 	public boolean restriccionesPassword(User usuario) throws contraseñaIncorrecta {
 		
@@ -118,5 +119,15 @@ public class SeguridadService {
 	
 	public PasswordEncoder codificador() {
 		return new BCryptPasswordEncoder();
+	}
+	
+	public boolean decodificador(String password, String passwordMongo) {
+		PasswordEncoder ncoder = codificador();
+		return ncoder.matches(password, passwordMongo);
+	}
+	
+	public Boolean emailValido(String email) {
+		String regex = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$";
+		return email.toLowerCase().matches(regex.toLowerCase());
 	}
 }
