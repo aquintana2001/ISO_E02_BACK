@@ -30,7 +30,9 @@ public class UserService {
 	private TokenDAO tokenDAO;
 	@Autowired
 	private SeguridadService comprobarSeguridad;
+	@Autowired
 	private AdminService adminService = new AdminService();
+	@Autowired
 	private ClienteService clienteService = new ClienteService();
 
 	public void registrarse(String nombre, String apellidos, String email, String password, String fechaNacimiento,
