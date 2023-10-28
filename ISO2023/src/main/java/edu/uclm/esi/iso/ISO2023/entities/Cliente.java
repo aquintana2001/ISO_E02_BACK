@@ -2,24 +2,23 @@ package edu.uclm.esi.iso.ISO2023.entities;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection="cliente")
-public class Cliente extends User{
+@Document(collection = "cliente")
+public class Cliente extends User {
 
 	private String fechaNacimiento;
 	private String carnet;
 	private String telefono;
 	private String dni;
-	
-	public Cliente(String nombre, String apellidos, String email, String password, boolean activo, int intentos, String fechaNacimiento,
+
+	public Cliente(String nombre, String apellidos, String email, String password, boolean activo, int intentos,
+			String fechaNacimiento,
 
 			String carnet, String telefono, String dni) {
 		super(nombre, apellidos, email, password, activo, intentos);
-		// TODO Auto-generated constructor stub
-		
-		this.fechaNacimiento = fechaNacimiento; 
+		this.fechaNacimiento = fechaNacimiento;
 		this.carnet = carnet;
-		this.telefono=telefono;
-		this.dni=dni;
+		this.telefono = telefono;
+		this.dni = dni;
 	}
 
 	public String getFechaNacimiento() {
@@ -35,26 +34,21 @@ public class Cliente extends User{
 		return carnet;
 	}
 
-
 	public void setCarnet(String carnet) {
 		this.carnet = carnet;
 	}
-
 
 	public String getTelefono() {
 		return telefono;
 	}
 
-
 	public void setTelefono(String telefono) {
 		this.telefono = telefono;
 	}
 
-
 	public String getDni() {
 		return dni;
 	}
-
 
 	public void setDni(String dni) {
 		this.dni = dni;
@@ -62,55 +56,42 @@ public class Cliente extends User{
 
 	@Override
 	public String toString() {
-		return "Cliente [dni=" + dni +", fechs nacimiento=" + fechaNacimiento + ", telefono=" + telefono +"]";
+		return "Cliente [dni=" + dni + ", fechs nacimiento=" + fechaNacimiento + ", telefono=" + telefono + "]";
 	}
 
-	//Comprobar longitud telefono
+	// Comprobar longitud telefono
 	public boolean comprobarNumero(String telefono) {
-		if(telefono.length() != 9)
+		if (telefono.length() != 9)
 			return false;
-		
-		//Evitar numeros extranjeros
-		//if(telefono.charAt(0) != '6' && telefono.charAt(0) != '7' && telefono.charAt(0)!= '8' && telefono.charAt(0)!='9')
-		//	return false;
-		
-		//Evitar letras en el numero
-		for(int i=0;i< telefono.length();i++)
-			if(!Character.isDigit(telefono.charAt(i)))
+
+		// Evitar letras en el numero
+		for (int i = 0; i < telefono.length(); i++)
+			if (!Character.isDigit(telefono.charAt(i)))
 				return false;
-		
+
 		return true;
 	}
-	
+
 	public boolean comprobarDni(String dni) {
-		 
+		boolean valido = true;
 		// El DNI debe tener 9 caracteres
 		if (dni.length() != 9) {
-			return false;
+			valido = false;
 		}
 
 		// Comprobar que los primeros 8 caracteres son dígitos
 		for (int i = 0; i < 8; i++) {
 			if (!Character.isDigit(dni.charAt(i))) {
-				return false;
+				valido = false;
 			}
 		}
 
 		// Comprobar que el último carácter es una letra
 		char letra = dni.charAt(8);
-		if (!Character.isLetter(letra)) {
-			return false;
-		}
+		if(!Character.isLetter(letra))
+			valido = false;
 
-		return true;
+		return valido;
 	}
 
-
-		
-
 }
-	
-	
-	
-	
-
