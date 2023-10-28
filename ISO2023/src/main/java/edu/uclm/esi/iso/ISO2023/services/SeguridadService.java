@@ -54,7 +54,7 @@ public class SeguridadService {
 
 		if (contieneMayus && contieneMinus && contieneNumero && contieneCaracterRaro
 				&& usuario.getPassword().length() >= 8)
-			return seguro = true;
+			seguro = true;
 		return seguro;
 	}
 
@@ -95,11 +95,6 @@ public class SeguridadService {
 		if (telefono.length() != 9)
 			throw new numeroInvalido("El numero de telefono introducido no es valido. Introduzca nueve digitos");
 
-		// Evitar numeros extranjeros
-		// if(telefono.charAt(0) != '6' && telefono.charAt(0) != '7' &&
-		// telefono.charAt(0)!= '8' && telefono.charAt(0)!='9')
-		// return false;
-
 		// Evitar letras en el numero
 		for (int i = 0; i < telefono.length(); i++) {
 			if (!Character.isDigit(telefono.charAt(i)))
@@ -126,10 +121,5 @@ public class SeguridadService {
 	public boolean decodificador(String password, String passwordMongo) {
 		PasswordEncoder ncoder = codificador();
 		return ncoder.matches(password, passwordMongo);
-	}
-
-	public Boolean emailValido(String email) {
-		String regex = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$";
-		return email.toLowerCase().matches(regex.toLowerCase());
 	}
 }
