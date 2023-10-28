@@ -26,6 +26,11 @@ public class UserService {
 	@Autowired
 	private SeguridadService comprobarSeguridad;
 
+	@Autowired
+	private AdminService adminService = new AdminService();
+	@Autowired
+	private ClienteService clienteService = new ClienteService();
+
 	public void registrarse(String nombre, String apellidos, String email, String password, String fechaNacimiento,
 			String carnet, String telefono, String dni) throws contraseñaIncorrecta, formatoIncompleto, numeroInvalido {
 		Cliente cliente = new Cliente(nombre, apellidos, email, password, true, 5, fechaNacimiento, carnet, telefono,
