@@ -1,10 +1,16 @@
 package edu.uclm.esi.iso.ISO2023.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import edu.uclm.esi.iso.ISO2023.dao.AdminDAO;
 import edu.uclm.esi.iso.ISO2023.dao.ClienteDAO;
+import edu.uclm.esi.iso.ISO2023.entities.Administrador;
 import edu.uclm.esi.iso.ISO2023.entities.Cliente;
 import edu.uclm.esi.iso.ISO2023.exceptions.*;
 
@@ -12,10 +18,15 @@ import edu.uclm.esi.iso.ISO2023.exceptions.*;
 public class ClienteService {
 	@Autowired
 	private ClienteDAO clienteDAO;
+	@Autowired
+	private AdminDAO adminDAO;
 
 	private SeguridadService comprobarSeguridad = new SeguridadService();
 
-	public List<Cliente> listaClientes() {
+	public List<Cliente> listaClientes(String email, String password) {
+		Optional<Administrador> adminExist = this.adminDAO.findByEmail(email);
+		if(!adminExist.isPresent()||!comprobarSeguridad.decodificador(password, adminExist.get().getPassword()))
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para ver los vehiculos.");
 		return this.clienteDAO.findAll();
 	}
 

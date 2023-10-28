@@ -36,7 +36,7 @@ public class AdminController {
 	private AdminDAO adminDAO;
 	@Autowired
 	private VehiculoService vehiculoService;
-	
+
 	public static final String NOMBRE = "nombre";
 	public static final String APELLIDOS = "apellidos";
 	public static final String EMAIL = "email";
@@ -47,14 +47,19 @@ public class AdminController {
 	public static final String MODELO = "modelo";
 
 	@GetMapping("/cliente")
-	public List<Cliente> listaCliente() {
-		return clienteService.listaClientes();
+	public List<Cliente> listaCliente(@RequestBody Map<String, Object> info) {
+		String email = info.get("email").toString();
+		String password = info.get("password").toString();
+		return clienteService.listaClientes(email, password);
 	}
-	
+
 	@GetMapping("/vehiculo")
-	public List<Vehiculo> listaVehiculo(){
-		return vehiculoService.listaVehiculo();
-	} 
+	public List<Vehiculo> listaVehiculo(@RequestBody Map<String, Object> info) {
+		String email = info.get("email").toString();
+		String password = info.get("password").toString();
+		return vehiculoService.listaVehiculo(email, password);
+	}
+
 	@PostMapping("/register")
 	public ResponseEntity<String> registrarse(@RequestBody Map<String, Object> info) {
 		String password1 = info.get("password1").toString();
@@ -213,10 +218,6 @@ public class AdminController {
 		} else {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tienes permiso para dar de baja vehículos.");
 		}
-	}
-
-	public Vehiculo consultarVehiculos() {
-		return null;
 	}
 
 }
