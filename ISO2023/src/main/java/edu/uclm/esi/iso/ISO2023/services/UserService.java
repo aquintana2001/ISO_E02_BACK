@@ -44,7 +44,7 @@ public class UserService {
 			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "La contraseña no es segura");
 
 		if (userExist.isPresent())
-			throw new formatoIncompleto("Error.No puedes usar ese email.");
+			throw new formatoIncompleto("Error.No puedes usar esos credenciales.");
 		userExist = this.clienteDAO.findByDni(dni);
 		if (userExist.isPresent()) {
 			throw new formatoIncompleto("Error.No puedes usar esos credenciales.");
@@ -66,37 +66,36 @@ public class UserService {
 			this.clienteDAO.save(cliente);
 			this.tokenDAO.save(token);
 		}
-
 	}
 	
 	public String loginUser(String email, String password) throws formatoIncompleto, numeroInvalido {
 		Optional<Administrador> possibleAdmin = this.adminDAO.findByEmail(email);
 		Optional<Cliente> possibleCliente = this.clienteDAO.findByEmail(email);
 		User possibleLogin = null;
-		String errMsg = "Las contraseÃ±as no son correctas";
+		String errMsg = "Credenciales incorrectos";
 		String usuario= null;
 		
 		if (Boolean.FALSE.equals(comprobarSeguridad.emailValido(email)))
-			throw new formatoIncompleto("El email no corresponde con uno vÃ¡lido");
+			throw new formatoIncompleto(errMsg);
 		
 		if (!possibleAdmin.isPresent() && !possibleCliente.isPresent())
-			throw new numeroInvalido("No se ha podido encontrar usuario con ese mail");
+			throw new numeroInvalido(errMsg);
 	
 		if (possibleAdmin.isPresent()) {
 			
 			boolean passwordAdmin = comprobarSeguridad.decodificador(password, possibleAdmin.get().getPassword());
 		
 			if (possibleAdmin.get().getIntentos() <= 0)
-				throw new numeroInvalido("Este usuario estÃ¡ bloqueado debido a mÃºltiples inicios fallidos de sesiÃ³n o decisiÃ³n de un administrador. \"\r\n"
-						+ "				+ \"Si necesita ayuda consulte con un administrador de la aplicaciÃ³n de TIComo\";\r\n"+ "");
+				throw new numeroInvalido("Este usuario esta bloqueado debido a multiples inicios fallidos de sesion o decision de un administrador. \"\r\n"
+						+ "				+ \"Si necesita ayuda consulte con un administrador de la aplicacion de TIComo\";\r\n"+ "");
 
 			if (!passwordAdmin) {
 				possibleAdmin.get().setIntentos(possibleAdmin.get().getIntentos() - 1);
-				adminService.updateAdmnIntentos(possibleAdmin.get().getEmail(),possibleAdmin.get().getIntentos());
+				adminDAO.save(possibleAdmin.get());
 				throw new formatoIncompleto(errMsg);
 			}
 			possibleAdmin.get().setIntentos(5);
-			adminService.updateAdmnIntentos(possibleAdmin.get().getEmail(),possibleAdmin.get().getIntentos());
+			adminDAO.save(possibleAdmin.get());
 			return usuario ="admin";
 		}
 		
@@ -108,33 +107,18 @@ public class UserService {
 						+ "				+ \"Si necesita ayuda consulte con un administrador de la aplicaciÃ³n de TIComo\";\r\n"+ "");
 
 			if (!passwordCliente) {
+				System.err.println("DENTRO");
 				possibleCliente.get().setIntentos(possibleCliente.get().getIntentos() - 1);
-				clienteService.actualizarIntentosCliente(possibleCliente.get().getEmail(),possibleCliente.get().getIntentos());
+				clienteDAO.save(possibleCliente.get());
 				throw new formatoIncompleto(errMsg);
 			}
 			
 			possibleCliente.get().setIntentos(5);
-			//clienteService.actualizarIntentosCliente(possibleCliente.get().getEmail(),possibleCliente.get().getIntentos());
+			clienteDAO.save(possibleCliente.get());
 			return usuario ="cliente";
 		}
 		
 		return usuario;
 	}
-
-//	public String loginUser(String email, String password) {
-//		
-//		Optional<Cliente> clienteExist = this.clienteDAO.findByEmail(email);
-//		Optional<Administrador> adminExist = this.adminDAO.findByEmail(email);
-//		String usuario;
-//		System.out.println("\npostman: "+password);
-//		System.out.println("\ndecoded: "+adminExist.get().getPassword());
-//		if (adminExist.isPresent() && this.comprobarSeguridad.decodificador(password, adminExist.get().getPassword())) {
-//			return usuario = "admin";
-//		} else if (clienteExist.isPresent() && this.comprobarSeguridad.decodificador(password, clienteExist.get().getPassword())) {
-//			return usuario = "cliente";
-//		} else {
-//			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Credenciales inválidas");
-//		}
-//	}
 
 }

@@ -16,12 +16,14 @@ public class VehiculoService {
 	@Autowired
 	private VehiculoDAO vehiculoDAO;
 	
+	public static final String ERROR_VE = "Ese vehiculo ya existe";
+	
 	public void darAltaCoche(String matricula, String tipo, int bateria, String modelo, String estado, String direccion, int nPlazas) {
 		Coche coche = new Coche(tipo, matricula, bateria, modelo, estado, direccion, nPlazas);
 		if(!vehiculoExist(coche.getId())) {
 			this.vehiculoDAO.save(coche);
 		}else {
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Ese vehiculo ya existe");
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, ERROR_VE);
 		}
 	}
 	
@@ -30,7 +32,7 @@ public class VehiculoService {
 		if(!vehiculoExist(moto.getId())) {
 			this.vehiculoDAO.save(moto);
 		}else {
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Ese vehiculo ya existe");
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, ERROR_VE);
 		}
 	}
 	
@@ -39,7 +41,7 @@ public class VehiculoService {
 		if(!vehiculoExist(patinete.getId())) {
 			this.vehiculoDAO.save(patinete);
 		}else {
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Ese vehiculo ya existe");
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, ERROR_VE);
 		}
 	}
 	

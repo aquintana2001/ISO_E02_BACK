@@ -62,18 +62,4 @@ public class ClienteService {
 
 		clienteDAO.save(cliente);
 	}
-
-	public void actualizarIntentosCliente(String email, int intentos) throws formatoIncompleto {
-
-		Optional<Cliente> cliente = clienteDAO.findByEmail(email);
-
-		if (!cliente.isPresent())
-			throw new formatoIncompleto("Imposible encontrar al usuario");
-
-		cliente.get().setIntentos(intentos);
-
-		clienteDAO.save(cliente.get());
-
-	}
-
 }
