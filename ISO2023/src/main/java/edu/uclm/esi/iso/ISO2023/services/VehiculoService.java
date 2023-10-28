@@ -6,21 +6,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import java.util.Optional;
 
+import edu.uclm.esi.iso.ISO2023.dao.AdminDAO;
 import edu.uclm.esi.iso.ISO2023.dao.VehiculoDAO;
+import edu.uclm.esi.iso.ISO2023.entities.Administrador;
 import edu.uclm.esi.iso.ISO2023.entities.Coche;
 import edu.uclm.esi.iso.ISO2023.entities.Moto;
 import edu.uclm.esi.iso.ISO2023.entities.Patinete;
 import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
-
+ 
 @Service
 public class VehiculoService {
 	@Autowired
 	private VehiculoDAO vehiculoDAO;
+	@Autowired
+	private AdminDAO adminDAO;
+	@Autowired
+	private SeguridadService comprobarSeguridad;
 
 	public static final String ERROR_VE = "Ese vehiculo ya existe";
 
-	public List<Vehiculo> listaVehiculo() {
+	public List<Vehiculo> listaVehiculo(String email, String password) {
+		Optional<Administrador> adminExist = this.adminDAO.findByEmail(email);
+		if(!adminExist.isPresent()||!comprobarSeguridad.decodificador(password, adminExist.get().getPassword()))
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para ver los vehiculos.");
 		return this.vehiculoDAO.findAll();
 	}
 
