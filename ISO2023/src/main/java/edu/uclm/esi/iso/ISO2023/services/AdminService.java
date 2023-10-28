@@ -113,7 +113,7 @@ public class AdminService {
 	public void eliminarCliente(String email) {
 		Optional<Cliente> clienteExiste = clienteDAO.findByEmail(email);
 		if (clienteExiste.isPresent()) {
-			adminDAO.deleteById(email);
+			clienteDAO.deleteById(email);
 		} else {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, ERROR_CL);
 		}
