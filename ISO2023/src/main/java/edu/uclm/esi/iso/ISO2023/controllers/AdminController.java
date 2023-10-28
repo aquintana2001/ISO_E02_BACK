@@ -55,8 +55,12 @@ public class AdminController {
 	@GetMapping("/cliente")
 	public List<Cliente> listaCliente() {
 		return clienteService.listaClientes();
-	}
 
+	
+	@GetMapping("/vehiculo")
+	public List<Vehiculo> listaVehiculo(){
+		return vehiculoService.listaVehiculo();
+	} 
 	@PostMapping("/register")
 	public ResponseEntity<String> registrarse(@RequestBody Map<String, Object> info) {
 		String password1 = info.get("password1").toString();
