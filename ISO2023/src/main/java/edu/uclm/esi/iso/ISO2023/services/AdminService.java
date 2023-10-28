@@ -32,7 +32,7 @@ public class AdminService {
 	
 	private SeguridadService comprobarSeguridad = new SeguridadService();
 	
-	
+	public static final String ERROR_CL = "Ese cliente no existe.";
 	
 	public void registrarse(String nombre, String apellidos, String email, String password) throws contraseñaIncorrecta, formatoIncompleto, numeroInvalido {
 		Administrador admin = new Administrador(nombre, apellidos, email, password, true, 5);
@@ -80,7 +80,7 @@ public class AdminService {
 			admin.setIntentos(intentos);
 			this.adminDAO.save(admin);
 		}else{
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Ese cliente no existe");
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, ERROR_CL);
 		}
 	}
 	
@@ -103,7 +103,7 @@ public class AdminService {
 			this.clienteDAO.save(cliente);
 			
 		}else{
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Ese cliente no existe");
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, ERROR_CL);
 		}
 	}
 		
@@ -112,7 +112,7 @@ public class AdminService {
 		if(adminExiste.isPresent()) {
 			adminDAO.deleteById(email);
 		}else{
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Ese cliente no existe");
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, ERROR_CL);
 		}
 	}
 	
@@ -121,21 +121,7 @@ public class AdminService {
 		if(clienteExiste.isPresent()) {
 			adminDAO.deleteById(email);
 		}else{
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Ese cliente no existe");
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, ERROR_CL);
 		}
 	}
-	
-public void updateAdmnIntentos(String email, int intentos) throws formatoIncompleto {
-		
-		Optional<Administrador> admin = adminDAO.findByEmail(email);
-		
-		if(!admin.isPresent())
-			throw new formatoIncompleto("Imposible encontrar al admin");
-		
-		admin.get().setIntentos(intentos);
-		
-		adminDAO.save(admin.get());
-		
-	}
-	
 }
