@@ -19,11 +19,9 @@ public class ClienteService {
 	@Autowired
 	private ClienteDAO clienteDAO;
 	@Autowired
-	private AdminDAO adminDAO;
-
-	private SeguridadService comprobarSeguridad = new SeguridadService();
-	
-	private AdminService adminService = new AdminService();
+	private SeguridadService comprobarSeguridad;
+	@Autowired
+	private AdminService adminService;
 
 	public List<Cliente> listaClientes(String emailAdmin, String passwordAdmin) {
 		adminService.comprobarAdmin(emailAdmin, passwordAdmin);

@@ -20,12 +20,9 @@ import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
 public class VehiculoService {
 	@Autowired
 	private VehiculoDAO vehiculoDAO;
-	@Autowired
-	private AdminDAO adminDAO;
-	@Autowired
-	private SeguridadService comprobarSeguridad;
 	
-	private AdminService adminService = new AdminService();
+	@Autowired
+	private AdminService adminService;
 
 	public static final String ERROR_VE = "Ese vehiculo ya existe";
 
@@ -68,6 +65,7 @@ public class VehiculoService {
 	}
 
 	public void darBajaVehiculo(String id, String emailAdmin, String passwordAdmin) {
+		adminService.comprobarAdmin(emailAdmin, passwordAdmin);
 		if (vehiculoExist(id)) {
 			vehiculoDAO.deleteById(id);
 		} else {
