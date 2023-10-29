@@ -30,8 +30,9 @@ public class AdminService {
 
 	public static final String ERROR_CL = "Ese cliente no existe.";
 
-	public void registrarse(String nombre, String apellidos, String email, String password)
+	public void registrarse(String nombre, String apellidos, String email, String password, String emailAdmin, String passwordAdmin)
 			throws contraseñaIncorrecta, formatoIncompleto, numeroInvalido {
+		comprobarAdmin(emailAdmin, passwordAdmin);
 		Administrador admin = new Administrador(nombre, apellidos, email, password, true, 5);
 
 		Optional<Administrador> adminExist = this.adminDAO.findByEmail(email);
@@ -57,12 +58,9 @@ public class AdminService {
 		}
 	}
 
-	public List<Cliente> listarClientes() {
-		return clienteDAO.findAll();
-	}
-
 	public void actualizarAdmin(String nombre, String apellidos, String email, String password, boolean activo,
-			int intentos) throws contraseñaIncorrecta, formatoIncompleto {
+			int intentos, String emailAdmin, String passwordAdmin) throws contraseñaIncorrecta, formatoIncompleto {
+		comprobarAdmin(emailAdmin, passwordAdmin);
 		Optional<Administrador> adminExiste = adminDAO.findByEmail(email);
 		if (adminExiste.isPresent()) {
 			Administrador admin = adminExiste.get();
@@ -78,30 +76,8 @@ public class AdminService {
 		}
 	}
 
-	public void actualizarCliente(String nombre, String apellidos, String email, String password, boolean activo,
-			int intentos, String fechaNacimiento, String carnet, String telefono, String dni)
-			throws contraseñaIncorrecta, formatoIncompleto {
-		Optional<Cliente> clienteExiste = clienteDAO.findByEmail(email);
-		if (clienteExiste.isPresent()) {
-			Cliente cliente = clienteExiste.get();
-			cliente.setNombre(nombre);
-			cliente.setApellidos(apellidos);
-			cliente.setEmail(email);
-			cliente.setPassword(password);
-			cliente.setActivo(activo);
-			cliente.setIntentos(intentos);
-			cliente.setFechaNacimiento(fechaNacimiento);
-			cliente.setCarnet(carnet);
-			cliente.setTelefono(telefono);
-			cliente.setDni(dni);
-			this.clienteDAO.save(cliente);
-
-		} else {
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, ERROR_CL);
-		}
-	}
-
-	public void eliminarAdmin(String email) {
+	public void eliminarAdmin(String email, String emailAdmin, String passwordAdmin) {
+		comprobarAdmin(emailAdmin, passwordAdmin);
 		Optional<Administrador> adminExiste = adminDAO.findByEmail(email);
 		if (adminExiste.isPresent()) {
 			adminDAO.deleteById(email);
@@ -110,12 +86,9 @@ public class AdminService {
 		}
 	}
 
-	public void eliminarCliente(String email) {
-		Optional<Cliente> clienteExiste = clienteDAO.findByEmail(email);
-		if (clienteExiste.isPresent()) {
-			clienteDAO.deleteById(email);
-		} else {
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, ERROR_CL);
-		}
+	public void comprobarAdmin(String emailAdmin, String passwordAdmin) {
+		Optional<Administrador> adminExist = this.adminDAO.findByEmail(emailAdmin);
+		if(!adminExist.isPresent()||!comprobarSeguridad.decodificador(passwordAdmin, adminExist.get().getPassword()))
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Debes ser un administrador para realizar esta accion.");
 	}
 }
