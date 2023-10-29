@@ -25,14 +25,13 @@ public class AdminService {
 	private TokenDAO tokenDAO;
 	@Autowired
 	private ClienteDAO clienteDAO;
-
-	private SeguridadService comprobarSeguridad = new SeguridadService();
+	@Autowired
+	private SeguridadService comprobarSeguridad;
 
 	public static final String ERROR_CL = "Ese cliente no existe.";
 
-	public void registrarse(String nombre, String apellidos, String email, String password, String emailAdmin, String passwordAdmin)
+	public void registrarse(String nombre, String apellidos, String email, String password)
 			throws contraseñaIncorrecta, formatoIncompleto, numeroInvalido {
-		comprobarAdmin(emailAdmin, passwordAdmin);
 		Administrador admin = new Administrador(nombre, apellidos, email, password, true, 5);
 
 		Optional<Administrador> adminExist = this.adminDAO.findByEmail(email);
@@ -78,16 +77,11 @@ public class AdminService {
 
 	public void eliminarAdmin(String email, String emailAdmin, String passwordAdmin) {
 		comprobarAdmin(emailAdmin, passwordAdmin);
-		Optional<Administrador> adminExiste = adminDAO.findByEmail(email);
-		if (adminExiste.isPresent()) {
-			adminDAO.deleteById(email);
-		} else {
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, ERROR_CL);
-		}
+		adminDAO.deleteById(email);
 	}
 
 	public void comprobarAdmin(String emailAdmin, String passwordAdmin) {
-		Optional<Administrador> adminExist = this.adminDAO.findByEmail(emailAdmin);
+		Optional<Administrador> adminExist = adminDAO.findByEmail(emailAdmin);
 		if(!adminExist.isPresent()||!comprobarSeguridad.decodificador(passwordAdmin, adminExist.get().getPassword()))
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Debes ser un administrador para realizar esta accion.");
 	}
