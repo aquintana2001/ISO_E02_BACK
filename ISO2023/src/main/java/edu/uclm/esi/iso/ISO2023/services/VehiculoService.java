@@ -20,22 +20,20 @@ import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
 public class VehiculoService {
 	@Autowired
 	private VehiculoDAO vehiculoDAO;
+	
 	@Autowired
-	private AdminDAO adminDAO;
-	@Autowired
-	private SeguridadService comprobarSeguridad;
+	private AdminService adminService;
 
 	public static final String ERROR_VE = "Ese vehiculo ya existe";
 
-	public List<Vehiculo> listaVehiculo(String email, String password) {
-		Optional<Administrador> adminExist = this.adminDAO.findByEmail(email);
-		if(!adminExist.isPresent()||!comprobarSeguridad.decodificador(password, adminExist.get().getPassword()))
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para ver los vehiculos.");
+	public List<Vehiculo> listaVehiculo(String emailAdmin, String passwordAdmin) {
+		adminService.comprobarAdmin(emailAdmin, passwordAdmin);
 		return this.vehiculoDAO.findAll();
 	}
 
 	public void darAltaCoche(String matricula, String tipo, int bateria, String modelo, String estado, String direccion,
-			int nPlazas) {
+			int nPlazas, String emailAdmin, String passwordAdmin) {
+		adminService.comprobarAdmin(emailAdmin, passwordAdmin);
 		Coche coche = new Coche(tipo, matricula, bateria, modelo, estado, direccion, nPlazas);
 		if (!vehiculoExist(coche.getId())) {
 			this.vehiculoDAO.save(coche);
@@ -45,7 +43,8 @@ public class VehiculoService {
 	}
 
 	public void darAltaMoto(String matricula, String tipo, int bateria, String modelo, String estado, String direccion,
-			boolean casco) {
+			boolean casco, String emailAdmin, String passwordAdmin) {
+		adminService.comprobarAdmin(emailAdmin, passwordAdmin);
 		Moto moto = new Moto(tipo, matricula, bateria, modelo, estado, direccion, casco);
 		if (!vehiculoExist(moto.getId())) {
 			this.vehiculoDAO.save(moto);
@@ -55,7 +54,8 @@ public class VehiculoService {
 	}
 
 	public void darAltaPatinete(String matricula, String tipo, int bateria, String modelo, String estado,
-			String direccion, String color) {
+			String direccion, String color, String emailAdmin, String passwordAdmin) {
+		adminService.comprobarAdmin(emailAdmin, passwordAdmin);
 		Patinete patinete = new Patinete(tipo, matricula, bateria, modelo, estado, direccion, color);
 		if (!vehiculoExist(patinete.getId())) {
 			this.vehiculoDAO.save(patinete);
@@ -64,7 +64,8 @@ public class VehiculoService {
 		}
 	}
 
-	public void darBajaVehiculo(String id) {
+	public void darBajaVehiculo(String id, String emailAdmin, String passwordAdmin) {
+		adminService.comprobarAdmin(emailAdmin, passwordAdmin);
 		if (vehiculoExist(id)) {
 			vehiculoDAO.deleteById(id);
 		} else {

@@ -40,22 +40,26 @@ public class SeguridadService {
 				contieneCaracterRaro = true;
 		}
 
-		if (!contieneMayus)
-			throw new contraseñaIncorrecta("Error. La contrasena tiene que tener minimo una mayuscula");
-
-		if (!contieneMinus)
-			throw new contraseñaIncorrecta("Error. La contrasena tiene que tener minimo una minusccula");
-
-		if (!contieneNumero)
-			throw new contraseñaIncorrecta("Error. La contrasena tiene que tener minimo un numero");
-
-		if (!contieneCaracterRaro)
-			throw new contraseñaIncorrecta("Error. La contrasena tiene que tener minimo un caracter raro");
+		lanzamientoErrores(contieneMayus, contieneMinus, contieneNumero, contieneCaracterRaro);
 
 		if (contieneMayus && contieneMinus && contieneNumero && contieneCaracterRaro
 				&& usuario.getPassword().length() >= 8)
 			seguro = true;
 		return seguro;
+	}
+
+	public void lanzamientoErrores(boolean may, boolean min, boolean num, boolean car) throws contraseñaIncorrecta {
+		if (!may)
+			throw new contraseñaIncorrecta("Error. La contrasena tiene que tener minimo una mayuscula");
+
+		if (!min)
+			throw new contraseñaIncorrecta("Error. La contrasena tiene que tener minimo una minusccula");
+
+		if (!num)
+			throw new contraseñaIncorrecta("Error. La contrasena tiene que tener minimo un numero");
+
+		if (!car)
+			throw new contraseñaIncorrecta("Error. La contrasena tiene que tener minimo un caracter raro");
 	}
 
 	public static boolean esCaracterRaro(char c) {

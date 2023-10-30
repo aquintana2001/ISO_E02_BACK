@@ -19,27 +19,22 @@ public class ClienteService {
 	@Autowired
 	private ClienteDAO clienteDAO;
 	@Autowired
-	private AdminDAO adminDAO;
+	private SeguridadService comprobarSeguridad;
+	@Autowired
+	private AdminService adminService;
 
-	private SeguridadService comprobarSeguridad = new SeguridadService();
-
-	public List<Cliente> listaClientes(String email, String password) {
-		Optional<Administrador> adminExist = this.adminDAO.findByEmail(email);
-		if(!adminExist.isPresent()||!comprobarSeguridad.decodificador(password, adminExist.get().getPassword()))
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para ver los vehiculos.");
+	public List<Cliente> listaClientes(String emailAdmin, String passwordAdmin) {
+		adminService.comprobarAdmin(emailAdmin, passwordAdmin);
 		return this.clienteDAO.findAll();
 	}
 
 	public void actualizarCliente(String nombre, String apellidos, String email, String password, boolean activo,
-			int intentos, String fechaNacimiento, String carnet, String telefono, String dni)
+			int intentos, String fechaNacimiento, String carnet, String telefono, String dni, String emailAdmin, String passwordAdmin)
 			throws contraseñaIncorrecta, formatoIncompleto, numeroInvalido {
+		adminService.comprobarAdmin(emailAdmin, passwordAdmin);
 		Cliente cliente = new Cliente(nombre, apellidos, email, password, activo, intentos, fechaNacimiento, carnet,
 				telefono, dni);
-		if (cliente.getNombre().equals("") || cliente.getApellidos().equals("") || cliente.getEmail().equals("")
-				|| cliente.getPassword().equals("") || cliente.getActivo().equals(Boolean.parseBoolean("")) || cliente.getCarnet().equals("")
-				|| cliente.getTelefono().equals("") || cliente.getDni().equals(""))
-			throw new formatoIncompleto("Introduzca todos los datos");
-
+		
 		Cliente auxiliar = cliente;
 		comprobarSeguridad.restriccionesPassword(auxiliar);
 		comprobarSeguridad.validarEmail(cliente.getEmail());
@@ -54,5 +49,15 @@ public class ClienteService {
 		}
 
 		clienteDAO.save(cliente);
+	}
+	
+	public void eliminarCliente(String email, String emailAdmin, String passwordAdmin) {
+		adminService.comprobarAdmin(emailAdmin, passwordAdmin);
+		Optional<Cliente> clienteExiste = clienteDAO.findByEmail(email);
+		if (clienteExiste.isPresent()) {
+			clienteDAO.deleteById(email);
+		} else {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Ese cliente no existe");
+		}
 	}
 }

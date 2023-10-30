@@ -38,6 +38,7 @@ public class AdminController {
 	private VehiculoService vehiculoService;
 
 	public static final String NOMBRE = "nombre";
+	public static final String PASSWORD = "password";
 	public static final String APELLIDOS = "apellidos";
 	public static final String EMAIL = "email";
 	public static final String BATERIA = "bateria";
@@ -45,19 +46,22 @@ public class AdminController {
 	public static final String ESTADO = "estado";
 	public static final String MATRICULA = "matricula";
 	public static final String MODELO = "modelo";
+	public static final String TIPO = "tipo";
+	public static final String EMAILADMIN = "emailAdmin";
+	public static final String PASSWORDADMIN = "passwordAdmin";
 
-	@GetMapping("/cliente")
+	@PostMapping("/cliente")
 	public List<Cliente> listaCliente(@RequestBody Map<String, Object> info) {
-		String email = info.get("email").toString();
-		String password = info.get("password").toString();
-		return clienteService.listaClientes(email, password);
+		String emailAdmin = info.get(EMAILADMIN).toString();
+		String passwordAdmin = info.get(PASSWORDADMIN).toString();
+		return clienteService.listaClientes(emailAdmin, passwordAdmin);
 	}
 
-	@GetMapping("/vehiculo")
+	@PostMapping("/vehiculo")
 	public List<Vehiculo> listaVehiculo(@RequestBody Map<String, Object> info) {
-		String email = info.get("email").toString();
-		String password = info.get("password").toString();
-		return vehiculoService.listaVehiculo(email, password);
+		String emailAdmin = info.get(EMAILADMIN).toString();
+		String passwordAdmin = info.get(PASSWORDADMIN).toString();
+		return vehiculoService.listaVehiculo(emailAdmin, passwordAdmin);
 	}
 
 	@PostMapping("/register")
@@ -84,17 +88,19 @@ public class AdminController {
 		String nombre = info.get(NOMBRE).toString();
 		String apellidos = info.get(APELLIDOS).toString();
 		String email = info.get(EMAIL).toString();
-		String password = info.get("password").toString();
+		String password = info.get(PASSWORD).toString();
 		boolean activo = Boolean.parseBoolean(info.get("activo").toString());
 		int intentos = Integer.parseInt(info.get("intentos").toString());
 		String fechaNacimiento = info.get("fechaNacimiento").toString();
 		String carnet = info.get("carnet").toString();
 		String telefono = info.get("telefono").toString();
 		String dni = info.get("dni").toString();
+		String emailAdmin = info.get(EMAILADMIN).toString();
+		String passwordAdmin = info.get(PASSWORDADMIN).toString();
 
 		try {
 			this.clienteService.actualizarCliente(nombre, apellidos, email, password, activo, intentos, fechaNacimiento,
-					carnet, telefono, dni);
+					carnet, telefono, dni, emailAdmin, passwordAdmin);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
@@ -106,12 +112,15 @@ public class AdminController {
 		String nombre = info.get(NOMBRE).toString();
 		String apellidos = info.get(APELLIDOS).toString();
 		String email = info.get(EMAIL).toString();
-		String password = info.get("password").toString();
+		String password = info.get(PASSWORD).toString();
 		boolean activo = Boolean.parseBoolean(info.get("activo").toString());
 		int intentos = Integer.parseInt(info.get("intentos").toString());
+		String emailAdmin = info.get(EMAILADMIN).toString();
+		String passwordAdmin = info.get(PASSWORDADMIN).toString();
 
 		try {
-			this.adminService.actualizarAdmin(nombre, apellidos, email, password, activo, intentos);
+			this.adminService.actualizarAdmin(nombre, apellidos, email, password, activo, intentos, emailAdmin,
+					passwordAdmin);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
@@ -121,8 +130,10 @@ public class AdminController {
 	@DeleteMapping("/eliminarAdmin")
 	public ResponseEntity<String> eliminarAdmin(@RequestBody Map<String, Object> info) {
 		String email = info.get(EMAIL).toString();
+		String emailAdmin = info.get(EMAILADMIN).toString();
+		String passwordAdmin = info.get(PASSWORDADMIN).toString();
 		try {
-			this.adminService.eliminarAdmin(email);
+			this.adminService.eliminarAdmin(email, emailAdmin, passwordAdmin);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
@@ -132,8 +143,10 @@ public class AdminController {
 	@DeleteMapping("/eliminarCliente")
 	public ResponseEntity<String> eliminarCliente(@RequestBody Map<String, Object> info) {
 		String email = info.get(EMAIL).toString();
+		String emailAdmin = info.get(EMAILADMIN).toString();
+		String passwordAdmin = info.get(PASSWORDADMIN).toString();
 		try {
-			this.adminService.eliminarCliente(email);
+			this.clienteService.eliminarCliente(email, emailAdmin, passwordAdmin);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
@@ -141,83 +154,102 @@ public class AdminController {
 	}
 
 	@PostMapping("/darAltaVehiculo")
-	public ResponseEntity<String> darAltaVehiculo(@RequestBody Map<String, Object> info) {
+    public ResponseEntity<String> darAltaVehiculo(@RequestBody Map<String, Object> info) {
 
-		String email = info.get(EMAIL).toString();
-		Optional<Administrador> adminExist = adminDAO.findByEmail(email);
+        String tipoVehiculo = (String) info.get(TIPO);
 
-		if (adminExist.isPresent()) {
-			String tipoVehiculo = (String) info.get("tipo");
+        switch (tipoVehiculo) {
+        case "coche":
+            darAltaCoche(info);
+            break;
+        case "moto":
+            darAltaMoto(info);
+            break;
+        case "patinete":
+            darAltaPatinete(info);
+            break;
+        default:
+            return ResponseEntity.badRequest().body("Tipo de vehículo desconocido.");
+        }
+        return ResponseEntity.ok("Vehículo dado de alta con éxito.");
 
-			switch (tipoVehiculo) {
-			case "coche":
-				darAltaCoche(info);
-				break;
-			case "moto":
-				darAltaMoto(info);
-				break;
-			case "patinete":
-				darAltaPatinete(info);
-				break;
-			default:
-				return ResponseEntity.badRequest().body("Tipo de vehículo desconocido.");
-			}
-			return ResponseEntity.ok("Vehículo dado de alta con éxito.");
-		} else {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tienes permiso para dar de alta vehículos.");
-		}
-	}
+    }
 
 	private void darAltaCoche(Map<String, Object> info) {
 		String matricula = info.get(MATRICULA).toString();
-		String tipo = info.get("tipo").toString();
-		int bateria = Integer.parseInt(info.get(BATERIA).toString());
+		String tipo = info.get(TIPO).toString();
+		int bateria = 100;
 		String modelo = info.get(MODELO).toString();
-		String estado = info.get(ESTADO).toString();
+		String estado = "nuevo";
 		String direccion = info.get(DIRECCION).toString();
 		int nPlazas = Integer.parseInt(info.get("nPlazas").toString());
+		String emailAdmin = info.get(EMAILADMIN).toString();
+		String passwordAdmin = info.get(PASSWORDADMIN).toString();
 
-		this.vehiculoService.darAltaCoche(matricula, tipo, bateria, modelo, estado, direccion, nPlazas);
+		this.vehiculoService.darAltaCoche(matricula, tipo, bateria, modelo, estado, direccion, nPlazas, emailAdmin,
+				passwordAdmin);
 
 	}
 
 	private void darAltaMoto(Map<String, Object> info) {
 
 		String matricula = info.get(MATRICULA).toString();
-		String tipo = info.get("tipo").toString();
-		int bateria = Integer.parseInt(info.get(BATERIA).toString());
+		String tipo = info.get(TIPO).toString();
+		int bateria = 100;
 		String modelo = info.get(MODELO).toString();
-		String estado = info.get(ESTADO).toString();
+		String estado = "nuevo";
 		String direccion = info.get(DIRECCION).toString();
 		boolean casco = Boolean.parseBoolean(info.get("casco").toString());
+		String emailAdmin = info.get(EMAILADMIN).toString();
+		String passwordAdmin = info.get(PASSWORDADMIN).toString();
 
-		this.vehiculoService.darAltaMoto(matricula, tipo, bateria, modelo, estado, direccion, casco);
+		this.vehiculoService.darAltaMoto(matricula, tipo, bateria, modelo, estado, direccion, casco, emailAdmin,
+				passwordAdmin);
 	}
 
 	private void darAltaPatinete(Map<String, Object> info) {
 
 		String matricula = info.get(MATRICULA).toString();
-		String tipo = info.get("tipo").toString();
-		int bateria = Integer.parseInt(info.get(BATERIA).toString());
+		String tipo = info.get(TIPO).toString();
+		int bateria = 100;
 		String modelo = info.get(MODELO).toString();
-		String estado = info.get(ESTADO).toString();
+		String estado = "nuevo";
 		String direccion = info.get(DIRECCION).toString();
 		String color = info.get("color").toString();
+		String emailAdmin = info.get(EMAILADMIN).toString();
+		String passwordAdmin = info.get(PASSWORDADMIN).toString();
 
-		this.vehiculoService.darAltaPatinete(matricula, tipo, bateria, modelo, estado, direccion, color);
+		this.vehiculoService.darAltaPatinete(matricula, tipo, bateria, modelo, estado, direccion, color, emailAdmin,
+				passwordAdmin);
 	}
 
 	@DeleteMapping("/darBajaVehiculo")
 	public ResponseEntity<String> darBajaVehiculo(@RequestBody Map<String, Object> info) {
-		String email = info.get(EMAIL).toString();
-		Optional<Administrador> adminExist = adminDAO.findByEmail(email);
+		String emailAdmin = info.get(EMAILADMIN).toString();
+		String passwordAdmin = info.get(PASSWORDADMIN).toString();
 		String id = info.get("id").toString();
-		if (adminExist.isPresent()) {
-			vehiculoService.darBajaVehiculo(id);
-			return ResponseEntity.ok("Vehículo dado de baja con éxito.");
-		} else {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tienes permiso para dar de baja vehículos.");
-		}
+		vehiculoService.darBajaVehiculo(id, emailAdmin, passwordAdmin);
+		return ResponseEntity.ok("Vehículo dado de baja con éxito.");
 	}
+
+//	@PutMapping("/actualizarVehiculo")
+//	public ResponseEntity<String> actualizarVehiculo(@RequestBody Map<String, Object> info) {
+//		String matricula = info.get(MATRICULA).toString();
+//		String tipo = info.get(TIPO).toString();
+//		int bateria = Integer.parseInt(info.get(BATERIA).toString());
+//		String modelo = info.get(MODELO).toString();
+//		String estado = info.get(ESTADO).toString();
+//		String direccion = info.get(DIRECCION).toString();
+//		String emailAdmin = info.get(EMAILADMIN).toString();
+//		String passwordAdmin = info.get(PASSWORDADMIN).toString();
+//
+//		try {
+//			this.clienteService.actualizarCliente(nombre, apellidos, email, password, activo, intentos, fechaNacimiento,
+//					carnet, telefono, dni);
+//		} catch (Exception e) {
+//			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+//		}
+//		return ResponseEntity.ok("Actualizacion realizada con éxito.");
+//	}
 
 }
