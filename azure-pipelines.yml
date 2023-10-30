@@ -10,14 +10,6 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-- task: SonarQubePrepare@4
-  inputs:
-    SonarQube: 'ISO2023SonarQube'
-    scannerMode: 'MSBuild'
-    projectKey: 'E2ISO23'
-    projectName: 'E2ISO23'
-    extraProperties: |
-      sonar.verbose=true
 - task: Maven@3
   inputs:
     mavenPomFile: '$(Build.SourcesDirectory)/ISO2023/pom.xml'
