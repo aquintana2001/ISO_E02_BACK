@@ -154,39 +154,33 @@ public class AdminController {
 	}
 
 	@PostMapping("/darAltaVehiculo")
-	public ResponseEntity<String> darAltaVehiculo(@RequestBody Map<String, Object> info) {
+    public ResponseEntity<String> darAltaVehiculo(@RequestBody Map<String, Object> info) {
 
-		String email = info.get(EMAIL).toString();
-		Optional<Administrador> adminExist = adminDAO.findByEmail(email);
+        String tipoVehiculo = (String) info.get(TIPO);
 
-		if (adminExist.isPresent()) {
-			String tipoVehiculo = (String) info.get(TIPO);
+        switch (tipoVehiculo) {
+        case "coche":
+            darAltaCoche(info);
+            break;
+        case "moto":
+            darAltaMoto(info);
+            break;
+        case "patinete":
+            darAltaPatinete(info);
+            break;
+        default:
+            return ResponseEntity.badRequest().body("Tipo de vehículo desconocido.");
+        }
+        return ResponseEntity.ok("Vehículo dado de alta con éxito.");
 
-			switch (tipoVehiculo) {
-			case "coche":
-				darAltaCoche(info);
-				break;
-			case "moto":
-				darAltaMoto(info);
-				break;
-			case "patinete":
-				darAltaPatinete(info);
-				break;
-			default:
-				return ResponseEntity.badRequest().body("Tipo de vehículo desconocido.");
-			}
-			return ResponseEntity.ok("Vehículo dado de alta con éxito.");
-		} else {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tienes permiso para dar de alta vehículos.");
-		}
-	}
+    }
 
 	private void darAltaCoche(Map<String, Object> info) {
 		String matricula = info.get(MATRICULA).toString();
 		String tipo = info.get(TIPO).toString();
-		int bateria = Integer.parseInt(info.get(BATERIA).toString());
+		int bateria = 100;
 		String modelo = info.get(MODELO).toString();
-		String estado = info.get(ESTADO).toString();
+		String estado = "nuevo";
 		String direccion = info.get(DIRECCION).toString();
 		int nPlazas = Integer.parseInt(info.get("nPlazas").toString());
 		String emailAdmin = info.get(EMAILADMIN).toString();
@@ -201,9 +195,9 @@ public class AdminController {
 
 		String matricula = info.get(MATRICULA).toString();
 		String tipo = info.get(TIPO).toString();
-		int bateria = Integer.parseInt(info.get(BATERIA).toString());
+		int bateria = 100;
 		String modelo = info.get(MODELO).toString();
-		String estado = info.get(ESTADO).toString();
+		String estado = "nuevo";
 		String direccion = info.get(DIRECCION).toString();
 		boolean casco = Boolean.parseBoolean(info.get("casco").toString());
 		String emailAdmin = info.get(EMAILADMIN).toString();
@@ -217,9 +211,9 @@ public class AdminController {
 
 		String matricula = info.get(MATRICULA).toString();
 		String tipo = info.get(TIPO).toString();
-		int bateria = Integer.parseInt(info.get(BATERIA).toString());
+		int bateria = 100;
 		String modelo = info.get(MODELO).toString();
-		String estado = info.get(ESTADO).toString();
+		String estado = "nuevo";
 		String direccion = info.get(DIRECCION).toString();
 		String color = info.get("color").toString();
 		String emailAdmin = info.get(EMAILADMIN).toString();
@@ -240,13 +234,14 @@ public class AdminController {
 
 //	@PutMapping("/actualizarVehiculo")
 //	public ResponseEntity<String> actualizarVehiculo(@RequestBody Map<String, Object> info) {
-//		String matricula = info.get("matricula").toString();
-//		String tipo = info.get("tipo").toString();
-//		String bateria = info.get(EMAIL).toString();
-//		String modelo = info.get(PASSWORD).toString();
-//		boolean estado = Boolean.parseBoolean(info.get("activo").toString());
-//		int direccion = Integer.parseInt(info.get("intentos").toString());
-//		
+//		String matricula = info.get(MATRICULA).toString();
+//		String tipo = info.get(TIPO).toString();
+//		int bateria = Integer.parseInt(info.get(BATERIA).toString());
+//		String modelo = info.get(MODELO).toString();
+//		String estado = info.get(ESTADO).toString();
+//		String direccion = info.get(DIRECCION).toString();
+//		String emailAdmin = info.get(EMAILADMIN).toString();
+//		String passwordAdmin = info.get(PASSWORDADMIN).toString();
 //
 //		try {
 //			this.clienteService.actualizarCliente(nombre, apellidos, email, password, activo, intentos, fechaNacimiento,
