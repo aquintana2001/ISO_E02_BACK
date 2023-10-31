@@ -47,6 +47,7 @@ public class AdminController {
 	public static final String MATRICULA = "matricula";
 	public static final String MODELO = "modelo";
 	public static final String TIPO = "tipo";
+	public static final String NUEVO = "nuevo";
 	public static final String EMAILADMIN = "emailAdmin";
 	public static final String PASSWORDADMIN = "passwordAdmin";
 
@@ -74,9 +75,11 @@ public class AdminController {
 		String nombre = info.get(NOMBRE).toString();
 		String apellidos = info.get(APELLIDOS).toString();
 		String email = info.get(EMAIL).toString();
+		String emailAdmin = info.get(EMAILADMIN).toString();
+		String passwordAdmin = info.get(PASSWORDADMIN).toString();
 
 		try {
-			this.adminService.registrarse(nombre, apellidos, email, password1);
+			this.adminService.registrarse(nombre, apellidos, email, password1, emailAdmin, passwordAdmin);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
@@ -180,7 +183,7 @@ public class AdminController {
 		String tipo = info.get(TIPO).toString();
 		int bateria = 100;
 		String modelo = info.get(MODELO).toString();
-		String estado = "nuevo";
+		String estado = NUEVO;
 		String direccion = info.get(DIRECCION).toString();
 		int nPlazas = Integer.parseInt(info.get("nPlazas").toString());
 		String emailAdmin = info.get(EMAILADMIN).toString();
@@ -197,7 +200,7 @@ public class AdminController {
 		String tipo = info.get(TIPO).toString();
 		int bateria = 100;
 		String modelo = info.get(MODELO).toString();
-		String estado = "nuevo";
+		String estado = NUEVO;
 		String direccion = info.get(DIRECCION).toString();
 		boolean casco = Boolean.parseBoolean(info.get("casco").toString());
 		String emailAdmin = info.get(EMAILADMIN).toString();
@@ -213,7 +216,7 @@ public class AdminController {
 		String tipo = info.get(TIPO).toString();
 		int bateria = 100;
 		String modelo = info.get(MODELO).toString();
-		String estado = "nuevo";
+		String estado = NUEVO;
 		String direccion = info.get(DIRECCION).toString();
 		String color = info.get("color").toString();
 		String emailAdmin = info.get(EMAILADMIN).toString();
