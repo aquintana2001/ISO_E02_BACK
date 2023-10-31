@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+
 public class SeguridadService {
 	public boolean restriccionesPassword(User usuario) throws contraseñaIncorrecta {
 
@@ -70,23 +71,28 @@ public class SeguridadService {
 		return matcher.matches();
 	}
 
+
 	public Boolean comprobarDni(String dni) throws numeroInvalido {
 
 		// El DNI debe tener 9 caracteres
 		if (dni.length() != 9)
 			throw new numeroInvalido("El numero de dni introducido no es valido. Introduzca nueve digitos");
 
+
 		// Comprobar que los primeros 8 caracteres son dígitos
 		for (int i = 0; i < 8; i++) {
 			if (!Character.isDigit(dni.charAt(i))) {
+
 				throw new numeroInvalido(
 						"El numero de dni introducido no es valido. Los 8 primeros digitos deben ser numeros");
+
 			}
 		}
 
 		// Comprobar que el último carácter es una letra
 		char letra = dni.charAt(8);
 		if (!Character.isLetter(letra)) {
+
 			throw new numeroInvalido(
 					"El nÃºmero de dni introducido no es vÃ¡lido. El ultimo caracter debe ser una letra.");
 
@@ -94,6 +100,7 @@ public class SeguridadService {
 
 		return true;
 	}
+
 
 	public Boolean comprobarNumero(String telefono) throws numeroInvalido {
 		if (telefono.length() != 9)
@@ -103,6 +110,7 @@ public class SeguridadService {
 		for (int i = 0; i < telefono.length(); i++) {
 			if (!Character.isDigit(telefono.charAt(i)))
 				throw new numeroInvalido("El numero de telefono introducido no es valido. Introduzca nueve digitos");
+
 
 		}
 		return true;
