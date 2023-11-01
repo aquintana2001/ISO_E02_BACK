@@ -83,10 +83,11 @@ public class UserService {
 
 			boolean passwordAdmin = comprobarSeguridad.decodificador(password, possibleAdmin.get().getPassword());
 
-			if (possibleAdmin.get().getIntentos() <= 0)
-				throw new numeroInvalido(
-						"Este usuario esta bloqueado debido a multiples inicios fallidos de sesion o decision de un administrador. Si necesita ayuda consulte con un administrador de la aplicacion de TIComo");
-
+			if (possibleAdmin.get().getIntentos() <= 0 || !possibleAdmin.get().getActivo()) {
+				possibleAdmin.get().setActivo(false);
+				adminDAO.save(possibleAdmin.get());
+				throw new numeroInvalido("Este usuario esta bloqueado.");
+			}
 			if (!passwordAdmin) {
 				possibleAdmin.get().setIntentos(possibleAdmin.get().getIntentos() - 1);
 				adminDAO.save(possibleAdmin.get());
@@ -100,9 +101,11 @@ public class UserService {
 		if (possibleCliente.isPresent()) {
 
 			boolean passwordCliente = comprobarSeguridad.decodificador(password, possibleCliente.get().getPassword());
-			if (possibleCliente.get().getIntentos() <= 0)
-				throw new numeroInvalido("Este usuario esta bloqueado debido a multiples inicios fallidos de sesion o decision de un administrador. Si necesita ayuda consulte con un administrador de la aplicacion de TIComo");
-
+			if (possibleCliente.get().getIntentos() <= 0 || !possibleCliente.get().getActivo()) {
+				possibleAdmin.get().setActivo(false);
+				adminDAO.save(possibleAdmin.get());
+				throw new numeroInvalido("Este usuario esta bloqueado.");
+			}
 			if (!passwordCliente) {
 				possibleCliente.get().setIntentos(possibleCliente.get().getIntentos() - 1);
 				clienteDAO.save(possibleCliente.get());
