@@ -15,6 +15,7 @@ import edu.uclm.esi.iso.ISO2023.entities.Coche;
 import edu.uclm.esi.iso.ISO2023.entities.Moto;
 import edu.uclm.esi.iso.ISO2023.entities.Patinete;
 import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
+import edu.uclm.esi.iso.ISO2023.exceptions.numeroInvalido;
  
 @Service
 public class VehiculoService {
@@ -32,36 +33,55 @@ public class VehiculoService {
 	}
 
 	public void darAltaCoche(String matricula, String tipo, int bateria, String modelo, String estado, String direccion,
-			int nPlazas, String emailAdmin, String passwordAdmin) {
-		adminService.comprobarAdmin(emailAdmin, passwordAdmin);
-		Coche coche = new Coche(tipo, matricula, bateria, modelo, estado, direccion, nPlazas);
-		if (!vehiculoExist(coche.getId())) {
-			this.vehiculoDAO.save(coche);
-		} else {
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, ERROR_VE);
-		}
-	}
+            int nPlazas, String emailAdmin, String passwordAdmin) throws numeroInvalido {
+        adminService.comprobarAdmin(emailAdmin, passwordAdmin);
+        Coche coche = new Coche(tipo, matricula, bateria, modelo, estado, direccion, nPlazas);
+
+        Optional<Vehiculo> possibleVehiculo = this.vehiculoDAO.findByMatricula(matricula);
+        String errMsg = "El vehiculo ya existe";
+
+        if (!possibleVehiculo.isPresent())
+            throw new numeroInvalido(errMsg);
+
+        if (possibleVehiculo.isPresent()) {
+            this.vehiculoDAO.save(coche);
+        } else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, ERROR_VE);
+        }
+    }
 
 	public void darAltaMoto(String matricula, String tipo, int bateria, String modelo, String estado, String direccion,
-			boolean casco, String emailAdmin, String passwordAdmin) {
+			boolean casco, String emailAdmin, String passwordAdmin) throws numeroInvalido{
 		adminService.comprobarAdmin(emailAdmin, passwordAdmin);
 		Moto moto = new Moto(tipo, matricula, bateria, modelo, estado, direccion, casco);
-		if (!vehiculoExist(moto.getId())) {
-			this.vehiculoDAO.save(moto);
-		} else {
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, ERROR_VE);
-		}
+		Optional<Vehiculo> possibleVehiculo = this.vehiculoDAO.findByMatricula(matricula);
+        String errMsg = "El vehiculo ya existe";
+
+        if (!possibleVehiculo.isPresent())
+            throw new numeroInvalido(errMsg);
+
+        if (possibleVehiculo.isPresent()) {
+            this.vehiculoDAO.save(moto);
+        } else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, ERROR_VE);
+        }
 	}
 
 	public void darAltaPatinete(String matricula, String tipo, int bateria, String modelo, String estado,
-			String direccion, String color, String emailAdmin, String passwordAdmin) {
+			String direccion, String color, String emailAdmin, String passwordAdmin) throws numeroInvalido {
 		adminService.comprobarAdmin(emailAdmin, passwordAdmin);
 		Patinete patinete = new Patinete(tipo, matricula, bateria, modelo, estado, direccion, color);
-		if (!vehiculoExist(patinete.getId())) {
-			this.vehiculoDAO.save(patinete);
-		} else {
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, ERROR_VE);
-		}
+		Optional<Vehiculo> possibleVehiculo = this.vehiculoDAO.findByMatricula(matricula);
+        String errMsg = "El vehiculo ya existe";
+
+        if (!possibleVehiculo.isPresent())
+            throw new numeroInvalido(errMsg);
+
+        if (possibleVehiculo.isPresent()) {
+            this.vehiculoDAO.save(patinete);
+        } else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, ERROR_VE);
+        }
 	}
 
 	public void darBajaVehiculo(String id, String emailAdmin, String passwordAdmin) {
