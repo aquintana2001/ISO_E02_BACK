@@ -20,6 +20,7 @@ import edu.uclm.esi.iso.ISO2023.dao.AdminDAO;
 import edu.uclm.esi.iso.ISO2023.entities.Administrador;
 import edu.uclm.esi.iso.ISO2023.entities.Cliente;
 import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
+import edu.uclm.esi.iso.ISO2023.exceptions.numeroInvalido;
 import edu.uclm.esi.iso.ISO2023.services.AdminService;
 import edu.uclm.esi.iso.ISO2023.services.ClienteService;
 import edu.uclm.esi.iso.ISO2023.services.VehiculoService;
@@ -157,7 +158,7 @@ public class AdminController {
 	}
 
 	@PostMapping("/darAltaVehiculo")
-    public ResponseEntity<String> darAltaVehiculo(@RequestBody Map<String, Object> info) {
+    public ResponseEntity<String> darAltaVehiculo(@RequestBody Map<String, Object> info) throws numeroInvalido {
 
         String tipoVehiculo = (String) info.get(TIPO);
 
@@ -178,7 +179,7 @@ public class AdminController {
 
     }
 
-	private void darAltaCoche(Map<String, Object> info) {
+	private void darAltaCoche(Map<String, Object> info) throws numeroInvalido {
 		String matricula = info.get(MATRICULA).toString();
 		String tipo = info.get(TIPO).toString();
 		int bateria = 100;
@@ -194,7 +195,7 @@ public class AdminController {
 
 	}
 
-	private void darAltaMoto(Map<String, Object> info) {
+	private void darAltaMoto(Map<String, Object> info) throws numeroInvalido {
 
 		String matricula = info.get(MATRICULA).toString();
 		String tipo = info.get(TIPO).toString();
@@ -210,7 +211,7 @@ public class AdminController {
 				passwordAdmin);
 	}
 
-	private void darAltaPatinete(Map<String, Object> info) {
+	private void darAltaPatinete(Map<String, Object> info) throws numeroInvalido {
 
 		String matricula = info.get(MATRICULA).toString();
 		String tipo = info.get(TIPO).toString();
