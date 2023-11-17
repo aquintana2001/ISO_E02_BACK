@@ -236,24 +236,78 @@ public class AdminController {
 		return ResponseEntity.ok("Vehículo dado de baja con éxito.");
 	}
 
-//	@PutMapping("/actualizarVehiculo")
-//	public ResponseEntity<String> actualizarVehiculo(@RequestBody Map<String, Object> info) {
-//		String matricula = info.get(MATRICULA).toString();
-//		String tipo = info.get(TIPO).toString();
-//		int bateria = Integer.parseInt(info.get(BATERIA).toString());
-//		String modelo = info.get(MODELO).toString();
-//		String estado = info.get(ESTADO).toString();
-//		String direccion = info.get(DIRECCION).toString();
-//		String emailAdmin = info.get(EMAILADMIN).toString();
-//		String passwordAdmin = info.get(PASSWORDADMIN).toString();
-//
-//		try {
-//			this.clienteService.actualizarCliente(nombre, apellidos, email, password, activo, intentos, fechaNacimiento,
-//					carnet, telefono, dni);
-//		} catch (Exception e) {
-//			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
-//		}
-//		return ResponseEntity.ok("Actualizacion realizada con éxito.");
-//	}
+	@PutMapping("/actualizarVehiculo")
+	public ResponseEntity<String> actualizarVehiculo(@RequestBody Map<String, Object> info) {
+		 String tipoVehiculo = (String) info.get(TIPO);
+
+	        switch (tipoVehiculo) {
+	        case "coche":
+	            modificarCoche(info);
+	            break;
+	        case "moto":
+	            modificarMoto(info);
+	            break;
+	        case "patinete":
+	            modificarPatinete(info);
+	            break;
+	        default:
+	            return ResponseEntity.badRequest().body("Tipo de vehículo desconocido.");
+	        }
+	        return ResponseEntity.ok("Vehículo modificado con éxito.");
+	}
+	
+	public void modificarCoche(Map<String, Object> info) {
+		String id = info.get("id").toString();
+		String matricula = info.get(MATRICULA).toString();
+		String tipo = info.get(TIPO).toString();
+		int bateria = Integer.parseInt(info.get(BATERIA).toString());
+		String modelo = info.get(MODELO).toString();
+		String estado = info.get(ESTADO).toString();
+		String direccion = info.get(DIRECCION).toString();
+		String emailAdmin = info.get(EMAILADMIN).toString();
+		String passwordAdmin = info.get(PASSWORDADMIN).toString();
+		int nPlazas = Integer.parseInt(info.get("nPlazas").toString());
+		try {
+			this.vehiculoService.modificarCoche(id,matricula,tipo,bateria,modelo,estado,direccion,emailAdmin,passwordAdmin,nPlazas);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+		}
+	}
+	
+	public void modificarMoto(Map<String, Object> info) {
+		String id = info.get("id").toString();
+		String matricula = info.get(MATRICULA).toString();
+		String tipo = info.get(TIPO).toString();
+		int bateria = Integer.parseInt(info.get(BATERIA).toString());
+		String modelo = info.get(MODELO).toString();
+		String estado = info.get(ESTADO).toString();
+		String direccion = info.get(DIRECCION).toString();
+		String emailAdmin = info.get(EMAILADMIN).toString();
+		String passwordAdmin = info.get(PASSWORDADMIN).toString();
+		boolean casco = Boolean.parseBoolean(info.get("casco").toString());
+		try {
+			this.vehiculoService.modificarMoto(id,matricula,tipo,bateria,modelo,estado,direccion,emailAdmin,passwordAdmin,casco);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+		}
+	}
+	
+	public void modificarPatinete(Map<String, Object> info) {
+		String id = info.get("id").toString();
+		String matricula = info.get(MATRICULA).toString();
+		String tipo = info.get(TIPO).toString();
+		int bateria = Integer.parseInt(info.get(BATERIA).toString());
+		String modelo = info.get(MODELO).toString();
+		String estado = info.get(ESTADO).toString();
+		String direccion = info.get(DIRECCION).toString();
+		String emailAdmin = info.get(EMAILADMIN).toString();
+		String passwordAdmin = info.get(PASSWORDADMIN).toString();
+		String color = info.get("color").toString();
+		try {
+			this.vehiculoService.modificarPatinete(id,matricula,tipo,bateria,modelo,estado,direccion,emailAdmin,passwordAdmin,color);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+		}
+	}
 
 }
