@@ -38,12 +38,8 @@ public class VehiculoService {
         Coche coche = new Coche(tipo, matricula, bateria, modelo, estado, direccion, nPlazas);
 
         Optional<Vehiculo> possibleVehiculo = this.vehiculoDAO.findByMatricula(matricula);
-        String errMsg = "El vehiculo ya existe";
 
-        if (!possibleVehiculo.isPresent())
-            throw new numeroInvalido(errMsg);
-
-        if (possibleVehiculo.isPresent()) {
+        if (!possibleVehiculo.isPresent()) {
             this.vehiculoDAO.save(coche);
         } else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, ERROR_VE);
@@ -55,12 +51,8 @@ public class VehiculoService {
 		adminService.comprobarAdmin(emailAdmin, passwordAdmin);
 		Moto moto = new Moto(tipo, matricula, bateria, modelo, estado, direccion, casco);
 		Optional<Vehiculo> possibleVehiculo = this.vehiculoDAO.findByMatricula(matricula);
-        String errMsg = "El vehiculo ya existe";
 
-        if (!possibleVehiculo.isPresent())
-            throw new numeroInvalido(errMsg);
-
-        if (possibleVehiculo.isPresent()) {
+        if (!possibleVehiculo.isPresent()) {
             this.vehiculoDAO.save(moto);
         } else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, ERROR_VE);
@@ -72,12 +64,8 @@ public class VehiculoService {
 		adminService.comprobarAdmin(emailAdmin, passwordAdmin);
 		Patinete patinete = new Patinete(tipo, matricula, bateria, modelo, estado, direccion, color);
 		Optional<Vehiculo> possibleVehiculo = this.vehiculoDAO.findByMatricula(matricula);
-        String errMsg = "El vehiculo ya existe";
-
-        if (!possibleVehiculo.isPresent())
-            throw new numeroInvalido(errMsg);
-
-        if (possibleVehiculo.isPresent()) {
+		
+        if (!possibleVehiculo.isPresent()) {
             this.vehiculoDAO.save(patinete);
         } else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, ERROR_VE);
