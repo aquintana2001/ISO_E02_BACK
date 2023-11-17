@@ -33,14 +33,17 @@ public class UserService {
 
 	public void registrarse(String nombre, String apellidos, String email, String password, String fechaNacimiento,
 			String carnet, String telefono, String dni) throws contraseñaIncorrecta, formatoIncompleto, numeroInvalido {
+
 		Cliente cliente = new Cliente(nombre, apellidos, email, password, true, 5, fechaNacimiento, carnet, telefono,
 				dni);
+
 
 		Optional<Cliente> userExist = this.clienteDAO.findByEmail(email);
 		Optional<Administrador> adminExist = this.adminDAO.findByEmail(email);
 
 		if (!comprobarSeguridad.restriccionesPassword(cliente))
 			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "La contraseña no es segura");
+
 
 		if (userExist.isPresent() || adminExist.isPresent())
 			throw new formatoIncompleto("Error.No puedes usar esos credenciales.");
@@ -50,22 +53,26 @@ public class UserService {
 
 		} else {
 			Token token = new Token();
+
 			token.setUser(cliente);
 			comprobarSeguridad.restriccionesPassword(cliente);
 			comprobarSeguridad.validarEmail(cliente.getEmail());
 			comprobarSeguridad.comprobarNumero(cliente.getTelefono());
+
 
 			if (!(comprobarSeguridad.comprobarDni(cliente.getDni())))
 				throw new numeroInvalido(
 						"El NIF introducido no es un NIF valido. Tiene que contener 8 numeros y un caracter");
 
 			if (cliente.getPassword().length() != 60) {
+
 				cliente.setPassword(comprobarSeguridad.cifrarPassword(cliente.getPassword()));
 			}
 			this.clienteDAO.save(cliente);
 			this.tokenDAO.save(token);
 		}
 	}
+
 
 	public String loginUser(String email, String password) throws formatoIncompleto, numeroInvalido {
 		Optional<Administrador> possibleAdmin = this.adminDAO.findByEmail(email);
