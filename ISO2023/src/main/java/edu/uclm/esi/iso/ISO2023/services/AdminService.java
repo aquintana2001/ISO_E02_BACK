@@ -30,8 +30,9 @@ public class AdminService {
 
 	public static final String ERROR_CL = "Ese cliente no existe.";
 
-	public void registrarse(String nombre, String apellidos, String email, String password)
+	public void registrarse(String nombre, String apellidos, String email, String password, String emailAdmin, String passwordAdmin)
 			throws contraseñaIncorrecta, formatoIncompleto, numeroInvalido {
+		comprobarAdmin(emailAdmin, passwordAdmin);
 		Administrador admin = new Administrador(nombre, apellidos, email, password, true, 5);
 
 		Optional<Administrador> adminExist = this.adminDAO.findByEmail(email);

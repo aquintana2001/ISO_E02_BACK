@@ -20,6 +20,7 @@ import edu.uclm.esi.iso.ISO2023.dao.AdminDAO;
 import edu.uclm.esi.iso.ISO2023.entities.Administrador;
 import edu.uclm.esi.iso.ISO2023.entities.Cliente;
 import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
+import edu.uclm.esi.iso.ISO2023.exceptions.numeroInvalido;
 import edu.uclm.esi.iso.ISO2023.services.AdminService;
 import edu.uclm.esi.iso.ISO2023.services.ClienteService;
 import edu.uclm.esi.iso.ISO2023.services.VehiculoService;
@@ -47,6 +48,7 @@ public class AdminController {
 	public static final String MATRICULA = "matricula";
 	public static final String MODELO = "modelo";
 	public static final String TIPO = "tipo";
+	public static final String NUEVO = "nuevo";
 	public static final String EMAILADMIN = "emailAdmin";
 	public static final String PASSWORDADMIN = "passwordAdmin";
 
@@ -74,9 +76,11 @@ public class AdminController {
 		String nombre = info.get(NOMBRE).toString();
 		String apellidos = info.get(APELLIDOS).toString();
 		String email = info.get(EMAIL).toString();
+		String emailAdmin = info.get(EMAILADMIN).toString();
+		String passwordAdmin = info.get(PASSWORDADMIN).toString();
 
 		try {
-			this.adminService.registrarse(nombre, apellidos, email, password1);
+			this.adminService.registrarse(nombre, apellidos, email, password1, emailAdmin, passwordAdmin);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
@@ -154,7 +158,7 @@ public class AdminController {
 	}
 
 	@PostMapping("/darAltaVehiculo")
-    public ResponseEntity<String> darAltaVehiculo(@RequestBody Map<String, Object> info) {
+    public ResponseEntity<String> darAltaVehiculo(@RequestBody Map<String, Object> info) throws numeroInvalido {
 
         String tipoVehiculo = (String) info.get(TIPO);
 
@@ -175,12 +179,12 @@ public class AdminController {
 
     }
 
-	private void darAltaCoche(Map<String, Object> info) {
+	private void darAltaCoche(Map<String, Object> info) throws numeroInvalido {
 		String matricula = info.get(MATRICULA).toString();
 		String tipo = info.get(TIPO).toString();
 		int bateria = 100;
 		String modelo = info.get(MODELO).toString();
-		String estado = "nuevo";
+		String estado = NUEVO;
 		String direccion = info.get(DIRECCION).toString();
 		int nPlazas = Integer.parseInt(info.get("nPlazas").toString());
 		String emailAdmin = info.get(EMAILADMIN).toString();
@@ -191,13 +195,13 @@ public class AdminController {
 
 	}
 
-	private void darAltaMoto(Map<String, Object> info) {
+	private void darAltaMoto(Map<String, Object> info) throws numeroInvalido {
 
 		String matricula = info.get(MATRICULA).toString();
 		String tipo = info.get(TIPO).toString();
 		int bateria = 100;
 		String modelo = info.get(MODELO).toString();
-		String estado = "nuevo";
+		String estado = NUEVO;
 		String direccion = info.get(DIRECCION).toString();
 		boolean casco = Boolean.parseBoolean(info.get("casco").toString());
 		String emailAdmin = info.get(EMAILADMIN).toString();
@@ -207,13 +211,13 @@ public class AdminController {
 				passwordAdmin);
 	}
 
-	private void darAltaPatinete(Map<String, Object> info) {
+	private void darAltaPatinete(Map<String, Object> info) throws numeroInvalido {
 
 		String matricula = info.get(MATRICULA).toString();
 		String tipo = info.get(TIPO).toString();
 		int bateria = 100;
 		String modelo = info.get(MODELO).toString();
-		String estado = "nuevo";
+		String estado = NUEVO;
 		String direccion = info.get(DIRECCION).toString();
 		String color = info.get("color").toString();
 		String emailAdmin = info.get(EMAILADMIN).toString();
