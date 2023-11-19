@@ -26,11 +26,6 @@ public class UserService {
 	@Autowired
 	private SeguridadService comprobarSeguridad;
 
-	@Autowired
-	private AdminService adminService = new AdminService();
-	@Autowired
-	private ClienteService clienteService = new ClienteService();
-
 	public void registrarse(String nombre, String apellidos, String email, String password, String fechaNacimiento,
 			String carnet, String telefono, String dni) throws contraseñaIncorrecta, formatoIncompleto, numeroInvalido {
 
@@ -124,6 +119,20 @@ public class UserService {
 			usuario = "cliente";
 		}
 
+		return usuario;
+	}
+	
+	public String comprobarUsuario(String email, String password) {
+		String usuario="";
+		Optional<Administrador> adminExist = adminDAO.findByEmail(email);
+		Optional<Cliente> clienteExist = clienteDAO.findByEmail(email);
+		if(adminExist.isPresent()&&comprobarSeguridad.decodificador(password, adminExist.get().getPassword())) {
+			usuario = "admin";
+		}else if(clienteExist.isPresent()&&comprobarSeguridad.decodificador(password, clienteExist.get().getPassword())){
+			usuario = "cliente";
+		}else {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permisos para realizar esta accion.");
+		}
 		return usuario;
 	}
 
