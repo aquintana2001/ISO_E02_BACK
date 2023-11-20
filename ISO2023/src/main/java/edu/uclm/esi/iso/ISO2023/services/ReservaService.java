@@ -58,7 +58,7 @@ public class ReservaService {
 			this.vehiculoDAO.save(reserva.getVehiculo());
 			this.reservaDAO.save(reserva);
 		}else {
-			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "No puedes cancelar la reserva.");
+			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Error al cancelar la reserva.");
 		}
 	}
 	
@@ -74,7 +74,17 @@ public class ReservaService {
 			this.vehiculoDAO.save(reserva.getVehiculo());
 			this.reservaDAO.save(reserva);
 		}else {
-			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "No puedes finalizar la reserva.");
+			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Error al finalizar la reserva.");
+		}
+	}
+
+	public void valorarReserva(String email, String password, String idReserva, double valoracion) {
+		Reserva reserva = this.reservaDAO.findById(idReserva).get();
+		if (userService.comprobarUsuario(email, password).equals("cliente")&&reserva.getEstado().equals("finalizada")&&reserva.getCliente().getEmail().equals(email)) {
+			reserva.setValoracion(valoracion);
+			this.reservaDAO.save(reserva);
+		}else {
+			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Error al valorar la reserva.");
 		}
 	}
 }

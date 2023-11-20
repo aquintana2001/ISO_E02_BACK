@@ -77,4 +77,17 @@ public class ClienteController {
 		}
 		return ResponseEntity.ok("Reserva finalizada con éxito.");
 	}
+	
+	@PutMapping("/valorarReserva")
+	public void valorarReserva(@RequestBody Map<String, Object> info) {
+		String email = info.get("emailUser").toString();
+		String password = info.get("passwordUser").toString();
+		String idReserva = info.get("idReserva").toString();
+		double valoracion = Double.parseDouble(info.get("valoracion").toString());
+		try {
+			this.reservaService.valorarReserva(email,password, idReserva, valoracion);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+		}
+	}
 }
