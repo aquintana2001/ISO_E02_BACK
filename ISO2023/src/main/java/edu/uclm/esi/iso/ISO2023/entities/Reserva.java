@@ -13,6 +13,7 @@ public class Reserva {
 	private Cliente cliente;
 	private double valoracion;
 	private String estado;
+	private String comentario;
 	
 	public Reserva(Vehiculo vehiculo, Cliente cliente, double valoracion) {
 		this.id = UUID.randomUUID().toString();
@@ -59,5 +60,13 @@ public class Reserva {
 
 	public void setEstado(String estado) {
 		this.estado = estado;
+	}
+	
+	public String getComentario() {
+		return comentario;
+	}
+
+	public void setComentario(String comentario) {
+		this.comentario = comentario;
 	}
 }
