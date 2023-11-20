@@ -1,7 +1,6 @@
 package edu.uclm.esi.iso.ISO2023.services;
 
-import java.util.Optional; 
-import java.util.UUID;
+import java.util.Optional;  
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,10 +29,6 @@ public class UserService {
 	@Autowired
 	private SeguridadService comprobarSeguridad;
 
-	@Autowired
-	private AdminService adminService = new AdminService();
-	@Autowired
-	private ClienteService clienteService = new ClienteService();
 	
 	@Autowired
     private JavaMailSender javaMailSender;
