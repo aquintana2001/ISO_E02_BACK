@@ -10,10 +10,12 @@ import org.springframework.web.server.ResponseStatusException;
 
 import edu.uclm.esi.iso.ISO2023.dao.AdminDAO;
 import edu.uclm.esi.iso.ISO2023.dao.ClienteDAO;
+import edu.uclm.esi.iso.ISO2023.dao.ParametrosDAO;
 import edu.uclm.esi.iso.ISO2023.dao.TokenDAO;
 import edu.uclm.esi.iso.ISO2023.dao.VehiculoDAO;
 import edu.uclm.esi.iso.ISO2023.entities.Administrador;
 import edu.uclm.esi.iso.ISO2023.entities.Cliente;
+import edu.uclm.esi.iso.ISO2023.entities.Parametros;
 import edu.uclm.esi.iso.ISO2023.entities.Token;
 import edu.uclm.esi.iso.ISO2023.exceptions.*;
 
@@ -29,6 +31,8 @@ public class AdminService {
 	private ClienteDAO clienteDAO;
 	@Autowired
 	private SeguridadService comprobarSeguridad;
+	@Autowired
+	private ParametrosDAO parametrosDAO;
 
 	public static final String ERROR_CL = "Ese cliente no existe.";
 
@@ -83,6 +87,17 @@ public class AdminService {
 	public void eliminarAdmin(String email, String emailAdmin, String passwordAdmin) {
 		if (userService.comprobarUsuario(emailAdmin, passwordAdmin).equals("admin"))
 			adminDAO.deleteById(email);
+	}
+
+	public void modificarParametros(int precioViaje, int minimoBateria, int bateriaViaje, int maxVehiculosMantenimiento, String emailAdmin, String passwordAdmin) {
+		if (userService.comprobarUsuario(emailAdmin, passwordAdmin).equals("admin")) {
+			Parametros par = new Parametros();
+			par.setPrecioViaje(precioViaje);
+			par.setMinimoBateria(minimoBateria);
+			par.setBateriaViaje(bateriaViaje);
+			par.setMaxVehiculosMantenimiento(maxVehiculosMantenimiento);
+			this.parametrosDAO.save(par);
+		}
 	}
 
 }
