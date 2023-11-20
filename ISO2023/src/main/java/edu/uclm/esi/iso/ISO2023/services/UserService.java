@@ -133,6 +133,20 @@ public class UserService {
 
 		return usuario;
 	}
+	
+	public String comprobarUsuario(String email, String password) {
+		String usuario="";
+		Optional<Administrador> adminExist = adminDAO.findByEmail(email);
+		Optional<Cliente> clienteExist = clienteDAO.findByEmail(email);
+		if(adminExist.isPresent()&&comprobarSeguridad.decodificador(password, adminExist.get().getPassword())) {
+			usuario = "admin";
+		}else if(clienteExist.isPresent()&&comprobarSeguridad.decodificador(password, clienteExist.get().getPassword())){
+			usuario = "cliente";
+		}else {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permisos para realizar esta accion.");
+		}
+		return usuario;
+	}
 
 
 	public void olvidarContrasena(String email, String resetUrl) {
