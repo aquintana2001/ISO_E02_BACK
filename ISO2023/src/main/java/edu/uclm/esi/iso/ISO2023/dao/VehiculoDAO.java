@@ -15,4 +15,7 @@ public interface VehiculoDAO extends MongoRepository<Vehiculo, String> {
 	List<Vehiculo> findByBateriaGreaterThanEqual(int bateria);
 
 	List<Vehiculo> findByBateriaLessThan(int bateria);
+	
+	List<Vehiculo> findByBateriaGreaterThanAndEstadoEquals(int bateria, String estado);
+
 }

@@ -1,5 +1,6 @@
 package edu.uclm.esi.iso.ISO2023.services;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,5 +88,15 @@ public class ReservaService {
 		}else {
 			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Error al valorar la reserva.");
 		}
+	}
+
+	public List<Reserva> listarReservas(String email, String password) {
+		if (userService.comprobarUsuario(email, password).equals("cliente")){
+			List<Reserva> reservas = this.reservaDAO.findByClienteEmail(email);
+			return reservas;
+		}else {
+			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Error al listar las reservas.");
+		}
+		
 	}
 }

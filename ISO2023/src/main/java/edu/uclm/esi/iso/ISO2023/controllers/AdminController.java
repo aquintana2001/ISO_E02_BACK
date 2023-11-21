@@ -19,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 import edu.uclm.esi.iso.ISO2023.dao.AdminDAO;
 import edu.uclm.esi.iso.ISO2023.entities.Administrador;
 import edu.uclm.esi.iso.ISO2023.entities.Cliente;
+import edu.uclm.esi.iso.ISO2023.entities.Parametros;
 import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
 import edu.uclm.esi.iso.ISO2023.exceptions.numeroInvalido;
 import edu.uclm.esi.iso.ISO2023.services.AdminService;
@@ -293,9 +294,20 @@ public class AdminController {
 		}
 	}
 
+	@GetMapping("/getParametros")
+	public Parametros getParametros(@RequestBody Map<String, Object> info) {
+		String emailAdmin = info.get(EMAILUSER).toString();
+		String passwordAdmin = info.get(PASSWORDUSER).toString();
+		try {
+			return this.adminService.getParametros(emailAdmin,passwordAdmin);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+		}
+	}
+	
 	@PutMapping("/actualizarParametros")
-	public void modificarParametros(@RequestBody Map<String, Object> info) {
-		int precioViaje = Integer.parseInt(info.get("precioViaje").toString());
+	public void actualizarParametros(@RequestBody Map<String, Object> info) {
+		double precioViaje = Double.parseDouble(info.get("precioViaje").toString());
 		int minimoBateria = Integer.parseInt(info.get("minimoBateria").toString());
 		int bateriaViaje = Integer.parseInt(info.get("bateriaViaje").toString());
 		int maxVehiculosMantenimiento = Integer.parseInt(info.get("maxVehiculosMantenimiento").toString());
@@ -303,7 +315,7 @@ public class AdminController {
 		String passwordAdmin = info.get(PASSWORDUSER).toString();
 
 		try {
-			this.adminService.modificarParametros(precioViaje, minimoBateria, bateriaViaje, maxVehiculosMantenimiento, emailAdmin, passwordAdmin);
+			this.adminService.actualizarParametros(precioViaje, minimoBateria, bateriaViaje, maxVehiculosMantenimiento, emailAdmin, passwordAdmin);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}

@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import edu.uclm.esi.iso.ISO2023.dao.AdminDAO;
+import edu.uclm.esi.iso.ISO2023.entities.Reserva;
 import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
 import edu.uclm.esi.iso.ISO2023.services.AdminService;
 import edu.uclm.esi.iso.ISO2023.services.ClienteService;
@@ -116,6 +118,17 @@ public class ClienteController {
 		String comentario = info.get("comentario").toString();
 		try {
 			this.reservaService.valorarReserva(email,password, idReserva, valoracion, comentario);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+		}
+	}
+	
+	@GetMapping("/listarReservas")
+	public List<Reserva> listarReservas(@RequestBody Map<String, Object> info) {
+		String email = info.get("emailUser").toString();
+		String password = info.get("passwordUser").toString();
+		try {
+			return this.reservaService.listarReservas(email,password);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}

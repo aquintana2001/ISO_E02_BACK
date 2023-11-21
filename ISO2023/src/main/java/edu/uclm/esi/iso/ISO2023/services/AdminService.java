@@ -89,9 +89,18 @@ public class AdminService {
 			adminDAO.deleteById(email);
 	}
 
-	public void modificarParametros(int precioViaje, int minimoBateria, int bateriaViaje, int maxVehiculosMantenimiento, String emailAdmin, String passwordAdmin) {
+	public Parametros getParametros(String email, String password) {
+		if (userService.comprobarUsuario(email, password).equals("admin")) {
+			return this.parametrosDAO.findById("655b1a3db7bb7908becebbf4").get();
+		}else {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No puedes consultar los parametros.");
+		}
+	}
+
+	public void actualizarParametros(double precioViaje, int minimoBateria, int bateriaViaje,
+			int maxVehiculosMantenimiento, String emailAdmin, String passwordAdmin) {
 		if (userService.comprobarUsuario(emailAdmin, passwordAdmin).equals("admin")) {
-			Parametros par = new Parametros();
+			Parametros par = getParametros(emailAdmin,passwordAdmin);
 			par.setPrecioViaje(precioViaje);
 			par.setMinimoBateria(minimoBateria);
 			par.setBateriaViaje(bateriaViaje);

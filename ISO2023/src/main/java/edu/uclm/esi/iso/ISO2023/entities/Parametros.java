@@ -1,10 +1,32 @@
 package edu.uclm.esi.iso.ISO2023.entities;
 
+import java.util.UUID;
+
+import org.springframework.data.annotation.Id;
+
 public class Parametros {
+	@Id
+	private String id;
 	private double precioViaje;
 	private int minimoBateria;
 	private int bateriaViaje;
 	private int maxVehiculosMantenimiento;
+	
+	public Parametros(double precioViaje, int minimoBateria, int bateriaViaje, int maxVehiculosMantenimiento) {
+		this.id = UUID.randomUUID().toString();
+		this.precioViaje = precioViaje;
+		this.minimoBateria = minimoBateria;
+		this.bateriaViaje = bateriaViaje;
+		this.maxVehiculosMantenimiento = maxVehiculosMantenimiento;
+	}
+	
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 	
 	public double getPrecioViaje() {
 		return precioViaje;
