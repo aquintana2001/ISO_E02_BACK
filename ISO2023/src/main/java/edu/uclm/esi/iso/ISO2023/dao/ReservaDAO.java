@@ -11,4 +11,5 @@ public interface ReservaDAO extends MongoRepository<Reserva, String>{
 	Optional<Reserva> findById(String id);
 	List<Reserva> findByClienteEmail(String emailCliente);
 	List<Reserva> findByClienteEmailAndVehiculoEstado(String emailCliente, String estadoVehiculo);
+	List<Reserva> findByClienteEmailAndFechaBetweenAndEstado(String emailCliente, String primerDia, String ultimoDia, String estado);
 }
