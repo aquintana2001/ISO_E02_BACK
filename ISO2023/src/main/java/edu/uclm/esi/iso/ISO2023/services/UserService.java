@@ -1,6 +1,6 @@
 package edu.uclm.esi.iso.ISO2023.services;
 
-import java.util.Optional;
+import java.util.Optional;  
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +15,9 @@ import edu.uclm.esi.iso.ISO2023.entities.Cliente;
 import edu.uclm.esi.iso.ISO2023.entities.Token;
 import edu.uclm.esi.iso.ISO2023.exceptions.*;
 
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+
 @Service
 public class UserService {
 	@Autowired
@@ -25,6 +28,10 @@ public class UserService {
 	private TokenDAO tokenDAO;
 	@Autowired
 	private SeguridadService comprobarSeguridad;
+
+	
+	@Autowired
+    private JavaMailSender javaMailSender;
 
 	public void registrarse(String nombre, String apellidos, String email, String password, String fechaNacimiento,
 			String carnet, String telefono, String dni) throws contraseñaIncorrecta, formatoIncompleto, numeroInvalido {
@@ -135,5 +142,56 @@ public class UserService {
 		}
 		return usuario;
 	}
+
+
+	public void olvidarContrasena(String email, String resetUrl) {
+		// TODO Auto-generated method stub
+		
+		Optional<Administrador> possibleAdmin = this.adminDAO.findByEmail(email);
+		Optional<Cliente> possibleCliente = this.clienteDAO.findByEmail(email);
+		
+		if (possibleCliente == null) {
+            return;
+        }
+		Token token = new Token();
+		token.setCliente(possibleCliente.get());
+        tokenDAO.save(token);
+		
+        String resetUrl1 = "http://localhost:4200/restablecerContrasena/" + token.getId();
+        enviarCorreoRestablecimiento(possibleCliente.get().getEmail(), resetUrl1);
+		
+	}
+	
+	
+	public boolean validarToken(String tokenValue) {
+		
+        Token token = tokenDAO.findById(tokenValue).orElse(null);
+        return token != null;
+    }
+	
+	public void restablecerContrasena(String tokenValue, String nuevaContrasena) {
+        
+        if (validarToken(tokenValue)) {
+
+            Token token = tokenDAO.findById(tokenValue).orElse(null);
+            Cliente cliente = token.getCliente();
+            cliente.setPassword(comprobarSeguridad.cifrarPassword(nuevaContrasena));
+            tokenDAO.delete(token);
+            clienteDAO.save(cliente);
+        }
+        
+        
+    }
+	
+	
+	private void enviarCorreoRestablecimiento(String email, String resetUrl) {
+        SimpleMailMessage mensaje = new SimpleMailMessage();
+        mensaje.setTo(email);
+        mensaje.setSubject("Restablecimiento de contraseña");
+        mensaje.setText("Haga clic en el siguiente enlace para restablecer su contraseña: " + resetUrl);
+
+        javaMailSender.send(mensaje);
+    }
+	
 
 }

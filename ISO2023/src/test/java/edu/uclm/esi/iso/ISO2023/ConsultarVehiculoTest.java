@@ -59,8 +59,8 @@ public class ConsultarVehiculoTest {
 
     public ResultActions sendAdmin(String name,String pwd) throws Exception {
 		JSONObject jsoUser = new JSONObject()
-				.put("emailAdmin", name)
-				.put("passwordAdmin",pwd);
+				.put("emailUser", name)
+				.put("passwordUser",pwd);
 		RequestBuilder request = MockMvcRequestBuilders.post("/admin/vehiculo").contentType("application/json").content(jsoUser.toString());
 		ResultActions resultActions = this.server.perform(request);
 		return resultActions;

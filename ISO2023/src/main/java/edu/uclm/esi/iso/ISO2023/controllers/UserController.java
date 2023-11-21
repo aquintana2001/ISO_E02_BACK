@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -57,4 +58,14 @@ public class UserController {
 		}
 		return usuario;
 	}
+	
+	@PostMapping("/olvidarContrasena")
+	 public ResponseEntity<String> olvidarContrasena(@RequestParam String email, @RequestParam String resetUrl) {
+        try {
+            userService.olvidarContrasena(email, resetUrl);
+            return ResponseEntity.ok("Correo de restablecimiento enviado con éxito.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al enviar el correo de restablecimiento: " + e.getMessage());
+        }
+    }
 }
