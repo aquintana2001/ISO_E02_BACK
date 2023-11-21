@@ -11,11 +11,13 @@ import org.springframework.web.server.ResponseStatusException;
 import edu.uclm.esi.iso.ISO2023.dao.AdminDAO;
 import edu.uclm.esi.iso.ISO2023.dao.ClienteDAO;
 import edu.uclm.esi.iso.ISO2023.dao.ParametrosDAO;
+import edu.uclm.esi.iso.ISO2023.dao.ReservaDAO;
 import edu.uclm.esi.iso.ISO2023.dao.TokenDAO;
 import edu.uclm.esi.iso.ISO2023.dao.VehiculoDAO;
 import edu.uclm.esi.iso.ISO2023.entities.Administrador;
 import edu.uclm.esi.iso.ISO2023.entities.Cliente;
 import edu.uclm.esi.iso.ISO2023.entities.Parametros;
+import edu.uclm.esi.iso.ISO2023.entities.Reserva;
 import edu.uclm.esi.iso.ISO2023.entities.Token;
 import edu.uclm.esi.iso.ISO2023.exceptions.*;
 
@@ -33,6 +35,8 @@ public class AdminService {
 	private SeguridadService comprobarSeguridad;
 	@Autowired
 	private ParametrosDAO parametrosDAO;
+	@Autowired
+	private ReservaDAO reservaDAO;
 
 	public static final String ERROR_CL = "Ese cliente no existe.";
 
@@ -107,6 +111,18 @@ public class AdminService {
 			par.setMaxVehiculosMantenimiento(maxVehiculosMantenimiento);
 			this.parametrosDAO.save(par);
 		}
+	}
+
+	public double obtenerFacturacion(String emailAdmin, String passwordAdmin, String emailCliente, String primerDia, String ultimoDia) {
+		double facturacion = 0;
+		if (userService.comprobarUsuario(emailAdmin, passwordAdmin).equals("admin")) {
+			Cliente cliente = this.clienteDAO.findByEmail(emailCliente).get();
+			Parametros par = getParametros(emailAdmin,passwordAdmin);
+			for(Reserva reserva:this.reservaDAO.findByClienteEmailAndFechaBetweenAndEstado(emailCliente,primerDia, ultimoDia, "finalizada")) {
+				facturacion += this.parametrosDAO.findById("655b1a3db7bb7908becebbf4").get().getPrecioViaje();
+			}
+		}
+		return facturacion;
 	}
 
 }

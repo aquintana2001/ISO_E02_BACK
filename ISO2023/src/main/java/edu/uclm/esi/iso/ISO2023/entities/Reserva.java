@@ -1,5 +1,7 @@
 package edu.uclm.esi.iso.ISO2023.entities;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 import org.springframework.data.annotation.Id;
@@ -14,12 +16,16 @@ public class Reserva {
 	private double valoracion;
 	private String estado;
 	private String comentario;
+	private String fecha;
 	
 	public Reserva(Vehiculo vehiculo, Cliente cliente, double valoracion) {
 		this.id = UUID.randomUUID().toString();
 		this.vehiculo = vehiculo;
 		this.cliente=cliente;
 		this.valoracion=valoracion;
+		LocalDateTime fechaHoraActual = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        this.fecha = fechaHoraActual.format(formatter);
 	}
 
 	public String getId() {
@@ -69,4 +75,14 @@ public class Reserva {
 	public void setComentario(String comentario) {
 		this.comentario = comentario;
 	}
+	
+	public String getFecha() {
+		return fecha;
+	}
+
+	public void setFecha(String fecha) {
+		this.fecha = fecha;
+	}
+
+
 }

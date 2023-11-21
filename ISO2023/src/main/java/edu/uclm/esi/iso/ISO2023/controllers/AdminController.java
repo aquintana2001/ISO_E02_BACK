@@ -49,7 +49,7 @@ public class AdminController {
 	public static final String MATRICULA = "matricula";
 	public static final String MODELO = "modelo";
 	public static final String TIPO = "tipo";
-	public static final String NUEVO = "nuevo";
+	public static final String DISPONIBLE = "disponible";
 	public static final String EMAILUSER = "emailUser";
 	public static final String PASSWORDUSER = "passwordUser";
 
@@ -165,7 +165,7 @@ public class AdminController {
 		String tipo = info.get(TIPO).toString();
 		int bateria = 100;
 		String modelo = info.get(MODELO).toString();
-		String estado = NUEVO;
+		String estado = DISPONIBLE;
 		String direccion = info.get(DIRECCION).toString();
 		int nPlazas = Integer.parseInt(info.get("nPlazas").toString());
 		String emailAdmin = info.get(EMAILUSER).toString();
@@ -182,7 +182,7 @@ public class AdminController {
 		String tipo = info.get(TIPO).toString();
 		int bateria = 100;
 		String modelo = info.get(MODELO).toString();
-		String estado = NUEVO;
+		String estado = DISPONIBLE;
 		String direccion = info.get(DIRECCION).toString();
 		boolean casco = Boolean.parseBoolean(info.get("casco").toString());
 		String emailAdmin = info.get(EMAILUSER).toString();
@@ -198,7 +198,7 @@ public class AdminController {
 		String tipo = info.get(TIPO).toString();
 		int bateria = 100;
 		String modelo = info.get(MODELO).toString();
-		String estado = NUEVO;
+		String estado = DISPONIBLE;
 		String direccion = info.get(DIRECCION).toString();
 		String color = info.get("color").toString();
 		String emailAdmin = info.get(EMAILUSER).toString();
@@ -316,6 +316,20 @@ public class AdminController {
 
 		try {
 			this.adminService.actualizarParametros(precioViaje, minimoBateria, bateriaViaje, maxVehiculosMantenimiento, emailAdmin, passwordAdmin);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+		}
+	}
+	
+	@GetMapping("/obtenerFacturacion")
+	public double obtenerFacturacion(@RequestBody Map<String, Object> info) {
+		String emailAdmin = info.get(EMAILUSER).toString();
+		String passwordAdmin = info.get(PASSWORDUSER).toString();
+		String emailCliente = info.get("emailCliente").toString();
+		String primerDia = info.get("primerDia").toString();
+		String ultimoDia = info.get("ultimoDia").toString();
+		try {
+			return this.adminService.obtenerFacturacion(emailAdmin,passwordAdmin,emailCliente, primerDia, ultimoDia);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
