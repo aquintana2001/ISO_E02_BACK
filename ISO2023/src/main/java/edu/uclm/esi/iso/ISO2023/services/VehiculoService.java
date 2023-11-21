@@ -9,11 +9,13 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Optional;
 
 import edu.uclm.esi.iso.ISO2023.dao.AdminDAO;
+import edu.uclm.esi.iso.ISO2023.dao.ParametrosDAO;
 import edu.uclm.esi.iso.ISO2023.dao.VehiculoDAO;
 import edu.uclm.esi.iso.ISO2023.entities.Administrador;
 import edu.uclm.esi.iso.ISO2023.entities.Cliente;
 import edu.uclm.esi.iso.ISO2023.entities.Coche;
 import edu.uclm.esi.iso.ISO2023.entities.Moto;
+import edu.uclm.esi.iso.ISO2023.entities.Parametros;
 import edu.uclm.esi.iso.ISO2023.entities.Patinete;
 import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
 import edu.uclm.esi.iso.ISO2023.exceptions.numeroInvalido;
@@ -25,19 +27,18 @@ public class VehiculoService {
 	@Autowired
 	private VehiculoDAO vehiculoDAO;
 	@Autowired
-	private AdminService adminService;
-	@Autowired
-	private SeguridadService comprobarSeguridad;
+	private ParametrosDAO parametrosDAO;
 
 	public static final String ERROR_VE = "Ese vehiculo ya existe";
 
 	public List<Vehiculo> listaVehiculo(String email, String password) {
+		Parametros parametros = parametrosDAO.findById("655b1a3db7bb7908becebbf4").get();
 		if (userService.comprobarUsuario(email, password).equals("admin")) {
 			return this.vehiculoDAO.findAll();
 		}else if(userService.comprobarUsuario(email, password).equals("cliente")) { 
-			return this.vehiculoDAO.findByBateriaGreaterThan(0);
+			return this.vehiculoDAO.findByBateriaGreaterThanAndEstadoEquals(parametros.getMinimoBateria(),"disponible");
 		}else if(userService.comprobarUsuario(email, password).equals("mantenimiento")){
-			return this.vehiculoDAO.findByBateria(0);
+			return this.vehiculoDAO.findByBateriaLessThan(parametros.getMinimoBateria());
 		}else {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permisos para realizar esta accion.");
 		}

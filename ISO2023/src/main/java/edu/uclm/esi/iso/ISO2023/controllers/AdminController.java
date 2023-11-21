@@ -19,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 import edu.uclm.esi.iso.ISO2023.dao.AdminDAO;
 import edu.uclm.esi.iso.ISO2023.entities.Administrador;
 import edu.uclm.esi.iso.ISO2023.entities.Cliente;
+import edu.uclm.esi.iso.ISO2023.entities.Parametros;
 import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
 import edu.uclm.esi.iso.ISO2023.exceptions.numeroInvalido;
 import edu.uclm.esi.iso.ISO2023.services.AdminService;
@@ -138,26 +139,26 @@ public class AdminController {
 	}
 
 	@PostMapping("/darAltaVehiculo")
-    public ResponseEntity<String> darAltaVehiculo(@RequestBody Map<String, Object> info) throws numeroInvalido {
+	public ResponseEntity<String> darAltaVehiculo(@RequestBody Map<String, Object> info) throws numeroInvalido {
 
-        String tipoVehiculo = (String) info.get(TIPO);
+		String tipoVehiculo = (String) info.get(TIPO);
 
-        switch (tipoVehiculo) {
-        case "coche":
-            darAltaCoche(info);
-            break;
-        case "moto":
-            darAltaMoto(info);
-            break;
-        case "patinete":
-            darAltaPatinete(info);
-            break;
-        default:
-            return ResponseEntity.badRequest().body("Tipo de vehículo desconocido.");
-        }
-        return ResponseEntity.ok("Vehículo dado de alta con éxito.");
+		switch (tipoVehiculo) {
+		case "coche":
+			darAltaCoche(info);
+			break;
+		case "moto":
+			darAltaMoto(info);
+			break;
+		case "patinete":
+			darAltaPatinete(info);
+			break;
+		default:
+			return ResponseEntity.badRequest().body("Tipo de vehículo desconocido.");
+		}
+		return ResponseEntity.ok("Vehículo dado de alta con éxito.");
 
-    }
+	}
 
 	private void darAltaCoche(Map<String, Object> info) throws numeroInvalido {
 		String matricula = info.get(MATRICULA).toString();
@@ -218,24 +219,24 @@ public class AdminController {
 
 	@PutMapping("/actualizarVehiculo")
 	public ResponseEntity<String> actualizarVehiculo(@RequestBody Map<String, Object> info) {
-		 String tipoVehiculo = (String) info.get(TIPO);
+		String tipoVehiculo = (String) info.get(TIPO);
 
-	        switch (tipoVehiculo) {
-	        case "coche":
-	            modificarCoche(info);
-	            break;
-	        case "moto":
-	            modificarMoto(info);
-	            break;
-	        case "patinete":
-	            modificarPatinete(info);
-	            break;
-	        default:
-	            return ResponseEntity.badRequest().body("Tipo de vehículo desconocido.");
-	        }
-	        return ResponseEntity.ok("Vehículo modificado con éxito.");
+		switch (tipoVehiculo) {
+		case "coche":
+			modificarCoche(info);
+			break;
+		case "moto":
+			modificarMoto(info);
+			break;
+		case "patinete":
+			modificarPatinete(info);
+			break;
+		default:
+			return ResponseEntity.badRequest().body("Tipo de vehículo desconocido.");
+		}
+		return ResponseEntity.ok("Vehículo modificado con éxito.");
 	}
-	
+
 	public void modificarCoche(Map<String, Object> info) {
 		String id = info.get("id").toString();
 		String matricula = info.get(MATRICULA).toString();
@@ -248,12 +249,13 @@ public class AdminController {
 		String passwordAdmin = info.get(PASSWORDUSER).toString();
 		int nPlazas = Integer.parseInt(info.get("nPlazas").toString());
 		try {
-			this.vehiculoService.modificarCoche(id,matricula,tipo,bateria,modelo,estado,direccion,emailAdmin,passwordAdmin,nPlazas);
+			this.vehiculoService.modificarCoche(id, matricula, tipo, bateria, modelo, estado, direccion, emailAdmin,
+					passwordAdmin, nPlazas);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
 	}
-	
+
 	public void modificarMoto(Map<String, Object> info) {
 		String id = info.get("id").toString();
 		String matricula = info.get(MATRICULA).toString();
@@ -266,12 +268,13 @@ public class AdminController {
 		String passwordAdmin = info.get(PASSWORDUSER).toString();
 		boolean casco = Boolean.parseBoolean(info.get("casco").toString());
 		try {
-			this.vehiculoService.modificarMoto(id,matricula,tipo,bateria,modelo,estado,direccion,emailAdmin,passwordAdmin,casco);
+			this.vehiculoService.modificarMoto(id, matricula, tipo, bateria, modelo, estado, direccion, emailAdmin,
+					passwordAdmin, casco);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
 	}
-	
+
 	public void modificarPatinete(Map<String, Object> info) {
 		String id = info.get("id").toString();
 		String matricula = info.get(MATRICULA).toString();
@@ -284,10 +287,37 @@ public class AdminController {
 		String passwordAdmin = info.get(PASSWORDUSER).toString();
 		String color = info.get("color").toString();
 		try {
-			this.vehiculoService.modificarPatinete(id,matricula,tipo,bateria,modelo,estado,direccion,emailAdmin,passwordAdmin,color);
+			this.vehiculoService.modificarPatinete(id, matricula, tipo, bateria, modelo, estado, direccion, emailAdmin,
+					passwordAdmin, color);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
 	}
 
+	@GetMapping("/getParametros")
+	public Parametros getParametros(@RequestBody Map<String, Object> info) {
+		String emailAdmin = info.get(EMAILUSER).toString();
+		String passwordAdmin = info.get(PASSWORDUSER).toString();
+		try {
+			return this.adminService.getParametros(emailAdmin,passwordAdmin);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+		}
+	}
+	
+	@PutMapping("/actualizarParametros")
+	public void actualizarParametros(@RequestBody Map<String, Object> info) {
+		double precioViaje = Double.parseDouble(info.get("precioViaje").toString());
+		int minimoBateria = Integer.parseInt(info.get("minimoBateria").toString());
+		int bateriaViaje = Integer.parseInt(info.get("bateriaViaje").toString());
+		int maxVehiculosMantenimiento = Integer.parseInt(info.get("maxVehiculosMantenimiento").toString());
+		String emailAdmin = info.get(EMAILUSER).toString();
+		String passwordAdmin = info.get(PASSWORDUSER).toString();
+
+		try {
+			this.adminService.actualizarParametros(precioViaje, minimoBateria, bateriaViaje, maxVehiculosMantenimiento, emailAdmin, passwordAdmin);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+		}
+	}
 }

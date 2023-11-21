@@ -33,6 +33,7 @@ public class ClienteService {
 		}
 	}
 
+	// METODO PARA EL ADMIN
 	public void actualizarCliente(String nombre, String apellidos, String email, String password, boolean activo,
 			int intentos, String fechaNacimiento, String carnet, String telefono, String dni, String emailAdmin,
 			String passwordAdmin) throws contraseñaIncorrecta, formatoIncompleto, numeroInvalido {
@@ -72,10 +73,51 @@ public class ClienteService {
 		if (userService.comprobarUsuario(emailAdmin, passwordAdmin).equals("admin")) {
 			Optional<Cliente> clienteExiste = clienteDAO.findByEmail(email);
 			if (clienteExiste.isPresent()) {
-				clienteDAO.deleteById(email);
+				clienteExiste.get().setActivo(false);
+				clienteDAO.save(clienteExiste.get());
 			} else {
 				throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Ese cliente no existe");
 			}
 		}
 	}
+
+	public void darDeBaja(String email, String password) {
+		if (userService.comprobarUsuario(email, password).equals("cliente")) {
+			clienteDAO.deleteById(email);
+			;
+		} else {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Error al eliminar la cuenta");
+		}
+
+	}
+
+	// METODO PARA EL CLIENTE
+	public void actualizarDatos(String nombre, String apellidos, String email, String password, String fechaNacimiento,
+			String carnet, String telefono, String dni) throws contraseñaIncorrecta, formatoIncompleto, numeroInvalido{
+		Cliente cliente = clienteDAO.findByEmail(email).get();
+		if (userService.comprobarUsuario(email, password).equals("cliente")) {
+
+			comprobarSeguridad.restriccionesPassword(cliente);
+			comprobarSeguridad.validarEmail(cliente.getEmail());
+			comprobarSeguridad.comprobarNumero(cliente.getTelefono());
+
+			if (Boolean.FALSE.equals(comprobarSeguridad.comprobarDni(cliente.getDni())))
+				throw new numeroInvalido(
+						"El NIF introducido no es un NIF valido. Tiene que contener 8 numeros y un caracter");
+
+			if (cliente.getPassword().length() != 60) {
+				cliente.setPassword(comprobarSeguridad.cifrarPassword(cliente.getPassword()));
+			}
+			cliente.setNombre(nombre);
+			cliente.setApellidos(apellidos);
+			cliente.setPassword(password);
+			cliente.setFechaNacimiento(fechaNacimiento);
+			cliente.setCarnet(carnet);
+			cliente.setTelefono(telefono);
+			cliente.setDni(dni);
+			clienteDAO.save(cliente);
+		}
+
+	}
+
 }
