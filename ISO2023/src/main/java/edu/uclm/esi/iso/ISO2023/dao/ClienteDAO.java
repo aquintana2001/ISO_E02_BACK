@@ -9,8 +9,6 @@ public interface ClienteDAO extends MongoRepository<Cliente,String>{
 	Optional<Cliente> findByEmail(String email);
 
 	Optional<Cliente> findByDni(String dni);
-	
-	Optional<Cliente> findByToken(String token);
 }
 
 

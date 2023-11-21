@@ -1,8 +1,10 @@
 package edu.uclm.esi.iso.ISO2023.services;
 
+
 import java.util.Optional; 
 
 //import javax.mail.MessagingException;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,8 +20,6 @@ import edu.uclm.esi.iso.ISO2023.entities.Token;
 import edu.uclm.esi.iso.ISO2023.exceptions.*;
 
 
-
-
 @Service
 public class UserService {
 	@Autowired
@@ -30,10 +30,9 @@ public class UserService {
 	private TokenDAO tokenDAO;
 	@Autowired
 	private SeguridadService comprobarSeguridad;
-	
+
 //	@Autowired
 //	private  EmailService emailService;
-//
 
 
 	public void registrarse(String nombre, String apellidos, String email, String password, String fechaNacimiento,
@@ -202,8 +201,5 @@ public class UserService {
 //			e.printStackTrace();
 //		}
 //    }
-//	
-
-	
 
 }

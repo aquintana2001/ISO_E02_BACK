@@ -9,8 +9,6 @@ public class Cliente extends User {
 	private String carnet;
 	private String telefono;
 	private String dni;
-	private String token;
-
 
 	public Cliente(String nombre, String apellidos, String email, String password, boolean activo, int intentos,
 			String fechaNacimiento,
