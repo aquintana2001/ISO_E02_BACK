@@ -9,15 +9,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.server.ResponseStatusException;
 
-import edu.uclm.esi.iso.ISO2023.dao.AdminDAO;
-import edu.uclm.esi.iso.ISO2023.entities.Administrador;
 import edu.uclm.esi.iso.ISO2023.entities.Cliente;
 import edu.uclm.esi.iso.ISO2023.entities.Parametros;
 import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
@@ -35,8 +32,6 @@ public class AdminController {
 	@Autowired
 	private ClienteService clienteService;
 	@Autowired
-	private AdminDAO adminDAO;
-	@Autowired
 	private VehiculoService vehiculoService;
 
 	public static final String NOMBRE = "nombre";
@@ -52,40 +47,67 @@ public class AdminController {
 	public static final String DISPONIBLE = "disponible";
 	public static final String EMAILUSER = "emailUser";
 	public static final String PASSWORDUSER = "passwordUser";
+	public static final String GET_PAR_ERR = "No se han podido capturar los parámetros de la petición, revíselos.";
 
 	@PostMapping("/cliente")
 	public List<Cliente> listaCliente(@RequestBody Map<String, Object> info) {
-		String emailAdmin = info.get(EMAILUSER).toString();
-		String passwordAdmin = info.get(PASSWORDUSER).toString();
+		String emailAdmin;
+		String passwordAdmin;
+		try {
+			emailAdmin = info.get(EMAILUSER).toString();
+			passwordAdmin = info.get(PASSWORDUSER).toString();
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
+		}
 		return clienteService.listaClientes(emailAdmin, passwordAdmin);
 	}
 
 	@PostMapping("/vehiculo")
 	public List<Vehiculo> listaVehiculo(@RequestBody Map<String, Object> info) {
-		String emailAdmin = info.get(EMAILUSER).toString();
-		String passwordAdmin = info.get(PASSWORDUSER).toString();
+		String emailAdmin;
+		String passwordAdmin;
+		try {
+			emailAdmin = info.get(EMAILUSER).toString();
+			passwordAdmin = info.get(PASSWORDUSER).toString();
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
+		}
 		return vehiculoService.listaVehiculo(emailAdmin, passwordAdmin);
 	}
 
 	@PostMapping("/register")
-	public ResponseEntity<String> registrarse(@RequestBody Map<String, Object> info) {
-		String password1 = info.get("password1").toString();
-		String password2 = info.get("password2").toString();
-		if (!password1.equals(password2))
-			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Las contraseñas no coinciden");
+	public ResponseEntity<String> registrar(@RequestBody Map<String, Object> info) {
+		String password1;
+		String nombre;
+		String apellidos;
+		String email;
+		String emailAdmin;
+		String passwordAdmin;
+		String tipoUsuario;
+		try {
+			password1 = info.get("password1").toString();
+			String password2 = info.get("password2").toString();
 
-		String nombre = info.get(NOMBRE).toString();
-		String apellidos = info.get(APELLIDOS).toString();
-		String email = info.get(EMAIL).toString();
-		String emailAdmin = info.get(EMAILUSER).toString();
-		String passwordAdmin = info.get(PASSWORDUSER).toString();
-		String tipoUsuario = info.get("tipoUsuario").toString();
+			if (!password1.equals(password2))
+				throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Las contraseñas no coinciden");
+
+			nombre = info.get(NOMBRE).toString();
+			apellidos = info.get(APELLIDOS).toString();
+			email = info.get(EMAIL).toString();
+			emailAdmin = info.get(EMAILUSER).toString();
+			passwordAdmin = info.get(PASSWORDUSER).toString();
+			tipoUsuario = info.get("tipoUsuario").toString();
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
+		}
 
 		try {
-			if(tipoUsuario.equals("admin"))
-				this.adminService.registrarse(nombre, apellidos, email, password1, emailAdmin, passwordAdmin, tipoUsuario);
-			if(tipoUsuario.equals("mantenimiento"))
-				this.adminService.registrarse(nombre, apellidos, email, password1, emailAdmin, passwordAdmin, tipoUsuario);
+			if (tipoUsuario.equals("admin"))
+				this.adminService.registrar(nombre, apellidos, email, password1, emailAdmin, passwordAdmin,
+						tipoUsuario);
+			if (tipoUsuario.equals("mantenimiento"))
+				this.adminService.registrar(nombre, apellidos, email, password1, emailAdmin, passwordAdmin,
+						tipoUsuario);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
@@ -94,18 +116,34 @@ public class AdminController {
 
 	@PutMapping("/actualizarCliente")
 	public ResponseEntity<String> actualizarCliente(@RequestBody Map<String, Object> info) {
-		String nombre = info.get(NOMBRE).toString();
-		String apellidos = info.get(APELLIDOS).toString();
-		String email = info.get(EMAIL).toString();
-		String password = info.get(PASSWORD).toString();
-		boolean activo = Boolean.parseBoolean(info.get("activo").toString());
-		int intentos = Integer.parseInt(info.get("intentos").toString());
-		String fechaNacimiento = info.get("fechaNacimiento").toString();
-		String carnet = info.get("carnet").toString();
-		String telefono = info.get("telefono").toString();
-		String dni = info.get("dni").toString();
-		String emailAdmin = info.get(EMAILUSER).toString();
-		String passwordAdmin = info.get(PASSWORDUSER).toString();
+		String nombre;
+		String apellidos;
+		String email;
+		String password;
+		boolean activo;
+		int intentos;
+		String fechaNacimiento;
+		String carnet;
+		String telefono;
+		String dni;
+		String emailAdmin;
+		String passwordAdmin;
+		try {
+			nombre = info.get(NOMBRE).toString();
+			apellidos = info.get(APELLIDOS).toString();
+			email = info.get(EMAIL).toString();
+			password = info.get(PASSWORD).toString();
+			activo = Boolean.parseBoolean(info.get("activo").toString());
+			intentos = Integer.parseInt(info.get("intentos").toString());
+			fechaNacimiento = info.get("fechaNacimiento").toString();
+			carnet = info.get("carnet").toString();
+			telefono = info.get("telefono").toString();
+			dni = info.get("dni").toString();
+			emailAdmin = info.get(EMAILUSER).toString();
+			passwordAdmin = info.get(PASSWORDUSER).toString();
+		} catch (NumberFormatException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
+		}
 
 		try {
 			this.clienteService.actualizarCliente(nombre, apellidos, email, password, activo, intentos, fechaNacimiento,
@@ -118,9 +156,16 @@ public class AdminController {
 
 	@DeleteMapping("/eliminarAdmin")
 	public ResponseEntity<String> eliminarAdmin(@RequestBody Map<String, Object> info) {
-		String email = info.get(EMAIL).toString();
-		String emailAdmin = info.get(EMAILUSER).toString();
-		String passwordAdmin = info.get(PASSWORDUSER).toString();
+		String email;
+		String emailAdmin;
+		String passwordAdmin;
+		try {
+			email = info.get(EMAIL).toString();
+			emailAdmin = info.get(EMAILUSER).toString();
+			passwordAdmin = info.get(PASSWORDUSER).toString();
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
+		}
 		try {
 			this.adminService.eliminarAdmin(email, emailAdmin, passwordAdmin);
 		} catch (Exception e) {
@@ -131,9 +176,16 @@ public class AdminController {
 
 	@DeleteMapping("/eliminarCliente")
 	public ResponseEntity<String> eliminarCliente(@RequestBody Map<String, Object> info) {
-		String email = info.get(EMAIL).toString();
-		String emailAdmin = info.get(EMAILUSER).toString();
-		String passwordAdmin = info.get(PASSWORDUSER).toString();
+		String email;
+		String emailAdmin;
+		String passwordAdmin;
+		try {
+			email = info.get(EMAIL).toString();
+			emailAdmin = info.get(EMAILUSER).toString();
+			passwordAdmin = info.get(PASSWORDUSER).toString();
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
+		}
 		try {
 			this.clienteService.eliminarCliente(email, emailAdmin, passwordAdmin);
 		} catch (Exception e) {
@@ -145,7 +197,12 @@ public class AdminController {
 	@PostMapping("/darAltaVehiculo")
 	public ResponseEntity<String> darAltaVehiculo(@RequestBody Map<String, Object> info) throws numeroInvalido {
 
-		String tipoVehiculo = (String) info.get(TIPO);
+		String tipoVehiculo;
+		try {
+			tipoVehiculo = (String) info.get(TIPO);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
+		}
 
 		switch (tipoVehiculo) {
 		case "coche":
@@ -165,15 +222,28 @@ public class AdminController {
 	}
 
 	private void darAltaCoche(Map<String, Object> info) throws numeroInvalido {
-		String matricula = info.get(MATRICULA).toString();
-		String tipo = info.get(TIPO).toString();
-		int bateria = 100;
-		String modelo = info.get(MODELO).toString();
-		String estado = DISPONIBLE;
-		String direccion = info.get(DIRECCION).toString();
-		int nPlazas = Integer.parseInt(info.get("nPlazas").toString());
-		String emailAdmin = info.get(EMAILUSER).toString();
-		String passwordAdmin = info.get(PASSWORDUSER).toString();
+		String matricula;
+		String tipo;
+		int bateria;
+		String modelo;
+		String estado;
+		String direccion;
+		int nPlazas;
+		String emailAdmin;
+		String passwordAdmin;
+		try {
+			matricula = info.get(MATRICULA).toString();
+			tipo = info.get(TIPO).toString();
+			bateria = 100;
+			modelo = info.get(MODELO).toString();
+			estado = DISPONIBLE;
+			direccion = info.get(DIRECCION).toString();
+			nPlazas = Integer.parseInt(info.get("nPlazas").toString());
+			emailAdmin = info.get(EMAILUSER).toString();
+			passwordAdmin = info.get(PASSWORDUSER).toString();
+		} catch (NumberFormatException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
+		}
 
 		this.vehiculoService.darAltaCoche(matricula, tipo, bateria, modelo, estado, direccion, nPlazas, emailAdmin,
 				passwordAdmin);
@@ -182,15 +252,28 @@ public class AdminController {
 
 	private void darAltaMoto(Map<String, Object> info) throws numeroInvalido {
 
-		String matricula = info.get(MATRICULA).toString();
-		String tipo = info.get(TIPO).toString();
-		int bateria = 100;
-		String modelo = info.get(MODELO).toString();
-		String estado = DISPONIBLE;
-		String direccion = info.get(DIRECCION).toString();
-		boolean casco = Boolean.parseBoolean(info.get("casco").toString());
-		String emailAdmin = info.get(EMAILUSER).toString();
-		String passwordAdmin = info.get(PASSWORDUSER).toString();
+		String matricula;
+		String tipo;
+		int bateria;
+		String modelo;
+		String estado;
+		String direccion;
+		boolean casco;
+		String emailAdmin;
+		String passwordAdmin;
+		try {
+			matricula = info.get(MATRICULA).toString();
+			tipo = info.get(TIPO).toString();
+			bateria = 100;
+			modelo = info.get(MODELO).toString();
+			estado = DISPONIBLE;
+			direccion = info.get(DIRECCION).toString();
+			casco = Boolean.parseBoolean(info.get("casco").toString());
+			emailAdmin = info.get(EMAILUSER).toString();
+			passwordAdmin = info.get(PASSWORDUSER).toString();
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
+		}
 
 		this.vehiculoService.darAltaMoto(matricula, tipo, bateria, modelo, estado, direccion, casco, emailAdmin,
 				passwordAdmin);
@@ -198,15 +281,28 @@ public class AdminController {
 
 	private void darAltaPatinete(Map<String, Object> info) throws numeroInvalido {
 
-		String matricula = info.get(MATRICULA).toString();
-		String tipo = info.get(TIPO).toString();
-		int bateria = 100;
-		String modelo = info.get(MODELO).toString();
-		String estado = DISPONIBLE;
-		String direccion = info.get(DIRECCION).toString();
-		String color = info.get("color").toString();
-		String emailAdmin = info.get(EMAILUSER).toString();
-		String passwordAdmin = info.get(PASSWORDUSER).toString();
+		String matricula;
+		String tipo;
+		int bateria;
+		String modelo;
+		String estado;
+		String direccion;
+		String color;
+		String emailAdmin;
+		String passwordAdmin;
+		try {
+			matricula = info.get(MATRICULA).toString();
+			tipo = info.get(TIPO).toString();
+			bateria = 100;
+			modelo = info.get(MODELO).toString();
+			estado = DISPONIBLE;
+			direccion = info.get(DIRECCION).toString();
+			color = info.get("color").toString();
+			emailAdmin = info.get(EMAILUSER).toString();
+			passwordAdmin = info.get(PASSWORDUSER).toString();
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
+		}
 
 		this.vehiculoService.darAltaPatinete(matricula, tipo, bateria, modelo, estado, direccion, color, emailAdmin,
 				passwordAdmin);
@@ -214,16 +310,28 @@ public class AdminController {
 
 	@DeleteMapping("/darBajaVehiculo")
 	public ResponseEntity<String> darBajaVehiculo(@RequestBody Map<String, Object> info) {
-		String emailAdmin = info.get(EMAILUSER).toString();
-		String passwordAdmin = info.get(PASSWORDUSER).toString();
-		String id = info.get("id").toString();
+		String emailAdmin;
+		String passwordAdmin;
+		String id;
+		try {
+			emailAdmin = info.get(EMAILUSER).toString();
+			passwordAdmin = info.get(PASSWORDUSER).toString();
+			id = info.get("id").toString();
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
+		}
 		vehiculoService.darBajaVehiculo(id, emailAdmin, passwordAdmin);
 		return ResponseEntity.ok("Vehículo dado de baja con éxito.");
 	}
 
 	@PutMapping("/actualizarVehiculo")
 	public ResponseEntity<String> actualizarVehiculo(@RequestBody Map<String, Object> info) {
-		String tipoVehiculo = (String) info.get(TIPO);
+		String tipoVehiculo;
+		try {
+			tipoVehiculo = (String) info.get(TIPO);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
+		}
 
 		switch (tipoVehiculo) {
 		case "coche":
@@ -242,16 +350,30 @@ public class AdminController {
 	}
 
 	public void modificarCoche(Map<String, Object> info) {
-		String id = info.get("id").toString();
-		String matricula = info.get(MATRICULA).toString();
-		String tipo = info.get(TIPO).toString();
-		int bateria = Integer.parseInt(info.get(BATERIA).toString());
-		String modelo = info.get(MODELO).toString();
-		String estado = info.get(ESTADO).toString();
-		String direccion = info.get(DIRECCION).toString();
-		String emailAdmin = info.get(EMAILUSER).toString();
-		String passwordAdmin = info.get(PASSWORDUSER).toString();
-		int nPlazas = Integer.parseInt(info.get("nPlazas").toString());
+		String id;
+		String matricula;
+		String tipo;
+		int bateria;
+		String modelo;
+		String estado;
+		String direccion;
+		String emailAdmin;
+		String passwordAdmin;
+		int nPlazas;
+		try {
+			id = info.get("id").toString();
+			matricula = info.get(MATRICULA).toString();
+			tipo = info.get(TIPO).toString();
+			bateria = Integer.parseInt(info.get(BATERIA).toString());
+			modelo = info.get(MODELO).toString();
+			estado = info.get(ESTADO).toString();
+			direccion = info.get(DIRECCION).toString();
+			emailAdmin = info.get(EMAILUSER).toString();
+			passwordAdmin = info.get(PASSWORDUSER).toString();
+			nPlazas = Integer.parseInt(info.get("nPlazas").toString());
+		} catch (NumberFormatException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
+		}
 		try {
 			this.vehiculoService.modificarCoche(id, matricula, tipo, bateria, modelo, estado, direccion, emailAdmin,
 					passwordAdmin, nPlazas);
@@ -261,16 +383,30 @@ public class AdminController {
 	}
 
 	public void modificarMoto(Map<String, Object> info) {
-		String id = info.get("id").toString();
-		String matricula = info.get(MATRICULA).toString();
-		String tipo = info.get(TIPO).toString();
-		int bateria = Integer.parseInt(info.get(BATERIA).toString());
-		String modelo = info.get(MODELO).toString();
-		String estado = info.get(ESTADO).toString();
-		String direccion = info.get(DIRECCION).toString();
-		String emailAdmin = info.get(EMAILUSER).toString();
-		String passwordAdmin = info.get(PASSWORDUSER).toString();
-		boolean casco = Boolean.parseBoolean(info.get("casco").toString());
+		String id;
+		String matricula;
+		String tipo;
+		int bateria;
+		String modelo;
+		String estado;
+		String direccion;
+		String emailAdmin;
+		String passwordAdmin;
+		boolean casco;
+		try {
+			id = info.get("id").toString();
+			matricula = info.get(MATRICULA).toString();
+			tipo = info.get(TIPO).toString();
+			bateria = Integer.parseInt(info.get(BATERIA).toString());
+			modelo = info.get(MODELO).toString();
+			estado = info.get(ESTADO).toString();
+			direccion = info.get(DIRECCION).toString();
+			emailAdmin = info.get(EMAILUSER).toString();
+			passwordAdmin = info.get(PASSWORDUSER).toString();
+			casco = Boolean.parseBoolean(info.get("casco").toString());
+		} catch (NumberFormatException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
+		}
 		try {
 			this.vehiculoService.modificarMoto(id, matricula, tipo, bateria, modelo, estado, direccion, emailAdmin,
 					passwordAdmin, casco);
@@ -280,16 +416,30 @@ public class AdminController {
 	}
 
 	public void modificarPatinete(Map<String, Object> info) {
-		String id = info.get("id").toString();
-		String matricula = info.get(MATRICULA).toString();
-		String tipo = info.get(TIPO).toString();
-		int bateria = Integer.parseInt(info.get(BATERIA).toString());
-		String modelo = info.get(MODELO).toString();
-		String estado = info.get(ESTADO).toString();
-		String direccion = info.get(DIRECCION).toString();
-		String emailAdmin = info.get(EMAILUSER).toString();
-		String passwordAdmin = info.get(PASSWORDUSER).toString();
-		String color = info.get("color").toString();
+		String id;
+		String matricula;
+		String tipo;
+		int bateria;
+		String modelo;
+		String estado;
+		String direccion;
+		String emailAdmin;
+		String passwordAdmin;
+		String color;
+		try {
+			id = info.get("id").toString();
+			matricula = info.get(MATRICULA).toString();
+			tipo = info.get(TIPO).toString();
+			bateria = Integer.parseInt(info.get(BATERIA).toString());
+			modelo = info.get(MODELO).toString();
+			estado = info.get(ESTADO).toString();
+			direccion = info.get(DIRECCION).toString();
+			emailAdmin = info.get(EMAILUSER).toString();
+			passwordAdmin = info.get(PASSWORDUSER).toString();
+			color = info.get("color").toString();
+		} catch (NumberFormatException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
+		}
 		try {
 			this.vehiculoService.modificarPatinete(id, matricula, tipo, bateria, modelo, estado, direccion, emailAdmin,
 					passwordAdmin, color);
@@ -300,40 +450,66 @@ public class AdminController {
 
 	@PostMapping("/getParametros")
 	public Parametros getParametros(@RequestBody Map<String, Object> info) {
-		String emailAdmin = info.get(EMAILUSER).toString();
-		String passwordAdmin = info.get(PASSWORDUSER).toString();
+		String emailAdmin;
+		String passwordAdmin;
 		try {
-			return this.adminService.getParametros(emailAdmin,passwordAdmin);
+			emailAdmin = info.get(EMAILUSER).toString();
+			passwordAdmin = info.get(PASSWORDUSER).toString();
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
+		}
+		try {
+			return this.adminService.getParametros(emailAdmin, passwordAdmin);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
 	}
-	
+
 	@PutMapping("/actualizarParametros")
 	public void actualizarParametros(@RequestBody Map<String, Object> info) {
-		double precioViaje = Double.parseDouble(info.get("precioViaje").toString());
-		int minimoBateria = Integer.parseInt(info.get("minimoBateria").toString());
-		int bateriaViaje = Integer.parseInt(info.get("bateriaViaje").toString());
-		int maxVehiculosMantenimiento = Integer.parseInt(info.get("maxVehiculosMantenimiento").toString());
-		String emailAdmin = info.get(EMAILUSER).toString();
-		String passwordAdmin = info.get(PASSWORDUSER).toString();
+		double precioViaje;
+		int minimoBateria;
+		int bateriaViaje;
+		int maxVehiculosMantenimiento;
+		String emailAdmin;
+		String passwordAdmin;
+		try {
+			precioViaje = Double.parseDouble(info.get("precioViaje").toString());
+			minimoBateria = Integer.parseInt(info.get("minimoBateria").toString());
+			bateriaViaje = Integer.parseInt(info.get("bateriaViaje").toString());
+			maxVehiculosMantenimiento = Integer.parseInt(info.get("maxVehiculosMantenimiento").toString());
+			emailAdmin = info.get(EMAILUSER).toString();
+			passwordAdmin = info.get(PASSWORDUSER).toString();
+		} catch (NumberFormatException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
+		}
 
 		try {
-			this.adminService.actualizarParametros(precioViaje, minimoBateria, bateriaViaje, maxVehiculosMantenimiento, emailAdmin, passwordAdmin);
+			this.adminService.actualizarParametros(precioViaje, minimoBateria, bateriaViaje, maxVehiculosMantenimiento,
+					emailAdmin, passwordAdmin);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
 	}
-	
+
 	@PostMapping("/obtenerFacturacion")
 	public double obtenerFacturacion(@RequestBody Map<String, Object> info) {
-		String emailAdmin = info.get(EMAILUSER).toString();
-		String passwordAdmin = info.get(PASSWORDUSER).toString();
-		String emailCliente = info.get("emailCliente").toString();
-		String primerDia = info.get("primerDia").toString();
-		String ultimoDia = info.get("ultimoDia").toString();
+		String emailAdmin;
+		String passwordAdmin;
+		String emailCliente;
+		String primerDia;
+		String ultimoDia;
 		try {
-			return this.adminService.obtenerFacturacion(emailAdmin,passwordAdmin,emailCliente, primerDia, ultimoDia);
+			emailAdmin = info.get(EMAILUSER).toString();
+			passwordAdmin = info.get(PASSWORDUSER).toString();
+			emailCliente = info.get("emailCliente").toString();
+			primerDia = info.get("primerDia").toString();
+			ultimoDia = info.get("ultimoDia").toString();
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
+		}
+		try {
+			return this.adminService.obtenerFacturacion(emailAdmin, passwordAdmin, emailCliente, primerDia, ultimoDia);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
