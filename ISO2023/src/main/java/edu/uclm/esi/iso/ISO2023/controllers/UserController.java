@@ -29,6 +29,8 @@ public class UserController {
 	private ReservaService reservaService;
 	@Autowired
 	private VehiculoService vehiculoService;
+	
+	private static final String GET_PAR_ERR = "No se han podido capturar los parámetros de la petición, revíselos.";
 
 	@PostMapping("/register")
 	public ResponseEntity<String> registrarse(@RequestBody Map<String, Object> info) {
@@ -56,8 +58,14 @@ public class UserController {
 	@PutMapping("/login")
 	public String loginUser(@RequestBody Map<String, Object> info) {
 		String usuario;
-		String email = info.get("email").toString();
-		String password = info.get("password").toString();
+		String email;
+		String password;
+		try {
+			email = info.get("email").toString();
+			password = info.get("password").toString();
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, GET_PAR_ERR);
+		}
 		try {
 			usuario = this.userService.loginUser(email, password);
 		} catch (Exception e) {

@@ -47,7 +47,7 @@ public class AdminService {
 
 	public void registrarse(String nombre, String apellidos, String email, String password, String emailAdmin,
 			String passwordAdmin, String tipoUsuario) throws contraseñaIncorrecta, formatoIncompleto, numeroInvalido {
-		if (userService.comprobarUsuario(emailAdmin, passwordAdmin).equals("admin")) {
+		if (userService.checkUser(emailAdmin, passwordAdmin).equals("admin")) {
 			User usuario = null;
 			Optional<Administrador> adminExist = this.adminDAO.findByEmail(email);
 			Optional<Cliente> clienteExist = this.clienteDAO.findByEmail(email);
@@ -89,7 +89,7 @@ public class AdminService {
 
 	public void actualizarAdmin(String nombre, String apellidos, String email, String password, boolean activo,
 			int intentos, String emailAdmin, String passwordAdmin) throws contraseñaIncorrecta, formatoIncompleto {
-		if (userService.comprobarUsuario(emailAdmin, passwordAdmin).equals("admin")) {
+		if (userService.checkUser(emailAdmin, passwordAdmin).equals("admin")) {
 			Optional<Administrador> adminExiste = adminDAO.findByEmail(email);
 			if (adminExiste.isPresent()) {
 				Administrador admin = adminExiste.get();
@@ -107,12 +107,12 @@ public class AdminService {
 	}
 
 	public void eliminarAdmin(String email, String emailAdmin, String passwordAdmin) {
-		if (userService.comprobarUsuario(emailAdmin, passwordAdmin).equals("admin"))
+		if (userService.checkUser(emailAdmin, passwordAdmin).equals("admin"))
 			adminDAO.deleteById(email);
 	}
 
 	public Parametros getParametros(String email, String password) {
-		if (userService.comprobarUsuario(email, password).equals("admin")) {
+		if (userService.checkUser(email, password).equals("admin")) {
 			return this.parametrosDAO.findById("655b1a3db7bb7908becebbf4").get();
 		} else {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No puedes consultar los parametros.");
@@ -121,7 +121,7 @@ public class AdminService {
 
 	public void actualizarParametros(double precioViaje, int minimoBateria, int bateriaViaje,
 			int maxVehiculosMantenimiento, String emailAdmin, String passwordAdmin) {
-		if (userService.comprobarUsuario(emailAdmin, passwordAdmin).equals("admin")) {
+		if (userService.checkUser(emailAdmin, passwordAdmin).equals("admin")) {
 			Parametros par = getParametros(emailAdmin, passwordAdmin);
 			par.setPrecioViaje(precioViaje);
 			par.setMinimoBateria(minimoBateria);
@@ -134,7 +134,7 @@ public class AdminService {
 	public double obtenerFacturacion(String emailAdmin, String passwordAdmin, String emailCliente, String primerDia,
 			String ultimoDia) {
 		double facturacion = 0;
-		if (userService.comprobarUsuario(emailAdmin, passwordAdmin).equals("admin")) {
+		if (userService.checkUser(emailAdmin, passwordAdmin).equals("admin")) {
 			Cliente cliente = this.clienteDAO.findByEmail(emailCliente).get();
 			Parametros par = getParametros(emailAdmin, passwordAdmin);
 			for (Reserva reserva : this.reservaDAO.findByUsuarioEmailAndFechaBetweenAndEstado(emailCliente, primerDia,

@@ -1,10 +1,8 @@
 package edu.uclm.esi.iso.ISO2023.services;
 
-
-import java.util.Optional; 
+import java.util.Optional;
 
 //import javax.mail.MessagingException;
-
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,8 +17,8 @@ import edu.uclm.esi.iso.ISO2023.entities.Administrador;
 import edu.uclm.esi.iso.ISO2023.entities.Cliente;
 import edu.uclm.esi.iso.ISO2023.entities.Mantenimiento;
 import edu.uclm.esi.iso.ISO2023.entities.Token;
+import edu.uclm.esi.iso.ISO2023.entities.User;
 import edu.uclm.esi.iso.ISO2023.exceptions.*;
-
 
 @Service
 public class UserService {
@@ -35,9 +33,6 @@ public class UserService {
 	@Autowired
 	private SeguridadService comprobarSeguridad;
 
-//	@Autowired
-//	private  EmailService emailService;
-
 
 	public void registrarse(String nombre, String apellidos, String email, String password, String fechaNacimiento,
 			String carnet, String telefono, String dni) throws contraseñaIncorrecta, formatoIncompleto, numeroInvalido {
@@ -45,13 +40,11 @@ public class UserService {
 		Cliente cliente = new Cliente(nombre, apellidos, email, password, true, 5, fechaNacimiento, carnet, telefono,
 				dni);
 
-
 		Optional<Cliente> userExist = this.clienteDAO.findByEmail(email);
 		Optional<Administrador> adminExist = this.adminDAO.findByEmail(email);
 
 		if (!comprobarSeguridad.restriccionesPassword(cliente))
 			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "La contraseña no es segura");
-
 
 		if (userExist.isPresent() || adminExist.isPresent())
 			throw new formatoIncompleto("Error.No puedes usar esos credenciales.");
@@ -67,7 +60,6 @@ public class UserService {
 			comprobarSeguridad.validarEmail(cliente.getEmail());
 			comprobarSeguridad.comprobarNumero(cliente.getTelefono());
 
-
 			if (!(comprobarSeguridad.comprobarDni(cliente.getDni())))
 				throw new numeroInvalido(
 						"El NIF introducido no es un NIF valido. Tiene que contener 8 numeros y un caracter");
@@ -81,77 +73,76 @@ public class UserService {
 		}
 	}
 
-
-	public String loginUser(String email, String password) throws formatoIncompleto, numeroInvalido {
-		Optional<Administrador> possibleAdmin = this.adminDAO.findByEmail(email);
-		Optional<Cliente> possibleCliente = this.clienteDAO.findByEmail(email);
-		String errMsg = "Credenciales incorrectos";
-		String usuario = null;
+	public String loginUser(String email, String password) throws formatoIncompleto {
+		String tipoUsuario = checkUser(email, password);
+		User usuario = findUser(tipoUsuario, email);
+		boolean passwordUser = comprobarSeguridad.decodificador(password, usuario.getPassword());
 
 		if (Boolean.FALSE.equals(comprobarSeguridad.validarEmail(email)))
-			throw new formatoIncompleto(errMsg);
+			throw new formatoIncompleto("");
 
-		if (!possibleAdmin.isPresent() && !possibleCliente.isPresent())
-			throw new numeroInvalido(errMsg);
-
-		if (possibleAdmin.isPresent()) {
-
-			boolean passwordAdmin = comprobarSeguridad.decodificador(password, possibleAdmin.get().getPassword());
-
-			if (possibleAdmin.get().getIntentos() <= 0 || !possibleAdmin.get().getActivo()) {
-				possibleAdmin.get().setActivo(false);
-				adminDAO.save(possibleAdmin.get());
-				throw new numeroInvalido("Este usuario esta bloqueado.");
-			}
-			if (!passwordAdmin) {
-				possibleAdmin.get().setIntentos(possibleAdmin.get().getIntentos() - 1);
-				adminDAO.save(possibleAdmin.get());
-				throw new formatoIncompleto(errMsg);
-			}
-			possibleAdmin.get().setIntentos(5);
-			adminDAO.save(possibleAdmin.get());
-			usuario = "admin";
+		if (usuario.getIntentos() <= 0 || !usuario.getActivo()) {
+			usuario.setActivo(false);
+			saveUser(usuario, tipoUsuario);
 		}
-
-		if (possibleCliente.isPresent()) {
-
-			boolean passwordCliente = comprobarSeguridad.decodificador(password, possibleCliente.get().getPassword());
-			if (possibleCliente.get().getIntentos() <= 0 || !possibleCliente.get().getActivo()) {
-				possibleAdmin.get().setActivo(false);
-				adminDAO.save(possibleAdmin.get());
-				throw new numeroInvalido("Este usuario esta bloqueado.");
-			}
-			if (!passwordCliente) {
-				possibleCliente.get().setIntentos(possibleCliente.get().getIntentos() - 1);
-				clienteDAO.save(possibleCliente.get());
-				throw new formatoIncompleto(errMsg);
-			}
-
-			possibleCliente.get().setIntentos(5);
-			clienteDAO.save(possibleCliente.get());
-			usuario = "cliente";
+		if (!passwordUser) {
+			usuario.setIntentos(usuario.getIntentos() - 1);
+			saveUser(usuario, tipoUsuario);
 		}
-
-		return usuario;
+		return tipoUsuario;
 	}
-	
-	public String comprobarUsuario(String email, String password) {
-		String usuario="";
+
+	public String checkUser(String email, String password) {
+		String usuario = "";
 		Optional<Administrador> adminExist = adminDAO.findByEmail(email);
 		Optional<Cliente> clienteExist = clienteDAO.findByEmail(email);
 		Optional<Mantenimiento> mantExist = mantenimientoDAO.findByEmail(email);
-		if(adminExist.isPresent()&&comprobarSeguridad.decodificador(password, adminExist.get().getPassword())) {
+		if (adminExist.isPresent() && comprobarSeguridad.decodificador(password, adminExist.get().getPassword())) {
 			usuario = "admin";
-		}else if(clienteExist.isPresent()&&comprobarSeguridad.decodificador(password, clienteExist.get().getPassword())){
+		} else if (clienteExist.isPresent()
+				&& comprobarSeguridad.decodificador(password, clienteExist.get().getPassword())) {
 			usuario = "cliente";
-		}else if(mantExist.isPresent()&&comprobarSeguridad.decodificador(password, mantExist.get().getPassword())){
+		} else if (mantExist.isPresent() && comprobarSeguridad.decodificador(password, mantExist.get().getPassword())) {
 			usuario = "mantenimiento";
-		}else{
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permisos para realizar esta accion.");
+		} else {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No perteneces al sistema.");
 		}
 		return usuario;
 	}
 
+	public User findUser(String tipoUsuario, String email) {
+		User usuario;
+		switch (tipoUsuario) {
+		case "admin":
+			usuario = (User) this.adminDAO.findByEmail(email).get();
+			break;
+		case "cliente":
+			usuario = (User) this.clienteDAO.findByEmail(email).get();
+			break;
+		case "mantenimiento":
+			usuario = (User) this.mantenimientoDAO.findByEmail(email).get();
+			break;
+		default:
+			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Error al guardar el usuario en la BBDD.");
+		}
+		return usuario;
+	}
+
+	public void saveUser(User usuario, String tipoUsuario) {
+		switch (tipoUsuario) {
+		case "admin":
+			adminDAO.save((Administrador) usuario);
+			break;
+		case "cliente":
+			clienteDAO.save((Cliente) usuario);
+			break;
+		case "mantenimiento":
+			mantenimientoDAO.save((Mantenimiento) usuario);
+			break;
+		default:
+			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Error al guardar el usuario en la BBDD.");
+
+		}
 
 //	public void olvidarContrasena(String email) {
 //		
@@ -209,4 +200,5 @@ public class UserService {
 //		}
 //    }
 
+	}
 }
