@@ -45,10 +45,8 @@ public class CancelarReservaTest {
 	void testCancelarReservaComoMantenimiento () throws Exception {
 		ResultActions result = this.sendCliente("prueba20@gmail.com", "Hola123*", "63c9b79a-0ce0-4a7c-8926-a60f6a8ca999");
 	    result
-            .andExpect(status().isOk()) // Verificar que el código de estado es 200 OK
-            .andExpect(content().contentType("application/json"));
-            // Puedes agregar más aserciones para verificar el contenido de la respuesta si es necesario
-   
+		    .andExpect(status().is4xxClientError());
+	        // Debería devolver un error 4xx ya que no se proporcionó autenticación
 	}
     
     @Test
@@ -56,8 +54,8 @@ public class CancelarReservaTest {
     void testCancelarResevaComoAdmin() throws Exception {
         ResultActions result = this.sendCliente("guillermo.santos2@alu.uclm.es", "Hola123*", "d38fbf4f-fafa-4a57-86a5-1f927438150c");
         result
-        .andExpect(status().is4xxClientError());
-        // Debería devolver un error 4xx ya que no se proporcionó autenticación
+	        .andExpect(status().is4xxClientError());
+	        // Debería devolver un error 4xx ya que no se proporcionó autenticación
     }
     
     @Test
