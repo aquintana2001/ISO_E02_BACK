@@ -9,7 +9,7 @@ import edu.uclm.esi.iso.ISO2023.entities.Reserva;
 
 public interface ReservaDAO extends MongoRepository<Reserva, String>{
 	Optional<Reserva> findById(String id);
-	List<Reserva> findByClienteEmail(String emailCliente);
-	List<Reserva> findByClienteEmailAndVehiculoEstado(String emailCliente, String estadoVehiculo);
-	List<Reserva> findByClienteEmailAndFechaBetweenAndEstado(String emailCliente, String primerDia, String ultimoDia, String estado);
+	List<Reserva> findByUsuarioEmail(String emailCliente);
+	List<Reserva> findByUsuarioEmailAndVehiculoEstado(String emailUsuario, String estadoVehiculo);
+	List<Reserva> findByUsuarioEmailAndFechaBetweenAndEstado(String emailUsuario, String primerDia, String ultimoDia, String estado);
 }

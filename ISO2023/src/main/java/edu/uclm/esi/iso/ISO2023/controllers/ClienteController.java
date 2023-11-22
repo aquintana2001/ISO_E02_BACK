@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import edu.uclm.esi.iso.ISO2023.dao.AdminDAO;
+import edu.uclm.esi.iso.ISO2023.entities.Cliente;
 import edu.uclm.esi.iso.ISO2023.entities.Reserva;
 import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
 import edu.uclm.esi.iso.ISO2023.services.AdminService;
@@ -42,6 +43,19 @@ public class ClienteController {
 		clienteService.darDeBaja(email, password);
 	}
 	
+	@PostMapping("/getDatos")
+	public Cliente getDatos(@RequestBody Map<String, Object> info) {
+		String email = info.get("emailUser").toString();
+		String password = info.get("passwordUser").toString();
+
+		try {
+			return this.clienteService.getDatos(email, password);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+		}
+	}
+	
+	
 	@PutMapping("/actualizarDatos")
 	public ResponseEntity<String> actualizarDatos(@RequestBody Map<String, Object> info) {
 		String nombre = info.get("nombre").toString();
@@ -61,53 +75,7 @@ public class ClienteController {
 		return ResponseEntity.ok("Actualizacion realizada con éxito.");
 	}
 	
-	@PostMapping("/vehiculo")
-	public List<Vehiculo> listaVehiculo(@RequestBody Map<String, Object> info) {
-		String email = info.get("emailUser").toString();
-		String password = info.get("passwordUser").toString();
-		return vehiculoService.listaVehiculo(email, password);
-	}
 	
-	@PostMapping("/reserva")
-	public ResponseEntity<String> realizarReserva(@RequestBody Map<String, Object> info) {
-		String email = info.get("emailUser").toString();
-		String password = info.get("passwordUser").toString();
-		String idVehiculo = info.get("idVehiculo").toString();
-		try {
-			this.reservaService.realizarReserva(email,password,idVehiculo);
-		} catch (Exception e) {
-			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
-		}
-		return ResponseEntity.ok("Reserva realizada con éxito.");
-	}
-	
-	@PutMapping("/cancelarReserva")
-	public ResponseEntity<String> cancelarReserva(@RequestBody Map<String, Object> info) {
-		String email = info.get("emailUser").toString();
-		String password = info.get("passwordUser").toString();
-		String idReserva = info.get("idReserva").toString();
-
-		try {
-			this.reservaService.cancelarReserva(email,password, idReserva);
-		} catch (Exception e) {
-			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
-		}
-		return ResponseEntity.ok("Reserva cancelada con éxito.");
-	}
-	
-	@PutMapping("/finalizarReserva")
-	public ResponseEntity<String> finalizarReserva(@RequestBody Map<String, Object> info) {
-		String email = info.get("emailUser").toString();
-		String password = info.get("passwordUser").toString();
-		String idReserva = info.get("idReserva").toString();
-
-		try {
-			this.reservaService.finalizarReserva(email,password, idReserva);
-		} catch (Exception e) {
-			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
-		}
-		return ResponseEntity.ok("Reserva finalizada con éxito.");
-	}
 	
 	@PutMapping("/valorarReserva")
 	public void valorarReserva(@RequestBody Map<String, Object> info) {

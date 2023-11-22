@@ -11,9 +11,7 @@ public class Cliente extends User {
 	private String dni;
 
 	public Cliente(String nombre, String apellidos, String email, String password, boolean activo, int intentos,
-			String fechaNacimiento,
-
-			String carnet, String telefono, String dni) {
+			String fechaNacimiento, String carnet, String telefono, String dni) {
 		super(nombre, apellidos, email, password, activo, intentos);
 		this.fechaNacimiento = fechaNacimiento;
 		this.carnet = carnet;
@@ -88,7 +86,7 @@ public class Cliente extends User {
 
 		// Comprobar que el último carácter es una letra
 		char letra = dni.charAt(8);
-		if(!Character.isLetter(letra))
+		if (!Character.isLetter(letra))
 			valido = false;
 
 		return valido;

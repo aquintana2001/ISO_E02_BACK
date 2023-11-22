@@ -12,16 +12,16 @@ public class Reserva {
 	@Id
 	private String id;
 	private Vehiculo vehiculo;
-	private Cliente cliente;
+	private User usuario;
 	private double valoracion;
 	private String estado;
 	private String comentario;
 	private String fecha;
 	
-	public Reserva(Vehiculo vehiculo, Cliente cliente, double valoracion) {
+	public Reserva(Vehiculo vehiculo, User usuario, double valoracion) {
 		this.id = UUID.randomUUID().toString();
 		this.vehiculo = vehiculo;
-		this.cliente=cliente;
+		this.usuario=usuario;
 		this.valoracion=valoracion;
 		LocalDateTime fechaHoraActual = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -44,12 +44,12 @@ public class Reserva {
 		this.vehiculo = vehiculo;
 	}
 
-	public Cliente getCliente() {
-		return cliente;
+	public User getUsuario() {
+		return usuario;
 	}
 
-	public void setCliente(Cliente cliente) {
-		this.cliente = cliente;
+	public void setUsuario(User usuario) {
+		this.usuario = usuario;
 	}
 
 	public double getValoracion() {
