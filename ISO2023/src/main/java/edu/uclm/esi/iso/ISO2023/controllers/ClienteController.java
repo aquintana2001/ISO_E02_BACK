@@ -62,7 +62,7 @@ public class ClienteController {
 	}
 	
 	@PostMapping("/vehiculo")
-	public List<Vehiculo> listaVehiculo(@RequestBody Map<String, Object> info) {
+	public List<Vehiculo> listaDisponibles(@RequestBody Map<String, Object> info) {
 		String email = info.get("emailUser").toString();
 		String password = info.get("passwordUser").toString();
 		return vehiculoService.listaVehiculo(email, password);
