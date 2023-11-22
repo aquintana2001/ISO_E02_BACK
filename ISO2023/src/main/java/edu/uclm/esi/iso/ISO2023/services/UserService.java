@@ -32,6 +32,11 @@ public class UserService {
 	private TokenDAO tokenDAO;
 	@Autowired
 	private SeguridadService comprobarSeguridad;
+	
+	private static final String ADMIN = "admin";
+	private static final String CLIENTE = "cliente";
+	private static final String MANTENIMIENTO = "mantenimiento";
+
 
 
 	public void registrarse(String nombre, String apellidos, String email, String password, String fechaNacimiento,
@@ -60,7 +65,7 @@ public class UserService {
 			comprobarSeguridad.validarEmail(cliente.getEmail());
 			comprobarSeguridad.comprobarNumero(cliente.getTelefono());
 
-			if (!(comprobarSeguridad.comprobarDni(cliente.getDni())))
+			if (Boolean.FALSE.equals((comprobarSeguridad.comprobarDni(cliente.getDni()))))
 				throw new numeroInvalido(
 						"El NIF introducido no es un NIF valido. Tiene que contener 8 numeros y un caracter");
 
@@ -81,7 +86,7 @@ public class UserService {
 		if (Boolean.FALSE.equals(comprobarSeguridad.validarEmail(email)))
 			throw new formatoIncompleto("");
 
-		if (usuario.getIntentos() <= 0 || !usuario.getActivo()) {
+		if (usuario.getIntentos() <= 0 || Boolean.FALSE.equals(usuario.getActivo())) {
 			usuario.setActivo(false);
 			saveUser(usuario, tipoUsuario);
 		}
@@ -98,46 +103,52 @@ public class UserService {
 		Optional<Cliente> clienteExist = clienteDAO.findByEmail(email);
 		Optional<Mantenimiento> mantExist = mantenimientoDAO.findByEmail(email);
 		if (adminExist.isPresent() && comprobarSeguridad.decodificador(password, adminExist.get().getPassword())) {
-			usuario = "admin";
-		} else if (clienteExist.isPresent()
-				&& comprobarSeguridad.decodificador(password, clienteExist.get().getPassword())) {
-			usuario = "cliente";
+			usuario = ADMIN;
+		} else if (clienteExist.isPresent() && comprobarSeguridad.decodificador(password, clienteExist.get().getPassword())) {
+			usuario = CLIENTE;
 		} else if (mantExist.isPresent() && comprobarSeguridad.decodificador(password, mantExist.get().getPassword())) {
-			usuario = "mantenimiento";
+			usuario = MANTENIMIENTO;
 		} else {
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No perteneces al sistema.");
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permisos.");
 		}
 		return usuario;
 	}
 
 	public User findUser(String tipoUsuario, String email) {
-		User usuario;
+		User usuario = null;
+		Optional<Administrador> admin = this.adminDAO.findByEmail(email);
+		Optional<Cliente> cliente = this.clienteDAO.findByEmail(email);
+		Optional<Mantenimiento> mantenimiento = this.mantenimientoDAO.findByEmail(email);
+
 		switch (tipoUsuario) {
-		case "admin":
-			usuario = (User) this.adminDAO.findByEmail(email).get();
+		case ADMIN:
+			if(admin.isPresent())
+				usuario = admin.get();
 			break;
-		case "cliente":
-			usuario = (User) this.clienteDAO.findByEmail(email).get();
+		case CLIENTE:
+			if(cliente.isPresent())
+				usuario = cliente.get();
 			break;
-		case "mantenimiento":
-			usuario = (User) this.mantenimientoDAO.findByEmail(email).get();
+		case MANTENIMIENTO:
+			if(mantenimiento.isPresent())
+				usuario = mantenimiento.get();
 			break;
 		default:
-			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Error al guardar el usuario en la BBDD.");
+			return usuario;
 		}
 		return usuario;
 	}
 
 	public void saveUser(User usuario, String tipoUsuario) {
 		switch (tipoUsuario) {
-		case "admin":
-			adminDAO.save((Administrador) usuario);
+		case ADMIN:
+			this.adminDAO.save((Administrador) usuario);
 			break;
-		case "cliente":
-			clienteDAO.save((Cliente) usuario);
+		case CLIENTE:
+			this.clienteDAO.save((Cliente) usuario);
 			break;
-		case "mantenimiento":
-			mantenimientoDAO.save((Mantenimiento) usuario);
+		case MANTENIMIENTO:
+			this.mantenimientoDAO.save((Mantenimiento) usuario);
 			break;
 		default:
 			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Error al guardar el usuario en la BBDD.");

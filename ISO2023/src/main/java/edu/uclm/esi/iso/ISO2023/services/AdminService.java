@@ -1,6 +1,5 @@
 package edu.uclm.esi.iso.ISO2023.services;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +13,7 @@ import edu.uclm.esi.iso.ISO2023.dao.MantenimientoDAO;
 import edu.uclm.esi.iso.ISO2023.dao.ParametrosDAO;
 import edu.uclm.esi.iso.ISO2023.dao.ReservaDAO;
 import edu.uclm.esi.iso.ISO2023.dao.TokenDAO;
-import edu.uclm.esi.iso.ISO2023.dao.VehiculoDAO;
 import edu.uclm.esi.iso.ISO2023.entities.Administrador;
-import edu.uclm.esi.iso.ISO2023.entities.Cliente;
 import edu.uclm.esi.iso.ISO2023.entities.Mantenimiento;
 import edu.uclm.esi.iso.ISO2023.entities.Parametros;
 import edu.uclm.esi.iso.ISO2023.entities.Reserva;
@@ -43,53 +40,56 @@ public class AdminService {
 	@Autowired
 	private ReservaDAO reservaDAO;
 
+	private static final String ADMIN = "admin";
+	private static final String MANTENIMIENTO = "mantenimiento";
+	private static final String ID_BBDD = "655b1a3db7bb7908becebbf4";
 	public static final String ERROR_CL = "Ese cliente no existe.";
 
-	public void registrarse(String nombre, String apellidos, String email, String password, String emailAdmin,
-			String passwordAdmin, String tipoUsuario) throws contraseñaIncorrecta, formatoIncompleto, numeroInvalido {
-		if (userService.checkUser(emailAdmin, passwordAdmin).equals("admin")) {
+	public void registrar(String nombre, String apellidos, String email, String password, String emailAdmin,
+			String passwordAdmin, String tipoUsuario) throws contraseñaIncorrecta, formatoIncompleto {
+		if (userService.checkUser(emailAdmin, passwordAdmin).equals(ADMIN)) {
 			User usuario = null;
-			Optional<Administrador> adminExist = this.adminDAO.findByEmail(email);
-			Optional<Cliente> clienteExist = this.clienteDAO.findByEmail(email);
-			Optional<Mantenimiento> mantExist = this.mantenimientoDAO.findByEmail(email);
-
-			if (tipoUsuario.equals("admin")) {
+			switch (tipoUsuario) {
+			case ADMIN:
 				usuario = new Administrador(nombre, apellidos, email, password, true, 5);
-			} else if (tipoUsuario.equals("mantenimiento")) {
+				break;
+			case MANTENIMIENTO:
 				usuario = new Mantenimiento(nombre, apellidos, email, password, true, 5);
+				break;
+			default:
+				throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Error al crear el usuario.");
+			}
+			seguridadRegistrar(usuario, tipoUsuario);
+		}
+	}
+
+	public void seguridadRegistrar(User usuario, String tipoUsuario) throws contraseñaIncorrecta, formatoIncompleto {
+		if (!comprobarSeguridad.restriccionesPassword(usuario))
+			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "La contraseña no es segura");
+		if (this.clienteDAO.findByEmail(usuario.getEmail()).isPresent()
+				|| this.adminDAO.findByEmail(usuario.getEmail()).isPresent()
+				|| this.mantenimientoDAO.findByEmail(usuario.getEmail()).isPresent()) {
+			throw new formatoIncompleto("Error. No puedes usar esos credenciales.");
+		} else {
+			Token token = new Token();
+			token.setUser(usuario);
+			comprobarSeguridad.restriccionesPassword(usuario);
+			comprobarSeguridad.validarEmail(usuario.getEmail());
+
+			if (usuario.getPassword().length() != 60) {
+				usuario.setPassword(comprobarSeguridad.cifrarPassword(usuario.getPassword()));
 			}
 
-			if (usuario != null) {
-				if (!comprobarSeguridad.restriccionesPassword(usuario))
-					throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "La contraseña no es segura");
+			userService.saveUser(usuario, tipoUsuario);
 
-				if (adminExist.isPresent() || clienteExist.isPresent() || mantExist.isPresent()) {
-					throw new formatoIncompleto("Error. No puedes usar esos credenciales.");
-				} else {
-					Token token = new Token();
-					token.setUser(usuario);
-					comprobarSeguridad.restriccionesPassword(usuario);
-					comprobarSeguridad.validarEmail(usuario.getEmail());
+			this.tokenDAO.save(token);
 
-					if (usuario.getPassword().length() != 60) {
-						usuario.setPassword(comprobarSeguridad.cifrarPassword(usuario.getPassword()));
-					}
-
-					if (usuario instanceof Administrador) {
-						this.adminDAO.save((Administrador) usuario);
-					} else if (usuario instanceof Mantenimiento) {
-						this.mantenimientoDAO.save((Mantenimiento) usuario);
-					}
-
-					this.tokenDAO.save(token);
-				}
-			}
 		}
 	}
 
 	public void actualizarAdmin(String nombre, String apellidos, String email, String password, boolean activo,
-			int intentos, String emailAdmin, String passwordAdmin) throws contraseñaIncorrecta, formatoIncompleto {
-		if (userService.checkUser(emailAdmin, passwordAdmin).equals("admin")) {
+			int intentos, String emailAdmin, String passwordAdmin) {
+		if (userService.checkUser(emailAdmin, passwordAdmin).equals(ADMIN)) {
 			Optional<Administrador> adminExiste = adminDAO.findByEmail(email);
 			if (adminExiste.isPresent()) {
 				Administrador admin = adminExiste.get();
@@ -107,21 +107,24 @@ public class AdminService {
 	}
 
 	public void eliminarAdmin(String email, String emailAdmin, String passwordAdmin) {
-		if (userService.checkUser(emailAdmin, passwordAdmin).equals("admin"))
+		if (userService.checkUser(emailAdmin, passwordAdmin).equals(ADMIN))
 			adminDAO.deleteById(email);
 	}
 
 	public Parametros getParametros(String email, String password) {
-		if (userService.checkUser(email, password).equals("admin")) {
-			return this.parametrosDAO.findById("655b1a3db7bb7908becebbf4").get();
+		Optional<Parametros> par = this.parametrosDAO.findById(ID_BBDD);
+		if (userService.checkUser(email, password).equals(ADMIN)) {
+			if (par.isPresent())
+				return par.get();
 		} else {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No puedes consultar los parametros.");
 		}
+		return null;
 	}
 
 	public void actualizarParametros(double precioViaje, int minimoBateria, int bateriaViaje,
 			int maxVehiculosMantenimiento, String emailAdmin, String passwordAdmin) {
-		if (userService.checkUser(emailAdmin, passwordAdmin).equals("admin")) {
+		if (userService.checkUser(emailAdmin, passwordAdmin).equals(ADMIN)) {
 			Parametros par = getParametros(emailAdmin, passwordAdmin);
 			par.setPrecioViaje(precioViaje);
 			par.setMinimoBateria(minimoBateria);
@@ -133,13 +136,12 @@ public class AdminService {
 
 	public double obtenerFacturacion(String emailAdmin, String passwordAdmin, String emailCliente, String primerDia,
 			String ultimoDia) {
+		Optional<Parametros> par = this.parametrosDAO.findById(ID_BBDD);
 		double facturacion = 0;
-		if (userService.checkUser(emailAdmin, passwordAdmin).equals("admin")) {
-			Cliente cliente = this.clienteDAO.findByEmail(emailCliente).get();
-			Parametros par = getParametros(emailAdmin, passwordAdmin);
+		if (userService.checkUser(emailAdmin, passwordAdmin).equals(ADMIN) && par.isPresent()) {
 			for (Reserva reserva : this.reservaDAO.findByUsuarioEmailAndFechaBetweenAndEstado(emailCliente, primerDia,
 					ultimoDia, "finalizada")) {
-				facturacion += this.parametrosDAO.findById("655b1a3db7bb7908becebbf4").get().getPrecioViaje();
+					facturacion += par.get().getPrecioViaje();
 			}
 		}
 		return facturacion;
