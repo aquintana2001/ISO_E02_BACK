@@ -33,7 +33,7 @@ public class ConsultarVehiculosNoDisponiblesTest {
 	@Test
 	@Order(1)
 	void testConsultarVehiculosNoDisponiblesComoMantenimiento () throws Exception {
-		ResultActions result = this.sendMantenimiento("20@gmail.com", "Hola123*");
+		ResultActions result = this.sendMantenimiento("prueba20@gmail.com", "Hola123*");
 	    result
             .andExpect(status().isOk()) // Verificar que el código de estado es 200 OK
             .andExpect(content().contentType("application/json"));
@@ -74,8 +74,8 @@ public class ConsultarVehiculosNoDisponiblesTest {
 	
 	public ResultActions sendMantenimiento(String name,String pwd) throws Exception {
 		JSONObject jsoUser = new JSONObject()
-				.put("email", name)
-				.put("password",pwd);
+				.put("emailUser", name)
+				.put("passwordUser",pwd);
 		RequestBuilder request = MockMvcRequestBuilders.post("/users/vehiculo").contentType("application/json").content(jsoUser.toString());
 		ResultActions resultActions = this.server.perform(request);
 		return resultActions;

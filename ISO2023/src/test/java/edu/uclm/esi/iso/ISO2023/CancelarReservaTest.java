@@ -33,7 +33,7 @@ public class CancelarReservaTest {
     @Test
     @Order(1)
     void testCancelarReservaComoUsuario() throws Exception {
-        ResultActions result = this.sendCliente("guillermo.423@alu.uclm.es", "Hola123*");
+        ResultActions result = this.sendCliente("prueba@gmail.com", "Hola123*", "d38fbf4f-fafa-4a57-86a5-1f927438150c");
         result
         .andExpect(status().isOk()) // Verificar que el código de estado es 200 OK
         .andExpect(content().contentType("application/json"));
@@ -43,7 +43,7 @@ public class CancelarReservaTest {
     @Test
 	@Order(2)
 	void testCancelarReservaComoMantenimiento () throws Exception {
-		ResultActions result = this.sendCliente("20@gmail.com", "Hola123*");
+		ResultActions result = this.sendCliente("prueba20@gmail.com", "Hola123*", "63c9b79a-0ce0-4a7c-8926-a60f6a8ca999");
 	    result
             .andExpect(status().isOk()) // Verificar que el código de estado es 200 OK
             .andExpect(content().contentType("application/json"));
@@ -54,7 +54,7 @@ public class CancelarReservaTest {
     @Test
     @Order(3)
     void testCancelarResevaComoAdmin() throws Exception {
-        ResultActions result = this.sendCliente("guillermo.santos2@alu.uclm.es", "Hola123*");
+        ResultActions result = this.sendCliente("guillermo.santos2@alu.uclm.es", "Hola123*", "d38fbf4f-fafa-4a57-86a5-1f927438150c");
         result
         .andExpect(status().is4xxClientError());
         // Debería devolver un error 4xx ya que no se proporcionó autenticación
@@ -63,16 +63,17 @@ public class CancelarReservaTest {
     @Test
     @Order(4)
     void testCancelrReservaSinAutenticación() throws Exception {
-        ResultActions result = this.sendCliente("", "");
+        ResultActions result = this.sendCliente("", "","");
         result
             .andExpect(status().is4xxClientError());
             // Debería devolver un error 4xx ya que no se proporcionó autenticación
     }
 
-    public ResultActions sendCliente(String name,String pwd) throws Exception {
+    public ResultActions sendCliente(String name,String pwd,String idReserva ) throws Exception {
 		JSONObject jsoUser = new JSONObject()
-				.put("email", name)
-				.put("password",pwd);
+				.put("emailUser", name)
+				.put("passwordUser",pwd)
+				.put("idReserva", idReserva);
 		RequestBuilder request = MockMvcRequestBuilders.put("/users/cancelarReserva").contentType("application/json").content(jsoUser.toString());
 		ResultActions resultActions = this.server.perform(request);
 		return resultActions;
