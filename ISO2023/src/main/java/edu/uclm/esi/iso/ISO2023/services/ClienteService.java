@@ -91,6 +91,14 @@ public class ClienteService {
 
 	}
 
+	public Cliente getDatos(String email, String password) {
+		Cliente cliente = this.clienteDAO.findByEmail(email).get();
+		if(comprobarSeguridad.decodificador(password, cliente.getPassword())){
+			return clienteDAO.findByEmail(email).get();	
+		}
+		return null;
+	}
+	
 	// METODO PARA EL CLIENTE
 	public void actualizarDatos(String nombre, String apellidos, String email, String password, String fechaNacimiento,
 			String carnet, String telefono, String dni) throws contraseñaIncorrecta, formatoIncompleto, numeroInvalido{
@@ -119,5 +127,7 @@ public class ClienteService {
 		}
 
 	}
+
+	
 
 }
