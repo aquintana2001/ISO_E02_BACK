@@ -79,9 +79,13 @@ public class AdminController {
 		String email = info.get(EMAIL).toString();
 		String emailAdmin = info.get(EMAILUSER).toString();
 		String passwordAdmin = info.get(PASSWORDUSER).toString();
+		String tipoUsuario = info.get("tipoUsuario").toString();
 
 		try {
-			this.adminService.registrarse(nombre, apellidos, email, password1, emailAdmin, passwordAdmin);
+			if(tipoUsuario.equals("admin"))
+				this.adminService.registrarse(nombre, apellidos, email, password1, emailAdmin, passwordAdmin, tipoUsuario);
+			if(tipoUsuario.equals("mantenimiento"))
+				this.adminService.registrarse(nombre, apellidos, email, password1, emailAdmin, passwordAdmin, tipoUsuario);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}

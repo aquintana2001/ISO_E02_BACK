@@ -38,7 +38,7 @@ public class VehiculoService {
 		}else if(userService.comprobarUsuario(email, password).equals("cliente")) { 
 			return this.vehiculoDAO.findByBateriaGreaterThanAndEstadoEquals(parametros.getMinimoBateria(),"disponible");
 		}else if(userService.comprobarUsuario(email, password).equals("mantenimiento")){
-			return this.vehiculoDAO.findByBateriaLessThan(parametros.getMinimoBateria());
+			return this.vehiculoDAO.findByBateriaLessThanAndEstadoEquals(parametros.getMinimoBateria(), "descargado");
 		}else {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permisos para realizar esta accion.");
 		}

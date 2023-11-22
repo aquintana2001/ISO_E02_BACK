@@ -9,9 +9,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 import edu.uclm.esi.iso.ISO2023.dao.AdminDAO;
 import edu.uclm.esi.iso.ISO2023.dao.ClienteDAO;
+import edu.uclm.esi.iso.ISO2023.dao.MantenimientoDAO;
 import edu.uclm.esi.iso.ISO2023.dao.TokenDAO;
 import edu.uclm.esi.iso.ISO2023.entities.Administrador;
 import edu.uclm.esi.iso.ISO2023.entities.Cliente;
+import edu.uclm.esi.iso.ISO2023.entities.Mantenimiento;
 import edu.uclm.esi.iso.ISO2023.entities.Token;
 import edu.uclm.esi.iso.ISO2023.exceptions.*;
 
@@ -21,6 +23,8 @@ public class UserService {
 	private ClienteDAO clienteDAO;
 	@Autowired
 	private AdminDAO adminDAO;
+	@Autowired
+	private MantenimientoDAO mantenimientoDAO;
 	@Autowired
 	private TokenDAO tokenDAO;
 	@Autowired
@@ -126,11 +130,14 @@ public class UserService {
 		String usuario="";
 		Optional<Administrador> adminExist = adminDAO.findByEmail(email);
 		Optional<Cliente> clienteExist = clienteDAO.findByEmail(email);
+		Optional<Mantenimiento> mantExist = mantenimientoDAO.findByEmail(email);
 		if(adminExist.isPresent()&&comprobarSeguridad.decodificador(password, adminExist.get().getPassword())) {
 			usuario = "admin";
 		}else if(clienteExist.isPresent()&&comprobarSeguridad.decodificador(password, clienteExist.get().getPassword())){
 			usuario = "cliente";
-		}else {
+		}else if(mantExist.isPresent()&&comprobarSeguridad.decodificador(password, mantExist.get().getPassword())){
+			usuario = "mantenimiento";
+		}else{
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permisos para realizar esta accion.");
 		}
 		return usuario;
