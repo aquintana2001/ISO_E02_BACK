@@ -298,7 +298,7 @@ public class AdminController {
 		}
 	}
 
-	@GetMapping("/getParametros")
+	@PostMapping("/getParametros")
 	public Parametros getParametros(@RequestBody Map<String, Object> info) {
 		String emailAdmin = info.get(EMAILUSER).toString();
 		String passwordAdmin = info.get(PASSWORDUSER).toString();
@@ -325,7 +325,7 @@ public class AdminController {
 		}
 	}
 	
-	@GetMapping("/obtenerFacturacion")
+	@PostMapping("/obtenerFacturacion")
 	public double obtenerFacturacion(@RequestBody Map<String, Object> info) {
 		String emailAdmin = info.get(EMAILUSER).toString();
 		String passwordAdmin = info.get(PASSWORDUSER).toString();
