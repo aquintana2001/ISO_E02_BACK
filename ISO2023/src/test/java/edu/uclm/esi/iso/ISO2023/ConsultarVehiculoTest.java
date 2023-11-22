@@ -32,7 +32,7 @@ public class ConsultarVehiculoTest {
     @Test
     @Order(1)
     void testConsultarVehiculosComoAdmin() throws Exception {
-        ResultActions result = this.sendAdmin("guillermo.santos2@alu.uclm.es", "Hola123*");
+        ResultActions result = this.sendAdmin("pepe@pepe.com", "Hola123*");
         result
             .andExpect(status().isOk()) // Verificar que el código de estado es 200 OK
             .andExpect(content().contentType("application/json"));
@@ -42,7 +42,7 @@ public class ConsultarVehiculoTest {
     @Test
     @Order(2)
     void testConsultarVehiculosComoUsuario() throws Exception {
-        ResultActions result = this.sendAdmin("guillermo.423@alu.uclm.es", "Hola123*");
+        ResultActions result = this.sendAdmin("antonio@gmail.com", "Hola123*");
         result
             .andExpect(status().is4xxClientError());
             // Debería devolver un error 4xx ya que un usuario no tiene permiso para consultar vehículos
@@ -59,9 +59,9 @@ public class ConsultarVehiculoTest {
 
     public ResultActions sendAdmin(String name,String pwd) throws Exception {
 		JSONObject jsoUser = new JSONObject()
-				.put("email", name)
-				.put("password",pwd);
-		RequestBuilder request = MockMvcRequestBuilders.get("/admin/vehiculo").contentType("application/json").content(jsoUser.toString());
+				.put("emailUser", name)
+				.put("passwordUser",pwd);
+		RequestBuilder request = MockMvcRequestBuilders.post("/admin/vehiculo").contentType("application/json").content(jsoUser.toString());
 		ResultActions resultActions = this.server.perform(request);
 		return resultActions;
 	}

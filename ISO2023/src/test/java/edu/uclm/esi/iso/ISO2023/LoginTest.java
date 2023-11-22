@@ -29,7 +29,7 @@ public class LoginTest {
 	private MockMvc server;
 	@Test @Order(1)
 	void testLoginCliente() throws Exception {
-	    ResultActions result = this.sendLogin("guillermo.4@alu.uclm.es", "Hola123*");
+	    ResultActions result = this.sendLogin("prueba@gmail.com", "Hola123*");
 	    result
 	        .andExpect(status().isOk()) // Verificar que el código de estado es 200 OK
 	        .andExpect(content().string("cliente"));
