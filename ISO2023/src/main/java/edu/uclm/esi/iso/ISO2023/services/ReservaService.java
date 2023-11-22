@@ -44,6 +44,7 @@ public class ReservaService {
 			if (vehiculo.getEstado().equals("disponible")) {
 				if (this.reservaDAO.findByUsuarioEmailAndVehiculoEstado(email, "reservado").isEmpty()) {
 					Cliente cliente = cli.get();
+					comprobarCarnet(cliente, vehiculo);
 					Reserva reserva = new Reserva(vehiculo, cliente, 0.0);
 					vehiculo.setEstado("reservado");
 					reserva.setEstado("activa");
@@ -73,6 +74,15 @@ public class ReservaService {
 			} else {
 				throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "El vehiculo no necesita mantenimiento.");
 			}
+		}
+	}
+	
+	public void comprobarCarnet(Cliente cliente, Vehiculo vehiculo) {
+		String carnet;
+		if(vehiculo.getTipo().equals("coche")&&!cliente.getCarnet().equals("B")) {
+			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Necesitas sacarte el carnet B.");
+		}else if(vehiculo.getTipo().equals("moto")&&!(cliente.getCarnet().equals("A")||cliente.getCarnet().equals("B"))){
+			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Necesitas sacarte el carnet A o B.");
 		}
 	}
 
