@@ -115,8 +115,8 @@ public class UserController {
 		String password;
 		String idReserva;
 		try {
-			email = info.get("emailUser").toString();
-			password = info.get("passwordUser").toString();
+			email = info.get(EMAILUSER).toString();
+			password = info.get(PASSWORDUSER).toString();
 			idReserva = info.get("idReserva").toString();
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
@@ -136,8 +136,8 @@ public class UserController {
 		String password;
 		String idReserva;
 		try {
-			email = info.get("emailUser").toString();
-			password = info.get("passwordUser").toString();
+			email = info.get(EMAILUSER).toString();
+			password = info.get(PASSWORDUSER).toString();
 			idReserva = info.get("idReserva").toString();
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
