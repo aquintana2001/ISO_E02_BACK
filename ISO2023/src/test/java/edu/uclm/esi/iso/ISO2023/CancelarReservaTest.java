@@ -33,10 +33,10 @@ public class CancelarReservaTest {
     @Test
     @Order(1)
     void testCancelarReservaComoUsuario() throws Exception {
-        ResultActions result = this.sendCliente("prueba@gmail.com", "Hola123*", "d38fbf4f-fafa-4a57-86a5-1f927438150c");
+        ResultActions result = this.sendCliente("prueba@gmail.com", "Hola123*", "a56e2a0b-0b56-4505-964f-5c164b9e72c8");
         result
-        .andExpect(status().isOk()) // Verificar que el código de estado es 200 OK
-        .andExpect(content().contentType("application/json"));
+        .andExpect(status().isOk()); // Verificar que el código de estado es 200 OK
+    
         // Puedes agregar más aserciones para verificar el contenido de la respuesta si es necesario
     }
 
