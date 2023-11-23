@@ -24,12 +24,12 @@ import org.json.JSONObject;
 @ExtendWith(SpringExtension.class)
 @AutoConfigureMockMvc
 @TestMethodOrder(OrderAnnotation.class)
-public class LoginTest {
+class LoginTest {
 	@Autowired
 	private MockMvc server;
 	@Test @Order(1)
 	void testLoginCliente() throws Exception {
-	    ResultActions result = this.sendLogin("antonio@gmail.com", "Hola123*");
+	    ResultActions result = this.sendLogin("prueba@gmail.com", "Hola123*");
 	    result
 	        .andExpect(status().isOk()) // Verificar que el código de estado es 200 OK
 	        .andExpect(content().string("cliente"));
