@@ -29,21 +29,38 @@ public class UserController {
 	private ReservaService reservaService;
 	@Autowired
 	private VehiculoService vehiculoService;
+	
+	private static final String EMAILUSER = "emailUser";
+	private static final String PASSWORDUSER = "passwordUser";
+	private static final String GET_PAR_ERR = "No se han podido capturar los parámetros de la petición, revíselos.";
 
 	@PostMapping("/register")
 	public ResponseEntity<String> registrarse(@RequestBody Map<String, Object> info) {
-		String password1 = info.get("password1").toString();
-		String password2 = info.get("password2").toString();
-		if (!password1.equals(password2))
-			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Las contraseñas no coinciden");
+		String password1;
+		String password2;
+		String nombre;
+		String apellidos;
+		String email;
+		String fechaNacimiento;
+		String carnet;
+		String telefono;
+		String dni;
+		try {
+			password1 = info.get("password1").toString();
+			password2 = info.get("password2").toString();
+			if (!password1.equals(password2))
+				throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Las contraseñas no coinciden");
 
-		String nombre = info.get("nombre").toString();
-		String apellidos = info.get("apellidos").toString();
-		String email = info.get("email").toString();
-		String fechaNacimiento = info.get("fechaNacimiento").toString();
-		String carnet = info.get("carnet").toString();
-		String telefono = info.get("telefono").toString();
-		String dni = info.get("dni").toString();
+			nombre = info.get("nombre").toString();
+			apellidos = info.get("apellidos").toString();
+			email = info.get("email").toString();
+			fechaNacimiento = info.get("fechaNacimiento").toString();
+			carnet = info.get("carnet").toString();
+			telefono = info.get("telefono").toString();
+			dni = info.get("dni").toString();
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
+		}
 
 		try {
 			this.userService.registrarse(nombre, apellidos, email, password1, fechaNacimiento, carnet, telefono, dni);
@@ -56,8 +73,14 @@ public class UserController {
 	@PutMapping("/login")
 	public String loginUser(@RequestBody Map<String, Object> info) {
 		String usuario;
-		String email = info.get("email").toString();
-		String password = info.get("password").toString();
+		String email;
+		String password;
+		try {
+			email = info.get("email").toString();
+			password = info.get("password").toString();
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
+		}
 		try {
 			usuario = this.userService.loginUser(email, password);
 		} catch (Exception e) {
@@ -68,9 +91,16 @@ public class UserController {
 	
 	@PostMapping("/reserva")
 	public ResponseEntity<String> realizarReserva(@RequestBody Map<String, Object> info) {
-		String email = info.get("emailUser").toString();
-		String password = info.get("passwordUser").toString();
-		String idVehiculo = info.get("idVehiculo").toString();
+		String email;
+		String password;
+		String idVehiculo;
+		try {
+			email = info.get(EMAILUSER).toString();
+			password = info.get(PASSWORDUSER).toString();
+			idVehiculo = info.get("idVehiculo").toString();
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
+		}
 		try {
 			this.reservaService.realizarReserva(email,password,idVehiculo);
 		} catch (Exception e) {
@@ -81,9 +111,16 @@ public class UserController {
 	
 	@PutMapping("/cancelarReserva")
 	public ResponseEntity<String> cancelarReserva(@RequestBody Map<String, Object> info) {
-		String email = info.get("emailUser").toString();
-		String password = info.get("passwordUser").toString();
-		String idReserva = info.get("idReserva").toString();
+		String email;
+		String password;
+		String idReserva;
+		try {
+			email = info.get("emailUser").toString();
+			password = info.get("passwordUser").toString();
+			idReserva = info.get("idReserva").toString();
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
+		}
 
 		try {
 			this.reservaService.cancelarReserva(email,password, idReserva);
@@ -95,9 +132,16 @@ public class UserController {
 	
 	@PutMapping("/finalizarReserva")
 	public ResponseEntity<String> finalizarReserva(@RequestBody Map<String, Object> info) {
-		String email = info.get("emailUser").toString();
-		String password = info.get("passwordUser").toString();
-		String idReserva = info.get("idReserva").toString();
+		String email;
+		String password;
+		String idReserva;
+		try {
+			email = info.get("emailUser").toString();
+			password = info.get("passwordUser").toString();
+			idReserva = info.get("idReserva").toString();
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
+		}
 
 		try {
 			this.reservaService.finalizarReserva(email,password, idReserva);
@@ -109,8 +153,14 @@ public class UserController {
 	
 	@PostMapping("/vehiculo")
 	public List<Vehiculo> listaVehiculos(@RequestBody Map<String, Object> info) {
-		String email = info.get("emailUser").toString();
-		String password = info.get("passwordUser").toString();
+		String email;
+		String password;
+		try {
+			email = info.get(EMAILUSER).toString();
+			password = info.get(PASSWORDUSER).toString();
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
+		}
 		return vehiculoService.listaVehiculo(email, password);
 	}
 	

@@ -26,7 +26,7 @@ public class ClienteService {
 	private AdminService adminService;
 
 	public List<Cliente> listaClientes(String emailAdmin, String passwordAdmin) {
-		if (userService.comprobarUsuario(emailAdmin, passwordAdmin).equals("admin"))
+		if (userService.checkUser(emailAdmin, passwordAdmin).equals("admin"))
 			return this.clienteDAO.findAll();
 		else {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permisos para realizar esta accion.");
@@ -37,7 +37,7 @@ public class ClienteService {
 	public void actualizarCliente(String nombre, String apellidos, String email, String password, boolean activo,
 			int intentos, String fechaNacimiento, String carnet, String telefono, String dni, String emailAdmin,
 			String passwordAdmin) throws contraseñaIncorrecta, formatoIncompleto, numeroInvalido {
-		if (userService.comprobarUsuario(emailAdmin, passwordAdmin).equals("admin")) {
+		if (userService.checkUser(emailAdmin, passwordAdmin).equals("admin")) {
 			Cliente cliente = new Cliente(nombre, apellidos, email, password, activo, intentos, fechaNacimiento, carnet,
 					telefono, dni);
 
@@ -70,7 +70,7 @@ public class ClienteService {
 	}
 
 	public void eliminarCliente(String email, String emailAdmin, String passwordAdmin) {
-		if (userService.comprobarUsuario(emailAdmin, passwordAdmin).equals("admin")) {
+		if (userService.checkUser(emailAdmin, passwordAdmin).equals("admin")) {
 			Optional<Cliente> clienteExiste = clienteDAO.findByEmail(email);
 			if (clienteExiste.isPresent()) {
 				clienteExiste.get().setActivo(false);
@@ -82,7 +82,7 @@ public class ClienteService {
 	}
 
 	public void darDeBaja(String email, String password) {
-		if (userService.comprobarUsuario(email, password).equals("cliente")) {
+		if (userService.checkUser(email, password).equals("cliente")) {
 			clienteDAO.deleteById(email);
 			;
 		} else {
@@ -103,7 +103,7 @@ public class ClienteService {
 	public void actualizarDatos(String nombre, String apellidos, String email, String password, String fechaNacimiento,
 			String carnet, String telefono, String dni) throws contraseñaIncorrecta, formatoIncompleto, numeroInvalido{
 		Cliente cliente = clienteDAO.findByEmail(email).get();
-		if (userService.comprobarUsuario(email, password).equals("cliente")) {
+		if (userService.checkUser(email, password).equals("cliente")) {
 
 			comprobarSeguridad.restriccionesPassword(cliente);
 			comprobarSeguridad.validarEmail(cliente.getEmail());
