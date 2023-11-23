@@ -24,7 +24,7 @@ import org.json.JSONObject;
 @ExtendWith(SpringExtension.class)
 @AutoConfigureMockMvc
 @TestMethodOrder(OrderAnnotation.class)
-public class LoginTest {
+class LoginTest {
 	@Autowired
 	private MockMvc server;
 	@Test @Order(1)

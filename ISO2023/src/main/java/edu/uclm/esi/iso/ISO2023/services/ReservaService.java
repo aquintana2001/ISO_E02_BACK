@@ -17,6 +17,7 @@ import edu.uclm.esi.iso.ISO2023.entities.Cliente;
 import edu.uclm.esi.iso.ISO2023.entities.Mantenimiento;
 import edu.uclm.esi.iso.ISO2023.entities.Parametros;
 import edu.uclm.esi.iso.ISO2023.entities.Reserva;
+import edu.uclm.esi.iso.ISO2023.entities.User;
 import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
 
 @Service
@@ -28,125 +29,162 @@ public class ReservaService {
 	@Autowired
 	private VehiculoDAO vehiculoDAO;
 	@Autowired
-	private ClienteDAO clienteDAO;
-	@Autowired
 	private MantenimientoDAO mantenimientoDAO;
+	@Autowired
+	private ClienteDAO clienteDAO;
 	@Autowired
 	private ParametrosDAO parametrosDAO;
 
+	private static final String CLIENTE = "cliente";
+	private static final String MANTENIMIENTO = "mantenimiento";
+	private static final String DISPONIBLE = "disponible";
+	private static final String DESCARGADO = "descargado";
+	private static final String RESERVADO = "reservado";
+	private static final String ACTIVA = "activa";
+	private static final String FINALIZADA = "finalizada";
+	private static final String ID_BBDD = "655b1a3db7bb7908becebbf4";
+
 	public void realizarReserva(String email, String password, String idVehiculo) {
+		String tipoCliente = userService.checkUser(email, password);
+		User usuario = userService.findUser(tipoCliente, email);
+		Optional<Vehiculo> vehiculo = this.vehiculoDAO.findById(idVehiculo);
 
-		Optional<Cliente> cli = this.clienteDAO.findByEmail(email);
-		Optional<Mantenimiento> mant = this.mantenimientoDAO.findByEmail(email);
-		Vehiculo vehiculo = this.vehiculoDAO.findById(idVehiculo).get();
-
-		if (userService.checkUser(email, password).equals("cliente")) {
-			if (vehiculo.getEstado().equals("disponible")) {
-				if (this.reservaDAO.findByUsuarioEmailAndVehiculoEstado(email, "reservado").isEmpty()) {
-					Cliente cliente = cli.get();
-					comprobarCarnet(cliente, vehiculo);
-					Reserva reserva = new Reserva(vehiculo, cliente, 0.0);
-					vehiculo.setEstado("reservado");
-					reserva.setEstado("activa");
-					this.vehiculoDAO.save(vehiculo);
-					this.reservaDAO.save(reserva);
-				} else {
-					throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Ya tienes una reserva activa.");
-				}
-			} else {
-				throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "El vehiculo ya está reservado.");
+		if (vehiculo.isPresent())
+			switch (tipoCliente) {
+			case CLIENTE:
+				reservaCliente(usuario, vehiculo.get());
+				break;
+			case MANTENIMIENTO:
+				reservaMantenimiento(usuario, vehiculo.get());
+				break;
+			default:
 			}
+	}
 
-		} else if (userService.checkUser(email, password).equals("mantenimiento")) {
-			if (vehiculo.getEstado().equals("descargado")) {
-				if (this.mantenimientoDAO.findByEmail(email).get().getReservasActivas() < this.parametrosDAO.findById("655b1a3db7bb7908becebbf4").get().getMaxVehiculosMantenimiento()) {
-					Mantenimiento mantenimiento = mant.get();
-					Reserva reserva = new Reserva(vehiculo, mantenimiento, 0.0);
-					vehiculo.setEstado("en mantenimiento");
-					reserva.setEstado("activa");
-					mantenimiento.setReservasActivas(mantenimiento.getReservasActivas() + 1);
-					this.vehiculoDAO.save(vehiculo);
-					this.reservaDAO.save(reserva);
-					this.mantenimientoDAO.save(mantenimiento);
-				} else {
-					throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "No puedes reservar mas vehiculos..");
-				}
+	public void reservaCliente(User usuario, Vehiculo vehiculo) {
+		Optional<Cliente> cliente = this.clienteDAO.findByEmail(usuario.getEmail());
+		if (vehiculo.getEstado().equals(DISPONIBLE) && cliente.isPresent()) {
+			if (this.reservaDAO.findByUsuarioEmailAndVehiculoEstado(usuario.getEmail(), RESERVADO).isEmpty()) {
+				comprobarCarnet((Cliente) usuario, vehiculo);
+				Reserva reserva = new Reserva(vehiculo, cliente.get(), 0.0);
+				vehiculo.setEstado(RESERVADO);
+				reserva.setEstado(ACTIVA);
+				this.vehiculoDAO.save(vehiculo);
+				this.reservaDAO.save(reserva);
 			} else {
-				throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "El vehiculo no necesita mantenimiento.");
+				throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Ya tienes una reserva activa.");
 			}
+		} else {
+			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "El vehiculo ya está reservado.");
 		}
 	}
-	
+
+	public void reservaMantenimiento(User usuario, Vehiculo vehiculo) {
+		Optional<Mantenimiento> mant = this.mantenimientoDAO.findByEmail(usuario.getEmail());
+		Optional<Parametros> par = this.parametrosDAO.findById(ID_BBDD);
+		if (vehiculo.getEstado().equals(DESCARGADO) && mant.isPresent() && par.isPresent()) {
+			if (mant.get().getReservasActivas() < par.get().getMaxVehiculosMantenimiento()) {
+				Reserva reserva = new Reserva(vehiculo, mant.get(), 0.0);
+				vehiculo.setEstado("en mantenimiento");
+				reserva.setEstado(ACTIVA);
+				mant.get().setReservasActivas(mant.get().getReservasActivas() + 1);
+				this.vehiculoDAO.save(vehiculo);
+				this.reservaDAO.save(reserva);
+				this.mantenimientoDAO.save(mant.get());
+			} else {
+				throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "No puedes reservar mas vehiculos.");
+			}
+		} else {
+			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "El vehiculo no necesita mantenimiento.");
+		}
+	}
+
 	public void comprobarCarnet(Cliente cliente, Vehiculo vehiculo) {
-		String carnet;
-		if(vehiculo.getTipo().equals("coche")&&!cliente.getCarnet().equals("B")) {
+		if (vehiculo.getTipo().equals("coche") && !cliente.getCarnet().equals("B")) {
 			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Necesitas sacarte el carnet B.");
-		}else if(vehiculo.getTipo().equals("moto")&&!(cliente.getCarnet().equals("A")||cliente.getCarnet().equals("B"))){
+		} else if (vehiculo.getTipo().equals("moto")
+				&& !(cliente.getCarnet().equals("A") || cliente.getCarnet().equals("B"))) {
 			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Necesitas sacarte el carnet A o B.");
 		}
 	}
 
 	public void cancelarReserva(String email, String password, String idReserva) {
-		Reserva reserva = this.reservaDAO.findById(idReserva).get();
-		if ((userService.checkUser(email, password).equals("cliente")
-				|| userService.checkUser(email, password).equals("mantenimiento"))
-				&& reserva.getEstado().equals("activa") && reserva.getUsuario().getEmail().equals(email)) {
-			reserva.setEstado("cancelada");
-			reserva.getVehiculo().setEstado("disponible");
-			if(userService.checkUser(email, password).equals("mantenimiento")) {
-				Mantenimiento mant = this.mantenimientoDAO.findByEmail(email).get();
-				mant.setReservasActivas(mant.getReservasActivas()-1);
-				this.mantenimientoDAO.save(mant);
+		Optional<Reserva> reserva = this.reservaDAO.findById(idReserva);
+		Optional<Mantenimiento> mant = this.mantenimientoDAO.findByEmail(email);
+		if (reserva.isPresent()) {
+			if ((userService.checkUser(email, password).equals(CLIENTE)
+					|| userService.checkUser(email, password).equals(MANTENIMIENTO))
+					&& reserva.get().getEstado().equals(ACTIVA)
+					&& reserva.get().getUsuario().getEmail().equals(email)) {
+				reserva.get().setEstado("cancelada");
+				reserva.get().getVehiculo().setEstado(DISPONIBLE);
+				if (userService.checkUser(email, password).equals(MANTENIMIENTO) && mant.isPresent()) {
+					mant.get().setReservasActivas(mant.get().getReservasActivas() - 1);
+					this.mantenimientoDAO.save(mant.get());
+				}
+				this.vehiculoDAO.save(reserva.get().getVehiculo());
+				this.reservaDAO.save(reserva.get());
+			} else {
+				throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Error al cancelar la reserva.");
 			}
-			this.vehiculoDAO.save(reserva.getVehiculo());
-			this.reservaDAO.save(reserva);
-		} else {
-			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Error al cancelar la reserva.");
 		}
 	}
 
 	public void finalizarReserva(String email, String password, String idReserva) {
-		Reserva reserva = this.reservaDAO.findById(idReserva).get();
-		Parametros parametros = this.parametrosDAO.findById("655b1a3db7bb7908becebbf4").get();
-		if (reserva.getEstado().equals("activa") && reserva.getUsuario().getEmail().equals(email)) {
-			if (userService.checkUser(email, password).equals("cliente")) {
-				reserva.setEstado("finalizada");
-				reserva.getVehiculo().setEstado("disponible");
-				reserva.getVehiculo().setBateria(reserva.getVehiculo().getBateria() - parametros.getBateriaViaje());
-				if (reserva.getVehiculo().getBateria() < parametros.getMinimoBateria())
-					reserva.getVehiculo().setEstado("descargado");
-				this.vehiculoDAO.save(reserva.getVehiculo());
-				this.reservaDAO.save(reserva);
-			}else if (userService.checkUser(email, password).equals("mantenimiento")) {
-				reserva.setEstado("finalizada");
-				reserva.getVehiculo().setEstado("disponible");
-				reserva.getVehiculo().setBateria(100);
-				Mantenimiento mant = this.mantenimientoDAO.findByEmail(email).get();
-				mant.setReservasActivas(mant.getReservasActivas()-1);
-				this.mantenimientoDAO.save(mant);
-				this.vehiculoDAO.save(reserva.getVehiculo());
-				this.reservaDAO.save(reserva);
+		Optional<Reserva> reserva = this.reservaDAO.findById(idReserva);
+		Optional<Parametros> parametros = this.parametrosDAO.findById(ID_BBDD);
+		if (reserva.isPresent() && parametros.isPresent()) {
+			if (reserva.get().getEstado().equals(ACTIVA) && reserva.get().getUsuario().getEmail().equals(email)) {
+				if (userService.checkUser(email, password).equals(CLIENTE)) {
+					finalizarCliente(reserva.get(), parametros.get());
+				} else if (userService.checkUser(email, password).equals(MANTENIMIENTO)) {
+					finalizarMantenimiento(reserva.get(), email);
+				}
+			} else {
+				throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Error al finalizar la reserva.");
 			}
-		} else {
-			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Error al finalizar la reserva.");
+		}
+	}
+
+	public void finalizarCliente(Reserva reserva, Parametros parametros) {
+		reserva.getVehiculo().setEstado(DISPONIBLE);
+		reserva.getVehiculo().setBateria(reserva.getVehiculo().getBateria() - parametros.getBateriaViaje());
+		if (reserva.getVehiculo().getBateria() < parametros.getMinimoBateria())
+			reserva.getVehiculo().setEstado(DESCARGADO);
+		this.vehiculoDAO.save(reserva.getVehiculo());
+		this.reservaDAO.save(reserva);
+	}
+
+	public void finalizarMantenimiento(Reserva reserva, String email) {
+		Optional<Mantenimiento> mant = this.mantenimientoDAO.findByEmail(email);
+		if (mant.isPresent()) {
+			reserva.setEstado(FINALIZADA);
+			reserva.getVehiculo().setEstado(DISPONIBLE);
+			reserva.getVehiculo().setBateria(100);
+			mant.get().setReservasActivas(mant.get().getReservasActivas() - 1);
+			this.mantenimientoDAO.save(mant.get());
+			this.vehiculoDAO.save(reserva.getVehiculo());
+			this.reservaDAO.save(reserva);
 		}
 	}
 
 	public void valorarReserva(String email, String password, String idReserva, double valoracion, String comentario) {
-		Reserva reserva = this.reservaDAO.findById(idReserva).get();
-		if (userService.checkUser(email, password).equals("cliente") && reserva.getEstado().equals("finalizada")
-				&& reserva.getUsuario().getEmail().equals(email)) {
-			reserva.setValoracion(valoracion);
-			reserva.setComentario(comentario);
-			this.reservaDAO.save(reserva);
-		} else {
-			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Error al valorar la reserva.");
+		Optional<Reserva> reserva = this.reservaDAO.findById(idReserva);
+		if (reserva.isPresent()) {
+			if (userService.checkUser(email, password).equals(CLIENTE) && reserva.get().getEstado().equals(FINALIZADA)
+					&& reserva.get().getUsuario().getEmail().equals(email)) {
+				reserva.get().setValoracion(valoracion);
+				reserva.get().setComentario(comentario);
+				this.reservaDAO.save(reserva.get());
+			} else {
+				throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Error al valorar la reserva.");
+			}
 		}
 	}
 
 	public List<Reserva> listarReservas(String email, String password) {
-		if (userService.checkUser(email, password).equals("cliente")) {
-			List<Reserva> reservas = this.reservaDAO.findByUsuarioEmail(email);
+		List<Reserva> reservas = this.reservaDAO.findByUsuarioEmail(email);
+		if (userService.checkUser(email, password).equals(CLIENTE)) {
 			return reservas;
 		} else {
 			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Error al listar las reservas.");

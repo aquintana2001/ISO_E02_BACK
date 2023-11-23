@@ -206,7 +206,7 @@ public class UserService {
 //        try {
 //			emailService.send(configuracion, email, subject, body);
 //		} catch (MessagingException e) {
-//			// TODO Auto-generated catch block
+
 //			e.printStackTrace();
 //		}
 //    }
