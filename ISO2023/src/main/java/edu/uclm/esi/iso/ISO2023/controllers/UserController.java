@@ -1,5 +1,6 @@
 package edu.uclm.esi.iso.ISO2023.controllers;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import edu.uclm.esi.iso.ISO2023.entities.User;
+import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
+import edu.uclm.esi.iso.ISO2023.services.ReservaService;
 import edu.uclm.esi.iso.ISO2023.services.UserService;
 import edu.uclm.esi.iso.ISO2023.services.VehiculoService;
 

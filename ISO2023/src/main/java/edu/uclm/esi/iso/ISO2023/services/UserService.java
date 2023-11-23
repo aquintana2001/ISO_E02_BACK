@@ -175,7 +175,7 @@ public class UserService {
 			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Error al guardar el usuario en la BBDD.");
 
 		}
-
+	}
 	public void olvidarContrasena(String email) throws contraseñaIncorrecta, formatoIncompleto {
 		
 		Cliente possibleCliente = this.clienteDAO.findByEmail(email).get();
@@ -188,28 +188,9 @@ public class UserService {
         String resetUrl1 = "http://localhost:4200/restablecerContrasena?token=" + comprobarSeguridad.cifrarPassword(tokenAux.get().getId());
         this.emailService.sendCorreoConfirmacion(possibleCliente, resetUrl1);
 		
+	
 	}
-	
-//	public void olvidarContrasena(String email) {
-//		Optional<Cliente> clienteExist = clienteDAO.findByEmail(email);
-//		Optional<Token> tokenAux = Optional.ofNullable(this.tokenDAO.findByUserEmail(email).get(0));
-//        if (clienteExist == null) {
-//            throw new Exception("Usuario no encontrado");
-//        }
-//
-//        // Genera un token y lo asocia con el usuario 
-//        Token token = new Token();
-//        token.setCliente(clienteExist.get());
-//        token.setHoraCreacion(System.currentTimeMillis());
-//        // Configura la relación inversa
-//        clienteExist.setToken(tokenAux.get());
-//        clienteDAO.save(clienteExist);
-//
-//        // Envía el correo con el token
-//        emailService.enviarCorreoRecuperacionContrasena(email, tokenAux);
-//    }
-//	
-	
+
 //	
 //	
 //	 private boolean validarToken(Token token, String tokenValue) {
@@ -253,20 +234,6 @@ public class UserService {
 //	}
 //	
 //	
-	
-//		    
-//	public void enviarCorreoRestablecimiento(String email, String token) {
-//	
-//	    SimpleMailMessage emailMessage = new SimpleMailMessage();
-//	    emailMessage.setTo(email);
-//	    emailMessage.setFrom("tucorreo@gmail.com");
-//	    emailMessage.setSubject("Restablecimiento de contraseña");
-//	    emailMessage.setText("Para restablecer tu contraseña, haz clic en el siguiente enlace:\n" + token);
-//	    
-//	    
-//
-//	    emailService.getMailSender().send(emailMessage);
-//	}
 
     
 
@@ -286,16 +253,6 @@ public class UserService {
 //        userDAO.save(user);
 //    }
 //
-//    public void sendForgotPasswordEmail(String email, String token) {
-//        // Valida que el token de recuperación de contraseña no sea válido
-//        if (token == null || token.isEmpty()) {
-//            throw new InvalidRequestException("El token de recuperación de contraseña no es válido");
-//        }
-//
-//        emailService.sendForgotPasswordEmail(email, token);
-//    }
 
-	
 
 	}
-}
