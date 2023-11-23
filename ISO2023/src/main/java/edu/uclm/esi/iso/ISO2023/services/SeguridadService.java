@@ -1,7 +1,11 @@
 package edu.uclm.esi.iso.ISO2023.services;
 
+import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import edu.uclm.esi.iso.ISO2023.entities.User;
 import edu.uclm.esi.iso.ISO2023.exceptions.*;
@@ -9,6 +13,19 @@ import edu.uclm.esi.iso.ISO2023.exceptions.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+import com.warrenstrange.googleauth.GoogleAuthenticator;
+import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
+import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
+
+
 
 @Service
 
@@ -134,4 +151,44 @@ public class SeguridadService {
 		PasswordEncoder ncoder = codificador();
 		return ncoder.matches(password, passwordMongo);
 	}
+	
+	//metodos encargados del doble factor de autentificación
+	private final GoogleAuthenticator gAuth = new GoogleAuthenticator();
+
+    public String generateSecretKey() {
+        final GoogleAuthenticatorKey key = gAuth.createCredentials();
+        return key.getKey();
+    }
+
+    public byte[] generateQRCodeImage(String secretKey, String username) throws WriterException, IOException {
+        String otpAuthURL = getOtpAuthURL("YourIssuer", username, secretKey);
+        return generateQRCode(otpAuthURL, 200, 200);
+    }
+
+    private String getOtpAuthURL(String issuer, String accountName, String secretKey) {
+        return String.format("otpauth://totp/%s:%s?secret=%s&issuer=%s", issuer, accountName, secretKey, issuer);
+    }
+
+    private byte[] generateQRCode(String text, int width, int height) throws WriterException, IOException {
+        Map<EncodeHintType, ErrorCorrectionLevel> hintMap = new HashMap<>();
+        hintMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.L);
+
+        BitMatrix bitMatrix = new MultiFormatWriter().encode(text, BarcodeFormat.QR_CODE, 200, 200, hintMap);
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
+        return outputStream.toByteArray();
+    }
+
+    // MÃ©todo para guardar el secretKey asociado a un usuario en tu base de datos
+    public void saveSecretKeyForUser(String username, String secretKey) {
+    	//if usuario existe en x tabla hacer un actualizaciÃ³n de la key
+        // LÃ³gica para guardar el secretKey asociado al usuario en tu base de datos
+    }
+	
+ // MÃ©todo para validar el cÃ³digo proporcionado por el usuario
+    public boolean verifyCode(String secretKey, int code) {
+        return gAuth.authorize(secretKey, code);
+    }
+	
 }
