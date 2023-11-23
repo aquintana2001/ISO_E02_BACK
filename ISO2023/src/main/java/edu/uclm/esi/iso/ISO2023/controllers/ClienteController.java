@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,14 +15,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import edu.uclm.esi.iso.ISO2023.dao.AdminDAO;
 import edu.uclm.esi.iso.ISO2023.entities.Cliente;
 import edu.uclm.esi.iso.ISO2023.entities.Reserva;
-import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
-import edu.uclm.esi.iso.ISO2023.services.AdminService;
 import edu.uclm.esi.iso.ISO2023.services.ClienteService;
 import edu.uclm.esi.iso.ISO2023.services.ReservaService;
-import edu.uclm.esi.iso.ISO2023.services.VehiculoService;
 
 @RestController
 @RequestMapping("cliente")
@@ -56,8 +51,8 @@ public class ClienteController {
 		String email;
 		String password;
 		try {
-			email = info.get("emailUser").toString();
-			password = info.get("passwordUser").toString();
+			email = info.get(EMAILUSER).toString();
+			password = info.get(PASSWORDUSER).toString();
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
 		}
@@ -111,8 +106,8 @@ public class ClienteController {
 		double valoracion;
 		String comentario;
 		try {
-			email = info.get("emailUser").toString();
-			password = info.get("passwordUser").toString();
+			email = info.get(EMAILUSER).toString();
+			password = info.get(PASSWORDUSER).toString();
 			idReserva = info.get("idReserva").toString();
 			valoracion = Double.parseDouble(info.get("valoracion").toString());
 			comentario = info.get("comentario").toString();
@@ -126,13 +121,13 @@ public class ClienteController {
 		}
 	}
 	
-	@GetMapping("/listarReservas")
+	@PostMapping("/listarReservas")
 	public List<Reserva> listarReservas(@RequestBody Map<String, Object> info) {
 		String email;
 		String password;
 		try {
-			email = info.get("emailUser").toString();
-			password = info.get("passwordUser").toString();
+			email = info.get(EMAILUSER).toString();
+			password = info.get(PASSWORDUSER).toString();
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
 		}

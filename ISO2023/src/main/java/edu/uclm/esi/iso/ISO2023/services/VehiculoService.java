@@ -8,17 +8,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import java.util.Optional;
 
-import edu.uclm.esi.iso.ISO2023.dao.AdminDAO;
 import edu.uclm.esi.iso.ISO2023.dao.ParametrosDAO;
 import edu.uclm.esi.iso.ISO2023.dao.VehiculoDAO;
-import edu.uclm.esi.iso.ISO2023.entities.Administrador;
-import edu.uclm.esi.iso.ISO2023.entities.Cliente;
 import edu.uclm.esi.iso.ISO2023.entities.Coche;
 import edu.uclm.esi.iso.ISO2023.entities.Moto;
 import edu.uclm.esi.iso.ISO2023.entities.Parametros;
 import edu.uclm.esi.iso.ISO2023.entities.Patinete;
 import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
-import edu.uclm.esi.iso.ISO2023.exceptions.numeroInvalido;
+import java.util.Collections;
 
 @Service
 public class VehiculoService {
@@ -30,24 +27,31 @@ public class VehiculoService {
 	private ParametrosDAO parametrosDAO;
 
 	public static final String ERROR_VE = "Ese vehiculo ya existe";
+	public static final String ID_BBDD = "655b1a3db7bb7908becebbf4";
+	public static final String ADMIN = "admin";
 
 	public List<Vehiculo> listaVehiculo(String email, String password) {
-		Parametros parametros = parametrosDAO.findById("655b1a3db7bb7908becebbf4").get();
-		if (userService.checkUser(email, password).equals("admin")) {
-			return this.vehiculoDAO.findAll();
-		}else if(userService.checkUser(email, password).equals("cliente")) { 
-			return this.vehiculoDAO.findByBateriaGreaterThanAndEstadoEquals(parametros.getMinimoBateria(),"disponible");
-		}else if(userService.checkUser(email, password).equals("mantenimiento")){
-			return this.vehiculoDAO.findByBateriaLessThanAndEstadoEquals(parametros.getMinimoBateria(), "descargado");
-		}else {
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permisos para realizar esta accion.");
+		Optional<Parametros> parametros = parametrosDAO.findById(ID_BBDD);
+		if (parametros.isPresent()) {
+			if (userService.checkUser(email, password).equals(ADMIN)) {
+				return this.vehiculoDAO.findAll();
+			} else if (userService.checkUser(email, password).equals("cliente")) {
+				return this.vehiculoDAO.findByBateriaGreaterThanAndEstadoEquals(parametros.get().getMinimoBateria(),
+						"disponible");
+			} else if (userService.checkUser(email, password).equals("mantenimiento")) {
+				return this.vehiculoDAO.findByBateriaLessThanAndEstadoEquals(parametros.get().getMinimoBateria(),
+						"descargado");
+			} else {
+				throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+						"No tienes permisos para realizar esta accion.");
+			}
 		}
-
+		return Collections.emptyList();
 	}
 
 	public void darAltaCoche(String matricula, String tipo, int bateria, String modelo, String estado, String direccion,
-			int nPlazas, String emailAdmin, String passwordAdmin) throws numeroInvalido {
-		if (userService.checkUser(emailAdmin, passwordAdmin).equals("admin")) {
+			int nPlazas, String emailAdmin, String passwordAdmin){
+		if (userService.checkUser(emailAdmin, passwordAdmin).equals(ADMIN)) {
 			Coche coche = new Coche(tipo, matricula, bateria, modelo, estado, direccion, nPlazas);
 
 			Optional<Vehiculo> possibleVehiculo = this.vehiculoDAO.findByMatricula(matricula);
@@ -61,8 +65,8 @@ public class VehiculoService {
 	}
 
 	public void darAltaMoto(String matricula, String tipo, int bateria, String modelo, String estado, String direccion,
-			boolean casco, String emailAdmin, String passwordAdmin) throws numeroInvalido {
-		if (userService.checkUser(emailAdmin, passwordAdmin).equals("admin")) {
+			boolean casco, String emailAdmin, String passwordAdmin)  {
+		if (userService.checkUser(emailAdmin, passwordAdmin).equals(ADMIN)) {
 			Moto moto = new Moto(tipo, matricula, bateria, modelo, estado, direccion, casco);
 			Optional<Vehiculo> possibleVehiculo = this.vehiculoDAO.findByMatricula(matricula);
 
@@ -75,8 +79,8 @@ public class VehiculoService {
 	}
 
 	public void darAltaPatinete(String matricula, String tipo, int bateria, String modelo, String estado,
-			String direccion, String color, String emailAdmin, String passwordAdmin) throws numeroInvalido {
-		if (userService.checkUser(emailAdmin, passwordAdmin).equals("admin")) {
+			String direccion, String color, String emailAdmin, String passwordAdmin) {
+		if (userService.checkUser(emailAdmin, passwordAdmin).equals(ADMIN)) {
 			Patinete patinete = new Patinete(tipo, matricula, bateria, modelo, estado, direccion, color);
 			Optional<Vehiculo> possibleVehiculo = this.vehiculoDAO.findByMatricula(matricula);
 
@@ -89,7 +93,7 @@ public class VehiculoService {
 	}
 
 	public void darBajaVehiculo(String id, String emailAdmin, String passwordAdmin) {
-		if (userService.checkUser(emailAdmin, passwordAdmin).equals("admin")) {
+		if (userService.checkUser(emailAdmin, passwordAdmin).equals(ADMIN)) {
 			if (vehiculoExist(id)) {
 				vehiculoDAO.deleteById(id);
 			} else {
@@ -106,7 +110,7 @@ public class VehiculoService {
 
 	public void modificarCoche(String id, String matricula, String tipo, int bateria, String modelo, String estado,
 			String direccion, String emailAdmin, String passwordAdmin, int nPlazas) {
-		if (userService.checkUser(emailAdmin, passwordAdmin).equals("admin")) {
+		if (userService.checkUser(emailAdmin, passwordAdmin).equals(ADMIN)) {
 			Optional<Vehiculo> vehiculoExiste = vehiculoDAO.findById(id);
 			if (vehiculoExiste.isPresent()) {
 				Vehiculo vehiculo = vehiculoExiste.get();
@@ -125,7 +129,7 @@ public class VehiculoService {
 
 	public void modificarMoto(String id, String matricula, String tipo, int bateria, String modelo, String estado,
 			String direccion, String emailAdmin, String passwordAdmin, boolean casco) {
-		if (userService.checkUser(emailAdmin, passwordAdmin).equals("admin")) {
+		if (userService.checkUser(emailAdmin, passwordAdmin).equals(ADMIN)) {
 			Optional<Vehiculo> vehiculoExiste = vehiculoDAO.findById(id);
 			if (vehiculoExiste.isPresent()) {
 				Vehiculo vehiculo = vehiculoExiste.get();
@@ -144,7 +148,7 @@ public class VehiculoService {
 
 	public void modificarPatinete(String id, String matricula, String tipo, int bateria, String modelo, String estado,
 			String direccion, String emailAdmin, String passwordAdmin, String color) {
-		if (userService.checkUser(emailAdmin, passwordAdmin).equals("admin")) {
+		if (userService.checkUser(emailAdmin, passwordAdmin).equals(ADMIN)) {
 			Optional<Vehiculo> vehiculoExiste = vehiculoDAO.findById(id);
 			if (vehiculoExiste.isPresent()) {
 				Vehiculo vehiculo = vehiculoExiste.get();
