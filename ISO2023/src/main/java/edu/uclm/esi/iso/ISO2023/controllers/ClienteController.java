@@ -30,23 +30,37 @@ import edu.uclm.esi.iso.ISO2023.services.VehiculoService;
 @CrossOrigin("*")
 public class ClienteController {
 	@Autowired
-	private VehiculoService vehiculoService;
-	@Autowired
 	private ReservaService reservaService;
 	@Autowired
 	private ClienteService clienteService;
+	
+	private static final String GET_PAR_ERR = "No se han podido capturar los parametros de la peticion, reviselos.";
+	private static final String EMAILUSER = "emailUser";
+	private static final String PASSWORDUSER = "passwordUser";
 
 	@DeleteMapping("/darDeBaja")
 	public void darDeBaja(@RequestBody Map<String, Object> info) {
-		String email = info.get("emailUser").toString();
-		String password = info.get("passwordUser").toString();
+		String email;
+		String password;
+		try {
+			email = info.get(EMAILUSER).toString();
+			password = info.get(PASSWORDUSER).toString();
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
+		}
 		clienteService.darDeBaja(email, password);
 	}
 	
 	@PostMapping("/getDatos")
 	public Cliente getDatos(@RequestBody Map<String, Object> info) {
-		String email = info.get("emailUser").toString();
-		String password = info.get("passwordUser").toString();
+		String email;
+		String password;
+		try {
+			email = info.get("emailUser").toString();
+			password = info.get("passwordUser").toString();
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
+		}
 
 		try {
 			return this.clienteService.getDatos(email, password);
@@ -58,14 +72,26 @@ public class ClienteController {
 	
 	@PutMapping("/actualizarDatos")
 	public ResponseEntity<String> actualizarDatos(@RequestBody Map<String, Object> info) {
-		String nombre = info.get("nombre").toString();
-		String email = info.get("email").toString();
-		String apellidos = info.get("apellidos").toString();
-		String password = info.get("password").toString();
-		String fechaNacimiento = info.get("fechaNacimiento").toString();
-		String carnet = info.get("carnet").toString();
-		String telefono = info.get("telefono").toString();
-		String dni = info.get("dni").toString();
+		String nombre;
+		String email;
+		String apellidos;
+		String password;
+		String fechaNacimiento;
+		String carnet;
+		String telefono;
+		String dni;
+		try {
+			nombre = info.get("nombre").toString();
+			email = info.get("email").toString();
+			apellidos = info.get("apellidos").toString();
+			password = info.get("password").toString();
+			fechaNacimiento = info.get("fechaNacimiento").toString();
+			carnet = info.get("carnet").toString();
+			telefono = info.get("telefono").toString();
+			dni = info.get("dni").toString();
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
+		}
 
 		try {
 			this.clienteService.actualizarDatos(nombre, apellidos, email, password, fechaNacimiento, carnet, telefono, dni);
@@ -79,11 +105,20 @@ public class ClienteController {
 	
 	@PutMapping("/valorarReserva")
 	public void valorarReserva(@RequestBody Map<String, Object> info) {
-		String email = info.get("emailUser").toString();
-		String password = info.get("passwordUser").toString();
-		String idReserva = info.get("idReserva").toString();
-		double valoracion = Double.parseDouble(info.get("valoracion").toString());
-		String comentario = info.get("comentario").toString();
+		String email;
+		String password;
+		String idReserva;
+		double valoracion;
+		String comentario;
+		try {
+			email = info.get("emailUser").toString();
+			password = info.get("passwordUser").toString();
+			idReserva = info.get("idReserva").toString();
+			valoracion = Double.parseDouble(info.get("valoracion").toString());
+			comentario = info.get("comentario").toString();
+		} catch (NumberFormatException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
+		}
 		try {
 			this.reservaService.valorarReserva(email,password, idReserva, valoracion, comentario);
 		} catch (Exception e) {
@@ -93,8 +128,14 @@ public class ClienteController {
 	
 	@GetMapping("/listarReservas")
 	public List<Reserva> listarReservas(@RequestBody Map<String, Object> info) {
-		String email = info.get("emailUser").toString();
-		String password = info.get("passwordUser").toString();
+		String email;
+		String password;
+		try {
+			email = info.get("emailUser").toString();
+			password = info.get("passwordUser").toString();
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
+		}
 		try {
 			return this.reservaService.listarReservas(email,password);
 		} catch (Exception e) {
