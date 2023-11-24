@@ -30,6 +30,13 @@ import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
 @Service
 
 public class SeguridadService {
+	
+	
+	
+    private static final String CLAVE_SECRETA_TOKEN = "Mueveteeeee"; 
+
+	
+	
 	public boolean restriccionesPassword(User usuario) throws contraseñaIncorrecta {
 
 		/* restricciones de seguridad de contraseÃ±a */
@@ -152,6 +159,11 @@ public class SeguridadService {
 		return ncoder.matches(password, passwordMongo);
 	}
 	
+	
+
+	
+	
+	
 	//metodos encargados del doble factor de autentificación
 	private final GoogleAuthenticator gAuth = new GoogleAuthenticator();
 
@@ -190,5 +202,62 @@ public class SeguridadService {
     public boolean verifyCode(String secretKey, int code) {
         return gAuth.authorize(secretKey, code);
     }
-	
+    
+    
+    
+    public boolean PasswordSecure(String pwd) throws contraseñaIncorrecta {
+		if (pwd.length() < 8)
+			throw new contraseñaIncorrecta("Error. La contrasena tiene que tener un minimo de 8 caracteres");
+
+		boolean seguro = false;
+		boolean contieneMayus = false;
+		boolean contieneMinus = false;
+		boolean contieneNumero = false;
+		boolean contieneCaracterRaro = false;
+
+		for (int i = 0; i < pwd.length()
+				|| (!contieneMayus && !contieneNumero && !contieneCaracterRaro && !contieneMinus); i++) {
+			if (Character.isUpperCase(pwd.charAt(i)))
+				contieneMayus = true;
+
+			if (Character.isLowerCase(pwd.charAt(i)))
+				contieneMinus = true;
+
+			if (Character.isDigit(pwd.charAt(i)))
+				contieneNumero = true;
+
+			if (esCaracterRaro(pwd.charAt(i)))
+				contieneCaracterRaro = true;
+		}
+
+		lanzamientoErrores(contieneMayus, contieneMinus, contieneNumero, contieneCaracterRaro);
+
+		if (contieneMayus && contieneMinus && contieneNumero && contieneCaracterRaro
+				&& pwd.length() >= 8)
+			seguro = true;
+		return seguro;
+	}
+
+    public String cifrarToken(String tokenEnClaro) {
+        StringBuilder tokenCifrado = new StringBuilder();
+        for (int i = 0; i < tokenEnClaro.length(); i++) {
+            char caracter = tokenEnClaro.charAt(i);
+            char clave = CLAVE_SECRETA_TOKEN.charAt(i % CLAVE_SECRETA_TOKEN.length());
+            char caracterCifrado = (char) (caracter ^ clave);
+            tokenCifrado.append(caracterCifrado);
+        }
+        return tokenCifrado.toString();
+    }
+
+    public String descifrarToken(String tokenCifrado) {
+        StringBuilder tokenEnClaro = new StringBuilder();
+        for (int i = 0; i < tokenCifrado.length(); i++) {
+            char caracterCifrado = tokenCifrado.charAt(i);
+            char clave = CLAVE_SECRETA_TOKEN.charAt(i % CLAVE_SECRETA_TOKEN.length());
+            char caracterEnClaro = (char) (caracterCifrado ^ clave);
+            tokenEnClaro.append(caracterEnClaro);
+        }
+        return tokenEnClaro.toString();
+    }
+
 }

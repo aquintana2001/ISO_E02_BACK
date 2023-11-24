@@ -92,17 +92,6 @@ public class UserController {
 		return usuario;
 	}
 	
-	@PostMapping("/reset-password")
-    public ResponseEntity<String> restablecerContraseña(@RequestBody Map<String, Object> info) {
-		String email = info.get("email").toString();
-        try {
-            this.userService.olvidarContrasena(email);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
-        }
-        return ResponseEntity.ok("Se ha enviado un correo electrónico para restablecer la contraseña.");
-    }
-	
 	
 	
 	
@@ -185,28 +174,33 @@ public class UserController {
 		return vehiculoService.listaVehiculo(email, password);
 	}
 	
-//	@PostMapping("/olvidarContrasena")
-//	 public ResponseEntity<String> olvidarContrasena(@RequestBody Map<String, Object> info) {
-//		String email = info.get("email").toString();
-//        try {
-//            userService.olvidarContrasena(email);
-//            return ResponseEntity.ok("Correo de restablecimiento enviado con éxito.");
-//        } catch (Exception e) {
-//            return ResponseEntity.badRequest().body("Error al enviar el correo de restablecimiento: " + e.getMessage());
-//        }
-//    }
-//	@PostMapping("/restablecerContrasena")
-//	 public ResponseEntity<String> restablecerContrasena(@RequestBody Map<String, Object> info) {
-//		
-//		String token = info.get("token").toString();
-//		String pwd = info.get("password").toString();
-//	
-//      try {
-//   	   userService.restablecerContrasena(token, pwd);
-//	        return ResponseEntity.ok("Contraseña restablecida con éxito");
-//      } catch (Exception e) {
-//          return ResponseEntity.badRequest().body("Error al enviar el correo de restablecimiento: " + e.getMessage());
-//      }
-//  }
+	
+	@PostMapping("/reset-password")
+    public ResponseEntity<String> restablecerContraseña(@RequestBody Map<String, Object> info) {
+		String email = info.get("email").toString();
+        try {
+            this.userService.olvidarContrasena(email);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+        }
+        return ResponseEntity.ok("Se ha enviado un correo electrónico para restablecer la contraseña.");
+    }
+	
+	
+	
+	@PostMapping("/modificarContrasena")
+	public ResponseEntity<String> modificarContrasena(@RequestBody Map<String, Object> info) {
+		String token = info.get("token").toString();
+		String pwd1 = info.get("pwd1").toString();
+		String pwd2 = info.get("pwd2").toString();
+		
+		
+		try {
+		userService.restablecerContrasena(token, pwd1, pwd2);
+	        return ResponseEntity.ok("Contraseña restablecida con éxito");
+      } catch (Exception e) {
+          return ResponseEntity.badRequest().body("No se ha podido modifcar la contraseña, intentalo de nuevo");
+      }
+		}
 
 }

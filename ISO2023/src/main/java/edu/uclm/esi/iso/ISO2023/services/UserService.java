@@ -176,83 +176,65 @@ public class UserService {
 
 		}
 	}
+	
+	
+	
 	public void olvidarContrasena(String email) throws contraseñaIncorrecta, formatoIncompleto {
 		
 		Cliente possibleCliente = this.clienteDAO.findByEmail(email).get();
 		Optional<Token> tokenAux = Optional.ofNullable(this.tokenDAO.findByUserEmail(email).get(0));
 		
-		if (possibleCliente==null)
-            throw new formatoIncompleto("No existe un usuario con ese correo electrónico");
+		if (possibleCliente!=null) {
+			String resetUrl1 = "http://localhost:4200/restablecerContrasena?token=" + comprobarSeguridad.cifrarPassword(tokenAux.get().getId());
+			this.emailService.sendCorreoConfirmacion(possibleCliente, resetUrl1);
+		}
 		
+        
+        
 		
-        String resetUrl1 = "http://localhost:4200/restablecerContrasena?token=" + comprobarSeguridad.cifrarPassword(tokenAux.get().getId());
-        this.emailService.sendCorreoConfirmacion(possibleCliente, resetUrl1);
-		
-	
+
 	}
 
-//	
-//	
-//	 private boolean validarToken(Token token, String tokenValue) {
-//	        // Implementa la lógica de validación del token según tus requisitos
-//	        // Aquí asumo que el valor del token se almacena en el objeto Token
-//	        return token != null && tokenValue.equals(token.getId());
-//	    }
-//	
-//	
-//	
-	
-	
-	
-//	public void restablecerContrasena(String tokenValue, String nuevaContrasena) {
-//        
-//        if (validarToken(tokenValue)) {
-//
-//            Token token = tokenDAO.findById(tokenValue).orElse(null);
-//            Cliente cliente = token.getCliente();
-//            cliente.setPassword(comprobarSeguridad.cifrarPassword(nuevaContrasena));
-//            tokenDAO.delete(token);
-//            clienteDAO.save(cliente);
-//        }
-//        
-//        
-//    }
-//	
-//	public void restablecerContrasena(String email, String token, String nuevaContrasena) {
-//		 Optional<Cliente> cliente = clienteDAO.findByEmail(email);
-//	        if (cliente == null) {
-//	            throw new Exception("Cliente no encontrado");
-//	        }
-//
-//	        Optional<Token> tokenEntity = tokenDAO.findByCliente(cliente);
-//	        if (tokenEntity.isPresent() && validarToken(tokenEntity.get(), token)) {
-//	            cliente.setPassword(passwordEncoder.encode(nuevaContrasena));
-//	            clienteDAO.save(cliente);
-//	        } else {
-//	            throw new Exception("Token inválido");
-//	        }
-//	}
-//	
-//	
+	public void restablecerContrasena(String token, String pwd1, String pwd2) throws contraseñaIncorrecta {
+		boolean segura = true;
+		Optional<Token> tokenAux = this.tokenDAO.findById(token);
 
-    
+		String tokenCifrado = tokenAux.get().getId();
+		
+		
+		System.out.println(token);
+		System.out.println(pwd1);
+		System.out.println(pwd2);
+		System.out.println(tokenCifrado);
+		String tokenDescifrado = comprobarSeguridad.descifrarToken(tokenCifrado);
+		System.out.println(tokenDescifrado);
 
-//	public void createPasswordResetToken(String email, String token) {
-//        // Valida que la dirección de correo electrónico sea válida
-//        if (!Validator.isEmailValid(email)) {
-//            throw new Exception("La dirección de correo electrónico no es válida");
-//        }
-//
-//        // Valida que el usuario exista
-//        User user = userDAO.findByEmail(email);
-//        if (user == null) {
-//            throw new NotFoundException("El usuario no existe");
-//        }
-//
-//        user.setPasswordResetToken(token);
-//        userDAO.save(user);
-//    }
-//
+
+
+		
+		if(pwd1.equals(pwd2)) {
+			if(comprobarSeguridad.PasswordSecure(pwd1) == segura) {
+//				String tokenDescifrado = comprobarSeguridad.descifrarToken(tokenCifrado);
+				User usuario = obtenerUsuarioPorIdToken(tokenDescifrado);
+	            Cliente cliente = clienteDAO.findByEmail(usuario.getEmail()).orElse(null);
+	            
+				cliente.setPassword(comprobarSeguridad.cifrarPassword(pwd1));
+				comprobarSeguridad.restriccionesPassword(cliente);
+				this.clienteDAO.save(cliente);
+			}
+
+		}
+	}
+	public User obtenerUsuarioPorIdToken(String idToken) {
+        Optional<Token> tokenOptional = tokenDAO.findById(idToken);
+        if (tokenOptional.isPresent()) {
+            Token token = tokenOptional.get();
+            return token.getUser(); 
+        } else {
+            return null; 
+        }
+    }
+
 
 
 	}

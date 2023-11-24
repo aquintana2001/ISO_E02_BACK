@@ -21,7 +21,7 @@ public class EmailService {
 
 
 	public void sendCorreoConfirmacion(Cliente possibleCliente, String url) {
-		String htmlContent = "<html><head></head><body><p>Por favor, confirma que ha olvidado la contraseña pulsando en el siguiente enlace,</p><p>Haz click aquí <a href='"+url+"'>restablecimiento de la contraseña MUEVE-TIC</a></p></body></html>";
+		 String htmlContent = "<html><head></head><body><p>Por favor, confirma que ha olvidado la contraseña pulsando en el siguiente enlace,</p><p>Haz click aquí <a href='"+url+"'>restablecimiento de la contraseña MUEVE-TIC</a></p></body></html>";
 		OkHttpClient client = new OkHttpClient().newBuilder()
 				.build();
 		MediaType mediaType = MediaType.parse("application/json");
