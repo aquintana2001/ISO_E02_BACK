@@ -191,15 +191,16 @@ public class UserController {
 	@PostMapping("/modificarContrasena")
 	public ResponseEntity<String> modificarContrasena(@RequestBody Map<String, Object> info) {
 		String token = info.get("token").toString();
+		String email = info.get("email").toString();
 		String pwd1 = info.get("pwd1").toString();
 		String pwd2 = info.get("pwd2").toString();
 		
 		
 		try {
-		userService.restablecerContrasena(token, pwd1, pwd2);
+		userService.restablecerContrasena(token, email, pwd1, pwd2);
 	        return ResponseEntity.ok("Contraseña restablecida con éxito");
       } catch (Exception e) {
-          return ResponseEntity.badRequest().body("No se ha podido modifcar la contraseña, intentalo de nuevo");
+          return ResponseEntity.badRequest().body("No se ha podido modifcar la contraseña, intentalo de nuevo"+e);
       }
 		}
 

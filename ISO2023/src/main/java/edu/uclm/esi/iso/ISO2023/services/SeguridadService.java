@@ -3,7 +3,13 @@ package edu.uclm.esi.iso.ISO2023.services;
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+
 import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,11 +36,6 @@ import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
 @Service
 
 public class SeguridadService {
-	
-	
-	
-    private static final String CLAVE_SECRETA_TOKEN = "Mueveteeeee"; 
-
 	
 	
 	public boolean restriccionesPassword(User usuario) throws contraseñaIncorrecta {
@@ -238,26 +239,5 @@ public class SeguridadService {
 		return seguro;
 	}
 
-    public String cifrarToken(String tokenEnClaro) {
-        StringBuilder tokenCifrado = new StringBuilder();
-        for (int i = 0; i < tokenEnClaro.length(); i++) {
-            char caracter = tokenEnClaro.charAt(i);
-            char clave = CLAVE_SECRETA_TOKEN.charAt(i % CLAVE_SECRETA_TOKEN.length());
-            char caracterCifrado = (char) (caracter ^ clave);
-            tokenCifrado.append(caracterCifrado);
-        }
-        return tokenCifrado.toString();
-    }
-
-    public String descifrarToken(String tokenCifrado) {
-        StringBuilder tokenEnClaro = new StringBuilder();
-        for (int i = 0; i < tokenCifrado.length(); i++) {
-            char caracterCifrado = tokenCifrado.charAt(i);
-            char clave = CLAVE_SECRETA_TOKEN.charAt(i % CLAVE_SECRETA_TOKEN.length());
-            char caracterEnClaro = (char) (caracterCifrado ^ clave);
-            tokenEnClaro.append(caracterEnClaro);
-        }
-        return tokenEnClaro.toString();
-    }
 
 }

@@ -195,46 +195,30 @@ public class UserService {
 
 	}
 
-	public void restablecerContrasena(String token, String pwd1, String pwd2) throws contraseñaIncorrecta {
+	public void restablecerContrasena(String token, String email, String pwd1, String pwd2) throws Exception {
 		boolean segura = true;
-		Optional<Token> tokenAux = this.tokenDAO.findById(token);
 
-		String tokenCifrado = tokenAux.get().getId();
-		
-		
-		System.out.println(token);
-		System.out.println(pwd1);
-		System.out.println(pwd2);
-		System.out.println(tokenCifrado);
-		String tokenDescifrado = comprobarSeguridad.descifrarToken(tokenCifrado);
-		System.out.println(tokenDescifrado);
-
-
-
-		
 		if(pwd1.equals(pwd2)) {
 			if(comprobarSeguridad.PasswordSecure(pwd1) == segura) {
-//				String tokenDescifrado = comprobarSeguridad.descifrarToken(tokenCifrado);
-				User usuario = obtenerUsuarioPorIdToken(tokenDescifrado);
-	            Cliente cliente = clienteDAO.findByEmail(usuario.getEmail()).orElse(null);
-	            
+				Optional<Token> tokenAux = Optional.ofNullable(this.tokenDAO.findByUserEmail(email).get(0));
+				//Comprobar que haya un user con ese email
+				if (!tokenAux.isPresent())
+					throw new Exception("No se ha podido cambiar la contraseña");
+				//Comprobar que el token sea correcto
+				if (token.equals(comprobarSeguridad.cifrarPassword(tokenAux.get().getId())))
+					throw new Exception("No se ha podido cambiar la contraseña");
+				//Comprobar que el mail pertenece a un cliente
+				Cliente cliente = clienteDAO.findByEmail(email).orElse(null);
+				if(cliente == null)
+					throw new Exception("No se ha podido cambiar la contraseña");
+				//Cambiar contraseña
 				cliente.setPassword(comprobarSeguridad.cifrarPassword(pwd1));
 				comprobarSeguridad.restriccionesPassword(cliente);
 				this.clienteDAO.save(cliente);
+
 			}
 
 		}
 	}
-	public User obtenerUsuarioPorIdToken(String idToken) {
-        Optional<Token> tokenOptional = tokenDAO.findById(idToken);
-        if (tokenOptional.isPresent()) {
-            Token token = tokenOptional.get();
-            return token.getUser(); 
-        } else {
-            return null; 
-        }
-    }
-
-
 
 	}
