@@ -17,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import edu.uclm.esi.iso.ISO2023.entities.User;
 import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
+import edu.uclm.esi.iso.ISO2023.exceptions.contraseñaIncorrecta;
 import edu.uclm.esi.iso.ISO2023.services.ReservaService;
 import edu.uclm.esi.iso.ISO2023.services.UserService;
 import edu.uclm.esi.iso.ISO2023.services.VehiculoService;
@@ -197,11 +198,12 @@ public class UserController {
 		
 		
 		try {
-		userService.restablecerContrasena(token, email, pwd1, pwd2);
+	        userService.restablecerContrasena(token, email, pwd1, pwd2);
 	        return ResponseEntity.ok("Contraseña restablecida con éxito");
-      } catch (Exception e) {
-          return ResponseEntity.badRequest().body("No se ha podido modifcar la contraseña, intentalo de nuevo"+e);
-      }
-		}
-
+	    } catch (contraseñaIncorrecta e) {
+	        return ResponseEntity.badRequest().body("Las contraseñas no coinciden o no cumplen con los requisitos.");
+	    } catch (Exception e) {
+	        return ResponseEntity.badRequest().body("No se ha podido modificar la contraseña, inténtalo de nuevo: " + e.getMessage());
+	    }
+	}
 }

@@ -189,16 +189,14 @@ public class UserService {
 			this.emailService.sendCorreoConfirmacion(possibleCliente, resetUrl1);
 		}
 		
-        
-        
-		
-
 	}
-
 	public void restablecerContrasena(String token, String email, String pwd1, String pwd2) throws Exception {
 		boolean segura = true;
 
+		
 		if(pwd1.equals(pwd2)) {
+			System.out.println(pwd1);
+			System.out.println(pwd2);
 			if(comprobarSeguridad.PasswordSecure(pwd1) == segura) {
 				Optional<Token> tokenAux = Optional.ofNullable(this.tokenDAO.findByUserEmail(email).get(0));
 				//Comprobar que haya un user con ese email
@@ -221,4 +219,7 @@ public class UserService {
 		}
 	}
 
-	}
+
+}
+
+	
