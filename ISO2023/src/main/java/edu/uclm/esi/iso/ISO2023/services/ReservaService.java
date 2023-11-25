@@ -40,7 +40,7 @@ public class ReservaService {
 		Optional<Mantenimiento> mant = this.mantenimientoDAO.findByEmail(email);
 		Vehiculo vehiculo = this.vehiculoDAO.findById(idVehiculo).get();
 
-		if (userService.comprobarUsuario(email, password).equals("cliente")) {
+		if (userService.checkUser(email, password).equals("cliente")) {
 			if (vehiculo.getEstado().equals("disponible")) {
 				if (this.reservaDAO.findByUsuarioEmailAndVehiculoEstado(email, "reservado").isEmpty()) {
 					Cliente cliente = cli.get();
@@ -57,7 +57,7 @@ public class ReservaService {
 				throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "El vehiculo ya está reservado.");
 			}
 
-		} else if (userService.comprobarUsuario(email, password).equals("mantenimiento")) {
+		} else if (userService.checkUser(email, password).equals("mantenimiento")) {
 			if (vehiculo.getEstado().equals("descargado")) {
 				if (this.mantenimientoDAO.findByEmail(email).get().getReservasActivas() < this.parametrosDAO.findById("655b1a3db7bb7908becebbf4").get().getMaxVehiculosMantenimiento()) {
 					Mantenimiento mantenimiento = mant.get();
@@ -88,12 +88,12 @@ public class ReservaService {
 
 	public void cancelarReserva(String email, String password, String idReserva) {
 		Reserva reserva = this.reservaDAO.findById(idReserva).get();
-		if ((userService.comprobarUsuario(email, password).equals("cliente")
-				|| userService.comprobarUsuario(email, password).equals("mantenimiento"))
+		if ((userService.checkUser(email, password).equals("cliente")
+				|| userService.checkUser(email, password).equals("mantenimiento"))
 				&& reserva.getEstado().equals("activa") && reserva.getUsuario().getEmail().equals(email)) {
 			reserva.setEstado("cancelada");
 			reserva.getVehiculo().setEstado("disponible");
-			if(userService.comprobarUsuario(email, password).equals("mantenimiento")) {
+			if(userService.checkUser(email, password).equals("mantenimiento")) {
 				Mantenimiento mant = this.mantenimientoDAO.findByEmail(email).get();
 				mant.setReservasActivas(mant.getReservasActivas()-1);
 				this.mantenimientoDAO.save(mant);
@@ -109,7 +109,7 @@ public class ReservaService {
 		Reserva reserva = this.reservaDAO.findById(idReserva).get();
 		Parametros parametros = this.parametrosDAO.findById("655b1a3db7bb7908becebbf4").get();
 		if (reserva.getEstado().equals("activa") && reserva.getUsuario().getEmail().equals(email)) {
-			if (userService.comprobarUsuario(email, password).equals("cliente")) {
+			if (userService.checkUser(email, password).equals("cliente")) {
 				reserva.setEstado("finalizada");
 				reserva.getVehiculo().setEstado("disponible");
 				reserva.getVehiculo().setBateria(reserva.getVehiculo().getBateria() - parametros.getBateriaViaje());
@@ -117,7 +117,7 @@ public class ReservaService {
 					reserva.getVehiculo().setEstado("descargado");
 				this.vehiculoDAO.save(reserva.getVehiculo());
 				this.reservaDAO.save(reserva);
-			}else if (userService.comprobarUsuario(email, password).equals("mantenimiento")) {
+			}else if (userService.checkUser(email, password).equals("mantenimiento")) {
 				reserva.setEstado("finalizada");
 				reserva.getVehiculo().setEstado("disponible");
 				reserva.getVehiculo().setBateria(100);
@@ -134,7 +134,7 @@ public class ReservaService {
 
 	public void valorarReserva(String email, String password, String idReserva, double valoracion, String comentario) {
 		Reserva reserva = this.reservaDAO.findById(idReserva).get();
-		if (userService.comprobarUsuario(email, password).equals("cliente") && reserva.getEstado().equals("finalizada")
+		if (userService.checkUser(email, password).equals("cliente") && reserva.getEstado().equals("finalizada")
 				&& reserva.getUsuario().getEmail().equals(email)) {
 			reserva.setValoracion(valoracion);
 			reserva.setComentario(comentario);
@@ -145,7 +145,7 @@ public class ReservaService {
 	}
 
 	public List<Reserva> listarReservas(String email, String password) {
-		if (userService.comprobarUsuario(email, password).equals("cliente")) {
+		if (userService.checkUser(email, password).equals("cliente")) {
 			List<Reserva> reservas = this.reservaDAO.findByUsuarioEmail(email);
 			return reservas;
 		} else {
