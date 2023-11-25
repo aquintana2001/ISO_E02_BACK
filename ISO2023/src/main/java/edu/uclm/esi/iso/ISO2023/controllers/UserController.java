@@ -1,7 +1,9 @@
 package edu.uclm.esi.iso.ISO2023.controllers;
 
 import java.util.List;
-import java.util.Map; 
+import java.util.Map;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import edu.uclm.esi.iso.ISO2023.entities.User;
 import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
 import edu.uclm.esi.iso.ISO2023.services.ReservaService;
 import edu.uclm.esi.iso.ISO2023.services.UserService;
@@ -88,6 +91,24 @@ public class UserController {
 		}
 		return usuario;
 	}
+	
+	@PostMapping("/reset-password")
+    public ResponseEntity<String> restablecerContraseña(@RequestBody Map<String, Object> info) {
+		String email = info.get("email").toString();
+        try {
+            this.userService.olvidarContrasena(email);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+        }
+        return ResponseEntity.ok("Se ha enviado un correo electrónico para restablecer la contraseña.");
+    }
+	
+	
+	
+	
+	
+	
+
 	
 	@PostMapping("/reserva")
 	public ResponseEntity<String> realizarReserva(@RequestBody Map<String, Object> info) {

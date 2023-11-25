@@ -2,11 +2,15 @@ package edu.uclm.esi.iso.ISO2023.services;
 
 import java.util.Optional;
 
+import org.openqa.selenium.NotFoundException;
+
 //import javax.mail.MessagingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+
 import org.springframework.stereotype.Service;
+import org.springframework.validation.Validator;
 import org.springframework.web.server.ResponseStatusException;
 
 import edu.uclm.esi.iso.ISO2023.dao.AdminDAO;
@@ -22,6 +26,15 @@ import edu.uclm.esi.iso.ISO2023.exceptions.*;
 
 @Service
 public class UserService {
+	
+	
+	
+	private final String username = "your-username";
+    private final String password = "your-password";
+    private final String host = "your-mail-host";
+    private final String port = "your-mail-port";
+    
+    
 	@Autowired
 	private ClienteDAO clienteDAO;
 	@Autowired
@@ -33,11 +46,14 @@ public class UserService {
 	@Autowired
 	private SeguridadService comprobarSeguridad;
 	
+	@Autowired
+	private EmailService emailService;
 	private static final String ADMIN = "admin";
 	private static final String CLIENTE = "cliente";
 	private static final String MANTENIMIENTO = "mantenimiento";
 
 
+	
 
 	public void registrarse(String nombre, String apellidos, String email, String password, String fechaNacimiento,
 			String carnet, String telefono, String dni) throws contraseñaIncorrecta, formatoIncompleto, numeroInvalido {
@@ -113,6 +129,11 @@ public class UserService {
 		}
 		return usuario;
 	}
+	
+	
+	
+	
+	
 
 	public User findUser(String tipoUsuario, String email) {
 		User usuario = null;
@@ -154,29 +175,35 @@ public class UserService {
 			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Error al guardar el usuario en la BBDD.");
 
 		}
+	}
+	public void olvidarContrasena(String email) throws contraseñaIncorrecta, formatoIncompleto {
+		
+		Cliente possibleCliente = this.clienteDAO.findByEmail(email).get();
+		Optional<Token> tokenAux = Optional.ofNullable(this.tokenDAO.findByUserEmail(email).get(0));
+		
+		if (possibleCliente==null)
+            throw new formatoIncompleto("No existe un usuario con ese correo electrónico");
+		
+		
+        String resetUrl1 = "http://localhost:4200/restablecerContrasena?token=" + comprobarSeguridad.cifrarPassword(tokenAux.get().getId());
+        this.emailService.sendCorreoConfirmacion(possibleCliente, resetUrl1);
+		
+	
+	}
 
-//	public void olvidarContrasena(String email) {
-//		
-//		Optional<Cliente> possibleCliente = this.clienteDAO.findByEmail(email);
-//		Optional<Token> tokenAux = Optional.ofNullable(this.tokenDAO.findByUserEmail(email).get(0));
-//		
-//		if (possibleCliente == null) {
-//            return;
-//        }
-//		
-//		
-//        String resetUrl1 = "http://localhost:4200/restablecerContrasena?token=" + comprobarSeguridad.cifrarPassword(tokenAux.get().getId());
-//        enviarCorreoRestablecimiento(possibleCliente.get().getEmail(), resetUrl1);
-//		
-//	}
 //	
 //	
-//	public boolean validarToken(String tokenValue) {
-//		
-//        Token token = tokenDAO.findById(tokenValue).orElse(null);
-//        return token != null;
-//    }
+//	 private boolean validarToken(Token token, String tokenValue) {
+//	        // Implementa la lógica de validación del token según tus requisitos
+//	        // Aquí asumo que el valor del token se almacena en el objeto Token
+//	        return token != null && tokenValue.equals(token.getId());
+//	    }
 //	
+//	
+//	
+	
+	
+	
 //	public void restablecerContrasena(String tokenValue, String nuevaContrasena) {
 //        
 //        if (validarToken(tokenValue)) {
@@ -191,25 +218,41 @@ public class UserService {
 //        
 //    }
 //	
+//	public void restablecerContrasena(String email, String token, String nuevaContrasena) {
+//		 Optional<Cliente> cliente = clienteDAO.findByEmail(email);
+//	        if (cliente == null) {
+//	            throw new Exception("Cliente no encontrado");
+//	        }
+//
+//	        Optional<Token> tokenEntity = tokenDAO.findByCliente(cliente);
+//	        if (tokenEntity.isPresent() && validarToken(tokenEntity.get(), token)) {
+//	            cliente.setPassword(passwordEncoder.encode(nuevaContrasena));
+//	            clienteDAO.save(cliente);
+//	        } else {
+//	            throw new Exception("Token inválido");
+//	        }
+//	}
 //	
-//	public void enviarCorreoRestablecimiento(String email, String token){
-//        
-//        String sender = "PracticaISO2324@outlook.es";
-//        String password = "Admin12345*";
-//
-//        EmailService.Configuracion configuracion = new EmailService.Configuracion(sender, password);
-//
-//        String subject = "Restablecimiento de contraseña";
-//        String body = "Haga clic en el siguiente enlace para restablecer su contraseña: " +
-//                "https://www.example.com/restablecerContrasena?token=" + token;
-//
-//        try {
-//			emailService.send(configuracion, email, subject, body);
-//		} catch (MessagingException e) {
+//	
 
-//			e.printStackTrace();
-//		}
+    
+
+//	public void createPasswordResetToken(String email, String token) {
+//        // Valida que la dirección de correo electrónico sea válida
+//        if (!Validator.isEmailValid(email)) {
+//            throw new Exception("La dirección de correo electrónico no es válida");
+//        }
+//
+//        // Valida que el usuario exista
+//        User user = userDAO.findByEmail(email);
+//        if (user == null) {
+//            throw new NotFoundException("El usuario no existe");
+//        }
+//
+//        user.setPasswordResetToken(token);
+//        userDAO.save(user);
 //    }
+//
+
 
 	}
-}
