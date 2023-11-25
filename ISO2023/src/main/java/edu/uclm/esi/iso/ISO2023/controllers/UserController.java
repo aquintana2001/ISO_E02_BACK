@@ -31,7 +31,7 @@ public class UserController {
 	private VehiculoService vehiculoService;
 
 	@PostMapping("/register")
-	public ResponseEntity<String> registrarse(@RequestBody Map<String, Object> info) {
+	public ResponseEntity<byte[]> registrarse(@RequestBody Map<String, Object> info) {
 		String password1 = info.get("password1").toString();
 		String password2 = info.get("password2").toString();
 		if (!password1.equals(password2))
@@ -44,22 +44,39 @@ public class UserController {
 		String carnet = info.get("carnet").toString();
 		String telefono = info.get("telefono").toString();
 		String dni = info.get("dni").toString();
+		byte[] QR ;
 
 		try {
-			this.userService.registrarse(nombre, apellidos, email, password1, fechaNacimiento, carnet, telefono, dni);
+			QR=this.userService.registrarse(nombre, apellidos, email, password1, fechaNacimiento, carnet, telefono, dni);
+			
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+		}
+		return ResponseEntity.ok(QR);
+	}
+
+	@PostMapping("/confirmarRegister")
+	public ResponseEntity<String> confirmarRegister(@RequestBody Map<String, Object> info) {
+		int mfaKey = (int) info.get("password1");
+		String email = info.get("email").toString();
+
+		try {
+			this.userService.confirmarRegister(email,mfaKey);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
 		return ResponseEntity.ok("Registro realizado con éxito.");
 	}
 
+	
 	@PutMapping("/login")
 	public String loginUser(@RequestBody Map<String, Object> info) {
 		String usuario;
 		String email = info.get("email").toString();
 		String password = info.get("password").toString();
+		int mfaKey = (int) info.get("mfaKey");
 		try {
-			usuario = this.userService.loginUser(email, password);
+			usuario = this.userService.loginUser(email, password, mfaKey);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
 		}

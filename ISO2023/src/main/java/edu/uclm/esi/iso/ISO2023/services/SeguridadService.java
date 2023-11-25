@@ -161,7 +161,7 @@ public class SeguridadService {
     }
 
     public byte[] generateQRCodeImage(String secretKey, String username) throws WriterException, IOException {
-        String otpAuthURL = getOtpAuthURL("YourIssuer", username, secretKey);
+        String otpAuthURL = getOtpAuthURL("MueveTIC", username, secretKey);
         return generateQRCode(otpAuthURL, 200, 200);
     }
 

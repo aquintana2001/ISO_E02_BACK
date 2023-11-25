@@ -10,6 +10,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import edu.uclm.esi.iso.ISO2023.dao.AdminDAO;
 import edu.uclm.esi.iso.ISO2023.dao.ClienteDAO;
+import edu.uclm.esi.iso.ISO2023.dao.TokenDAO;
 import edu.uclm.esi.iso.ISO2023.entities.Administrador;
 import edu.uclm.esi.iso.ISO2023.entities.Cliente;
 import edu.uclm.esi.iso.ISO2023.exceptions.*;
@@ -20,6 +21,8 @@ public class ClienteService {
 	private UserService userService;
 	@Autowired
 	private ClienteDAO clienteDAO;
+	@Autowired
+	private TokenDAO tokenDAO;
 	@Autowired
 	private SeguridadService comprobarSeguridad;
 	@Autowired
@@ -35,11 +38,11 @@ public class ClienteService {
 
 	// METODO PARA EL ADMIN
 	public void actualizarCliente(String nombre, String apellidos, String email, String password, boolean activo,
-			int intentos, String fechaNacimiento, String carnet, String telefono, String dni, String emailAdmin,
+			int intentos, String fechaNacimiento, String carnet, String telefono, String dni, String secretKey,String emailAdmin,
 			String passwordAdmin) throws contraseñaIncorrecta, formatoIncompleto, numeroInvalido {
 		if (userService.comprobarUsuario(emailAdmin, passwordAdmin).equals("admin")) {
 			Cliente cliente = new Cliente(nombre, apellidos, email, password, activo, intentos, fechaNacimiento, carnet,
-					telefono, dni);
+					telefono, dni, secretKey);
 
 			Optional<Cliente> clienteExiste = clienteDAO.findByEmail(email);
 			if (clienteExiste.isPresent()) {
@@ -84,6 +87,7 @@ public class ClienteService {
 	public void darDeBaja(String email, String password) {
 		if (userService.comprobarUsuario(email, password).equals("cliente")) {
 			clienteDAO.deleteById(email);
+			tokenDAO.deleteById(email);
 			;
 		} else {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Error al eliminar la cuenta");

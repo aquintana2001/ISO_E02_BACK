@@ -106,10 +106,11 @@ public class AdminController {
 		String dni = info.get("dni").toString();
 		String emailAdmin = info.get(EMAILUSER).toString();
 		String passwordAdmin = info.get(PASSWORDUSER).toString();
+		String secretKey = "";
 
 		try {
 			this.clienteService.actualizarCliente(nombre, apellidos, email, password, activo, intentos, fechaNacimiento,
-					carnet, telefono, dni, emailAdmin, passwordAdmin);
+					carnet, telefono, dni, secretKey,emailAdmin, passwordAdmin);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
