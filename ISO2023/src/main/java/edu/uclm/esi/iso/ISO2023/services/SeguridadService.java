@@ -1,9 +1,12 @@
 package edu.uclm.esi.iso.ISO2023.services;
 
-import java.io.IOException;
+import java.io.IOException; 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+
 import java.io.ByteArrayOutputStream;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,19 +26,19 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
-import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
 
 
 
 @Service
 
 public class SeguridadService {
-	public boolean restriccionesPassword(User usuario) throws contraseñaIncorrecta {
+
+	public boolean restriccionesPassword(User usuario) throws contrasenaIncorrecta {
 
 		/* restricciones de seguridad de contraseÃ±a */
 
 		if (usuario.getPassword().length() < 8)
-			throw new contraseñaIncorrecta("Error. La contrasena tiene que tener un minimo de 8 caracteres");
+			throw new contrasenaIncorrecta("Error. La contrasena tiene que tener un minimo de 8 caracteres");
 
 		boolean seguro = false;
 		boolean contieneMayus = false;
@@ -66,18 +69,18 @@ public class SeguridadService {
 		return seguro;
 	}
 
-	public void lanzamientoErrores(boolean may, boolean min, boolean num, boolean car) throws contraseñaIncorrecta {
+	public void lanzamientoErrores(boolean may, boolean min, boolean num, boolean car) throws contrasenaIncorrecta {
 		if (!may)
-			throw new contraseñaIncorrecta("Error. La contrasena tiene que tener minimo una mayuscula");
+			throw new contrasenaIncorrecta("Error. La contrasena tiene que tener minimo una mayuscula");
 
 		if (!min)
-			throw new contraseñaIncorrecta("Error. La contrasena tiene que tener minimo una minusccula");
+			throw new contrasenaIncorrecta("Error. La contrasena tiene que tener minimo una minusccula");
 
 		if (!num)
-			throw new contraseñaIncorrecta("Error. La contrasena tiene que tener minimo un numero");
+			throw new contrasenaIncorrecta("Error. La contrasena tiene que tener minimo un numero");
 
 		if (!car)
-			throw new contraseñaIncorrecta("Error. La contrasena tiene que tener minimo un caracter raro");
+			throw new contrasenaIncorrecta("Error. La contrasena tiene que tener minimo un caracter raro");
 	}
 
 	public static boolean esCaracterRaro(char c) {
@@ -88,13 +91,11 @@ public class SeguridadService {
 		return matcher.matches();
 	}
 
-
 	public Boolean comprobarDni(String dni) throws numeroInvalido {
 
 		// El DNI debe tener 9 caracteres
 		if (dni.length() != 9)
 			throw new numeroInvalido("El numero de dni introducido no es valido. Introduzca nueve digitos");
-
 
 		// Comprobar que los primeros 8 caracteres son dígitos
 		for (int i = 0; i < 8; i++) {
@@ -118,7 +119,6 @@ public class SeguridadService {
 		return true;
 	}
 
-
 	public Boolean comprobarNumero(String telefono) throws numeroInvalido {
 		if (telefono.length() != 9)
 			throw new numeroInvalido("El numero de telefono introducido no es valido. Introduzca nueve digitos");
@@ -127,7 +127,6 @@ public class SeguridadService {
 		for (int i = 0; i < telefono.length(); i++) {
 			if (!Character.isDigit(telefono.charAt(i)))
 				throw new numeroInvalido("El numero de telefono introducido no es valido. Introduzca nueve digitos");
-
 
 		}
 		return true;
@@ -151,44 +150,69 @@ public class SeguridadService {
 		PasswordEncoder ncoder = codificador();
 		return ncoder.matches(password, passwordMongo);
 	}
-	
-	//metodos encargados del doble factor de autentificación
+
+	// metodos encargados del doble factor de autentificación
 	private final GoogleAuthenticator gAuth = new GoogleAuthenticator();
 
-    public String generateSecretKey() {
-        final GoogleAuthenticatorKey key = gAuth.createCredentials();
-        return key.getKey();
-    }
+	public String generateSecretKey() {
+		final GoogleAuthenticatorKey key = gAuth.createCredentials();
+		return key.getKey();
+	}
 
-    public byte[] generateQRCodeImage(String secretKey, String username) throws WriterException, IOException {
-        String otpAuthURL = getOtpAuthURL("YourIssuer", username, secretKey);
-        return generateQRCode(otpAuthURL, 200, 200);
-    }
+	public byte[] generateQRCodeImage(String secretKey, String username) throws WriterException, IOException {
+		String otpAuthURL = getOtpAuthURL("YourIssuer", username, secretKey);
+		return generateQRCode(otpAuthURL, 200);
+	}
 
-    private String getOtpAuthURL(String issuer, String accountName, String secretKey) {
-        return String.format("otpauth://totp/%s:%s?secret=%s&issuer=%s", issuer, accountName, secretKey, issuer);
-    }
+	private String getOtpAuthURL(String issuer, String accountName, String secretKey) {
+		return String.format("otpauth://totp/%s:%s?secret=%s&issuer=%s", issuer, accountName, secretKey, issuer);
+	}
 
-    private byte[] generateQRCode(String text, int width, int height) throws WriterException, IOException {
-        Map<EncodeHintType, ErrorCorrectionLevel> hintMap = new HashMap<>();
-        hintMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.L);
+	private byte[] generateQRCode(String text, int height) throws WriterException, IOException {
+		Map<EncodeHintType, ErrorCorrectionLevel> hintMap = new HashMap<>();
+		hintMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.L);
 
-        BitMatrix bitMatrix = new MultiFormatWriter().encode(text, BarcodeFormat.QR_CODE, 200, 200, hintMap);
+		BitMatrix bitMatrix = new MultiFormatWriter().encode(text, BarcodeFormat.QR_CODE, 200, 200, hintMap);
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
-        return outputStream.toByteArray();
-    }
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
+		return outputStream.toByteArray();
+	}
 
-    // MÃ©todo para guardar el secretKey asociado a un usuario en tu base de datos
-    public void saveSecretKeyForUser(String username, String secretKey) {
-    	//if usuario existe en x tabla hacer un actualizaciÃ³n de la key
-        // LÃ³gica para guardar el secretKey asociado al usuario en tu base de datos
-    }
-	
- // MÃ©todo para validar el cÃ³digo proporcionado por el usuario
-    public boolean verifyCode(String secretKey, int code) {
-        return gAuth.authorize(secretKey, code);
-    }
-	
+	public boolean verifyCode(String secretKey, int code) {
+		return gAuth.authorize(secretKey, code);
+	}
+
+	public boolean passwordSecure(String pwd) throws contrasenaIncorrecta {
+		if (pwd.length() < 8)
+			throw new contrasenaIncorrecta("Error. La contrasena tiene que tener un minimo de 8 caracteres");
+
+		boolean seguro = false;
+		boolean contieneMayus = false;
+		boolean contieneMinus = false;
+		boolean contieneNumero = false;
+		boolean contieneCaracterRaro = false;
+
+		for (int i = 0; i < pwd.length()
+				|| (!contieneMayus && !contieneNumero && !contieneCaracterRaro && !contieneMinus); i++) {
+			if (Character.isUpperCase(pwd.charAt(i)))
+				contieneMayus = true;
+
+			if (Character.isLowerCase(pwd.charAt(i)))
+				contieneMinus = true;
+
+			if (Character.isDigit(pwd.charAt(i)))
+				contieneNumero = true;
+
+			if (esCaracterRaro(pwd.charAt(i)))
+				contieneCaracterRaro = true;
+		}
+
+		lanzamientoErrores(contieneMayus, contieneMinus, contieneNumero, contieneCaracterRaro);
+
+		if (contieneMayus && contieneMinus && contieneNumero && contieneCaracterRaro && pwd.length() >= 8)
+			seguro = true;
+		return seguro;
+	}
+
 }
