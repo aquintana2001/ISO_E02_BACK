@@ -87,18 +87,18 @@ public class UserService {
 	}
 	
 	public void confirmarRegister(String email, int mfaKey) throws formatoIncompleto, WriterException, IOException {
-		Optional<Cliente> userExist = this.clienteDAO.findByEmail(email);
+		Optional<Cliente> clienteExist = this.clienteDAO.findByEmail(email);
 		String errMsg = "Credenciales incorrectos";
-		if (!userExist.isPresent()) {
+		if (!clienteExist.isPresent()) {
 			throw new formatoIncompleto("Error.No puedes usar esos credenciales.");
 		}
-		//comprobarSeguridad.generateQRCodeImage(userExist.get().getsecretKey(), userExist.get().getEmail());
-		boolean mfa = comprobarSeguridad.verifyCode(userExist.get().getsecretKey(), mfaKey);
+		
+		boolean mfa = comprobarSeguridad.verifyCode(clienteExist.get().getsecretKey(), mfaKey);
 		if (!mfa) {
-			throw new formatoIncompleto(errMsg);
+			throw new formatoIncompleto(errMsg);	
 		}
-		userExist.get().setActivo(true);
-		clienteDAO.save(userExist.get());
+		clienteExist.get().setActivo(true);
+		clienteDAO.save(clienteExist.get());
 	}
 
 

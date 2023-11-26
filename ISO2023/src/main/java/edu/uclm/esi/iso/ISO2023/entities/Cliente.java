@@ -9,7 +9,7 @@ public class Cliente extends User {
 	private String carnet;
 	private String telefono;
 	private String dni;
-	private String secretKey="";
+	private String secretKey;
 
 	public Cliente(String nombre, String apellidos, String email, String password, boolean activo, int intentos,
 			String fechaNacimiento, String carnet, String telefono, String dni, String secretKey) {
@@ -18,6 +18,7 @@ public class Cliente extends User {
 		this.carnet = carnet;
 		this.telefono = telefono;
 		this.dni = dni;
+		this.secretKey = secretKey;
 	}
 
 	public String getFechaNacimiento() {
