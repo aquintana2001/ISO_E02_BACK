@@ -1,9 +1,16 @@
 package edu.uclm.esi.iso.ISO2023.controllers;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.List;
-import java.util.Map; 
+import java.util.Map;
+
+import javax.imageio.ImageIO;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,7 +42,7 @@ public class UserController {
 	private static final String GET_PAR_ERR = "No se han podido capturar los parámetros de la petición, revíselos.";
 
 	@PostMapping("/register")
-	public ResponseEntity<byte[]> registrarse(@RequestBody Map<String, Object> info) {
+	public ResponseEntity<byte[]> registrarse(@RequestBody Map<String, Object> info) throws Exception {
 
 		String password1;
 		String password2;
@@ -43,7 +50,7 @@ public class UserController {
 		String apellidos;
 		String email;
 		String fechaNacimiento;
-		String carnet;
+		String carnet;	
 		String telefono;
 		String dni;
 		byte[] QR ;
@@ -69,12 +76,14 @@ public class UserController {
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
-		return ResponseEntity.ok(QR);
+		return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG) // Ajusta según el tipo de imagen
+                .body(QR);
 	}
 
 	@PostMapping("/confirmarRegister")
 	public ResponseEntity<String> confirmarRegister(@RequestBody Map<String, Object> info) {
-		int mfaKey = (int) info.get("password1");
+		int mfaKey = Integer.parseInt(info.get("codigo").toString());
 		String email = info.get("email").toString();
 
 		try {
