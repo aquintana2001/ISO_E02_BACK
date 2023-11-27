@@ -221,7 +221,7 @@ public class AdminController {
 
 	}
 
-	private void darAltaCoche(Map<String, Object> info) throws numeroInvalido {
+	private void darAltaCoche(Map<String, Object> info){
 		String matricula;
 		String tipo;
 		int bateria;
@@ -250,7 +250,7 @@ public class AdminController {
 
 	}
 
-	private void darAltaMoto(Map<String, Object> info) throws numeroInvalido {
+	private void darAltaMoto(Map<String, Object> info) {
 
 		String matricula;
 		String tipo;
@@ -279,7 +279,7 @@ public class AdminController {
 				passwordAdmin);
 	}
 
-	private void darAltaPatinete(Map<String, Object> info) throws numeroInvalido {
+	private void darAltaPatinete(Map<String, Object> info) {
 
 		String matricula;
 		String tipo;
