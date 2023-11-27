@@ -1,6 +1,6 @@
 package edu.uclm.esi.iso.ISO2023.controllers;
 
-import java.util.*;
+import java.util.*; 
 
 import org.springframework.web.bind.annotation.RestController;
 
@@ -116,7 +116,6 @@ public class AdminController {
 
 	@PutMapping("/actualizarCliente")
 	public ResponseEntity<String> actualizarCliente(@RequestBody Map<String, Object> info) {
-
 		String nombre;
 		String apellidos;
 		String email;
@@ -148,7 +147,7 @@ public class AdminController {
 
 		try {
 			this.clienteService.actualizarCliente(nombre, apellidos, email, password, activo, intentos, fechaNacimiento,
-					carnet, telefono, dni,emailAdmin, passwordAdmin);
+					carnet, telefono, dni, emailAdmin, passwordAdmin);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}

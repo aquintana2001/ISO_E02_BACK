@@ -1,12 +1,7 @@
 package edu.uclm.esi.iso.ISO2023.controllers;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.List;
+import java.util.List;   
 import java.util.Map;
-
-import javax.imageio.ImageIO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
+import edu.uclm.esi.iso.ISO2023.exceptions.contrasenaIncorrecta;
 import edu.uclm.esi.iso.ISO2023.services.ReservaService;
 import edu.uclm.esi.iso.ISO2023.services.UserService;
 import edu.uclm.esi.iso.ISO2023.services.VehiculoService;
@@ -40,17 +36,17 @@ public class UserController {
 	private static final String EMAILUSER = "emailUser";
 	private static final String PASSWORDUSER = "passwordUser";
 	private static final String GET_PAR_ERR = "No se han podido capturar los parámetros de la petición, revíselos.";
+	private static final String EMAIL = "email";
 
 	@PostMapping("/register")
-	public ResponseEntity<byte[]> registrarse(@RequestBody Map<String, Object> info) throws Exception {
-
+	public ResponseEntity<byte[]> registrarse(@RequestBody Map<String, Object> info) {
 		String password1;
 		String password2;
 		String nombre;
 		String apellidos;
 		String email;
 		String fechaNacimiento;
-		String carnet;	
+		String carnet;
 		String telefono;
 		String dni;
 		byte[] QR ;
@@ -62,7 +58,7 @@ public class UserController {
 
 			nombre = info.get("nombre").toString();
 			apellidos = info.get("apellidos").toString();
-			email = info.get("email").toString();
+			email = info.get(EMAIL).toString();
 			fechaNacimiento = info.get("fechaNacimiento").toString();
 			carnet = info.get("carnet").toString();
 			telefono = info.get("telefono").toString();
@@ -70,9 +66,9 @@ public class UserController {
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
 		}
+
 		try {
 			QR=this.userService.registrarse(nombre, apellidos, email, password1, fechaNacimiento, carnet, telefono, dni);
-			
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
@@ -80,7 +76,7 @@ public class UserController {
                 .contentType(MediaType.IMAGE_JPEG) // Ajusta según el tipo de imagen
                 .body(QR);
 	}
-
+	
 	@PostMapping("/confirmarRegister")
 	public ResponseEntity<String> confirmarRegister(@RequestBody Map<String, Object> info) {
 		int mfaKey = Integer.parseInt(info.get("codigo").toString());
@@ -94,7 +90,6 @@ public class UserController {
 		return ResponseEntity.ok("Registro realizado con éxito.");
 	}
 
-	
 	@PutMapping("/login")
 	public String loginUser(@RequestBody Map<String, Object> info) {
 		String usuario;
@@ -102,7 +97,7 @@ public class UserController {
 		String password;
 		int mfaKey;
 		try {
-			email = info.get("email").toString();
+			email = info.get(EMAIL).toString();
 			password = info.get("password").toString();
 			mfaKey = (int) info.get("mfaKey");
 		} catch (Exception e) {
@@ -115,6 +110,7 @@ public class UserController {
 		}
 		return usuario;
 	}
+	
 	
 	@PostMapping("/reserva")
 	public ResponseEntity<String> realizarReserva(@RequestBody Map<String, Object> info) {
@@ -142,8 +138,8 @@ public class UserController {
 		String password;
 		String idReserva;
 		try {
-			email = info.get("emailUser").toString();
-			password = info.get("passwordUser").toString();
+			email = info.get(EMAILUSER).toString();
+			password = info.get(PASSWORDUSER).toString();
 			idReserva = info.get("idReserva").toString();
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
@@ -163,8 +159,8 @@ public class UserController {
 		String password;
 		String idReserva;
 		try {
-			email = info.get("emailUser").toString();
-			password = info.get("passwordUser").toString();
+			email = info.get(EMAILUSER).toString();
+			password = info.get(PASSWORDUSER).toString();
 			idReserva = info.get("idReserva").toString();
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
@@ -191,28 +187,35 @@ public class UserController {
 		return vehiculoService.listaVehiculo(email, password);
 	}
 	
-//	@PostMapping("/olvidarContrasena")
-//	 public ResponseEntity<String> olvidarContrasena(@RequestBody Map<String, Object> info) {
-//		String email = info.get("email").toString();
-//        try {
-//            userService.olvidarContrasena(email);
-//            return ResponseEntity.ok("Correo de restablecimiento enviado con éxito.");
-//        } catch (Exception e) {
-//            return ResponseEntity.badRequest().body("Error al enviar el correo de restablecimiento: " + e.getMessage());
-//        }
-//    }
-//	@PostMapping("/restablecerContrasena")
-//	 public ResponseEntity<String> restablecerContrasena(@RequestBody Map<String, Object> info) {
-//		
-//		String token = info.get("token").toString();
-//		String pwd = info.get("password").toString();
-//	
-//      try {
-//   	   userService.restablecerContrasena(token, pwd);
-//	        return ResponseEntity.ok("Contraseña restablecida con éxito");
-//      } catch (Exception e) {
-//          return ResponseEntity.badRequest().body("Error al enviar el correo de restablecimiento: " + e.getMessage());
-//      }
-//  }
-
+	
+	@PostMapping("/reset-password")
+    public ResponseEntity<String> restablecerContrasena(@RequestBody Map<String, Object> info) {
+		String email = info.get(EMAIL).toString();
+        try {
+            this.userService.olvidarContrasena(email);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+        }
+        return ResponseEntity.ok("Se ha enviado un correo electrónico para restablecer la contraseña.");
+    }
+	
+	
+	
+	@PostMapping("/modificarContrasena")
+	public ResponseEntity<String> modificarContrasena(@RequestBody Map<String, Object> info) {
+		String token = info.get("token").toString();
+		String email = info.get(EMAIL).toString();
+		String pwd1 = info.get("pwd1").toString();
+		String pwd2 = info.get("pwd2").toString();
+		
+		
+		try {
+	        userService.restablecerContrasena(token, email, pwd1, pwd2);
+	        return ResponseEntity.ok("Contraseña restablecida con éxito");
+	    } catch (contrasenaIncorrecta e) {
+	        return ResponseEntity.badRequest().body("Las contraseñas no coinciden o no cumplen con los requisitos.");
+	    } catch (Exception e) {
+	        return ResponseEntity.badRequest().body("No se ha podido modificar la contraseña, inténtalo de nuevo: " + e.getMessage());
+	    }
+	}
 }

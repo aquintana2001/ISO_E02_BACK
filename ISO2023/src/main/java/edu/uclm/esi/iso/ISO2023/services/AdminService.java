@@ -46,7 +46,7 @@ public class AdminService {
 	public static final String ERROR_CL = "Ese cliente no existe.";
 
 	public void registrar(String nombre, String apellidos, String email, String password, String emailAdmin,
-			String passwordAdmin, String tipoUsuario) throws contraseñaIncorrecta, formatoIncompleto {
+			String passwordAdmin, String tipoUsuario) throws contrasenaIncorrecta, formatoIncompleto {
 		if (userService.checkUser(emailAdmin, passwordAdmin).equals(ADMIN)) {
 			User usuario = null;
 			switch (tipoUsuario) {
@@ -63,7 +63,7 @@ public class AdminService {
 		}
 	}
 
-	public void seguridadRegistrar(User usuario, String tipoUsuario) throws contraseñaIncorrecta, formatoIncompleto {
+	public void seguridadRegistrar(User usuario, String tipoUsuario) throws contrasenaIncorrecta, formatoIncompleto {
 		if (!comprobarSeguridad.restriccionesPassword(usuario))
 			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "La contraseña no es segura");
 		if (this.clienteDAO.findByEmail(usuario.getEmail()).isPresent()
