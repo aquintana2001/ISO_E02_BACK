@@ -10,6 +10,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import edu.uclm.esi.iso.ISO2023.dao.ClienteDAO;
 import edu.uclm.esi.iso.ISO2023.dao.ReservaDAO;
+
 import edu.uclm.esi.iso.ISO2023.dao.TokenDAO;
 import edu.uclm.esi.iso.ISO2023.entities.Cliente;
 import edu.uclm.esi.iso.ISO2023.entities.Reserva;
@@ -23,10 +24,12 @@ public class ClienteService {
 	private ClienteDAO clienteDAO;
 	@Autowired
 	private TokenDAO tokenDAO;
+
 	@Autowired
 	private SeguridadService comprobarSeguridad;
 	@Autowired
 	private ReservaDAO reservaDAO;
+
 	
 	private static final String ADMIN = "admin";
 
@@ -44,7 +47,7 @@ public class ClienteService {
 			String passwordAdmin) throws contrasenaIncorrecta, numeroInvalido {
 		if (userService.checkUser(emailAdmin, passwordAdmin).equals(ADMIN)) {
 			Cliente cliente = new Cliente(nombre, apellidos, email, password, activo, intentos, fechaNacimiento, carnet,
-					telefono, dni);
+					telefono, dni, "");
 
 			Optional<Cliente> clienteExiste = clienteDAO.findByEmail(email);
 			if (clienteExiste.isPresent()) {
@@ -69,10 +72,12 @@ public class ClienteService {
 				cliente.setCarnet(carnet);
 				cliente.setTelefono(telefono);
 				cliente.setDni(dni);
+				cliente.setsecretKey(clienteExiste.get().getsecretKey());
 				clienteDAO.save(cliente);
 			}
 		}
 	}
+
 
 	public void anularCliente(String email, String emailAdmin, String passwordAdmin) {
 		if (userService.checkUser(emailAdmin, passwordAdmin).equals(ADMIN)) {
@@ -95,6 +100,8 @@ public class ClienteService {
 			}
 			this.tokenDAO.deleteAllByUserEmail(email);
 			clienteDAO.deleteById(email);
+
+			tokenDAO.deleteById(email);
 		} else {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Error al eliminar la cuenta");
 		}
@@ -137,7 +144,5 @@ public class ClienteService {
 		}
 
 	}
-
-	
 
 }
