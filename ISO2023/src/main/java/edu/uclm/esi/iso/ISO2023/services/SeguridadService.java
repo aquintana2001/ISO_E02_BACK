@@ -101,6 +101,7 @@ public class SeguridadService {
 		return seguro;
 	}
 
+
 	public void lanzamientoErrores(boolean may, boolean min, boolean num, boolean car) throws contrasenaIncorrecta {
 		if (!may)
 			throw new contrasenaIncorrecta("Error. La contrasena tiene que tener minimo una mayuscula");

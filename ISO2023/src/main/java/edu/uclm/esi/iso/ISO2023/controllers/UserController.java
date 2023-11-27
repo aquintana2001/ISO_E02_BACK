@@ -111,7 +111,7 @@ public class UserController {
 		return usuario;
 	}
 	
-	
+
 	@PostMapping("/reserva")
 	public ResponseEntity<String> realizarReserva(@RequestBody Map<String, Object> info) {
 		String email;
@@ -218,4 +218,6 @@ public class UserController {
 	        return ResponseEntity.badRequest().body("No se ha podido modificar la contraseña, inténtalo de nuevo: " + e.getMessage());
 	    }
 	}
+
 }
+

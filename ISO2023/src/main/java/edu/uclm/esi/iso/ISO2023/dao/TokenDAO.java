@@ -11,9 +11,9 @@ import edu.uclm.esi.iso.ISO2023.entities.User;
 
 public interface TokenDAO extends MongoRepository<Token, String> {
 	Optional<Token> findByUser(User user);
-	
+
 	List<Token> findByUserEmail(String email);
-	
+	void deleteAllByUserEmail(String email);	
 	Optional<Token> findById(String id);
-	
 }
+

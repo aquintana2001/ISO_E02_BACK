@@ -1,5 +1,6 @@
 package edu.uclm.esi.iso.ISO2023.services;
 
+
 import java.io.IOException;
 import java.util.Optional;   
 
@@ -40,6 +41,7 @@ public class UserService {
 	@Autowired
 	private EmailService emailService;
 	
+
 	private static final String ADMIN = "admin";
 	private static final String CLIENTE = "cliente";
 	private static final String MANTENIMIENTO = "mantenimiento";
@@ -47,8 +49,11 @@ public class UserService {
 	private static final String MENSAJE = "No se ha podido cambiar la contraseña";
 
 
+
 	public byte[] registrarse(String nombre, String apellidos, String email, String password, String fechaNacimiento,
 			String carnet, String telefono, String dni) throws contrasenaIncorrecta, formatoIncompleto, numeroInvalido, WriterException, IOException {
+
+
 
 		Cliente cliente = new Cliente(nombre, apellidos, email, password, false, 5, fechaNacimiento, carnet, telefono,
 				dni,"");
@@ -153,6 +158,11 @@ public class UserService {
 		return usuario;
 	}
 
+
+
+
+
+
 	public User findUser(String tipoUsuario, String email) {
 		User usuario = null;
 		Optional<Administrador> admin = this.adminDAO.findByEmail(email);
@@ -204,11 +214,12 @@ public class UserService {
 			String resetUrl1 = "http://localhost:4200/restablecerContrasena?token=" + comprobarSeguridad.cifrarPassword(tokenAux.get().getId());
 			this.emailService.sendCorreoConfirmacion(possibleCliente.get(),resetUrl1);
 		}
+
 	}
-	
 	public void restablecerContrasena(String token, String email, String pwd1, String pwd2) throws formatoIncompleto, contrasenaIncorrecta {
 		boolean segura = true;
-		
+
+
 		if(pwd1.equals(pwd2)) {
 			if(comprobarSeguridad.passwordSecure(pwd1) == segura) {
 				Optional<Token> tokenAux = Optional.ofNullable(this.tokenDAO.findByUserEmail(email).get(0));
@@ -231,6 +242,10 @@ public class UserService {
 		}else {
 			throw new contrasenaIncorrecta("Las contraseñas no coinciden");
 
+
 		}
 	}
+
 }
+
+

@@ -140,6 +140,9 @@ public class ReservaService {
 				} else if (userService.checkUser(email, password).equals(MANTENIMIENTO)) {
 					finalizarMantenimiento(reserva.get(), email);
 				}
+				reserva.get().setEstado(FINALIZADA);
+				this.vehiculoDAO.save(reserva.get().getVehiculo());
+				this.reservaDAO.save(reserva.get());
 			} else {
 				throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Error al finalizar la reserva.");
 			}
@@ -151,8 +154,7 @@ public class ReservaService {
 		reserva.getVehiculo().setBateria(reserva.getVehiculo().getBateria() - parametros.getBateriaViaje());
 		if (reserva.getVehiculo().getBateria() < parametros.getMinimoBateria())
 			reserva.getVehiculo().setEstado(DESCARGADO);
-		this.vehiculoDAO.save(reserva.getVehiculo());
-		this.reservaDAO.save(reserva);
+		
 	}
 
 	public void finalizarMantenimiento(Reserva reserva, String email) {
@@ -163,8 +165,6 @@ public class ReservaService {
 			reserva.getVehiculo().setBateria(100);
 			mant.get().setReservasActivas(mant.get().getReservasActivas() - 1);
 			this.mantenimientoDAO.save(mant.get());
-			this.vehiculoDAO.save(reserva.getVehiculo());
-			this.reservaDAO.save(reserva);
 		}
 	}
 

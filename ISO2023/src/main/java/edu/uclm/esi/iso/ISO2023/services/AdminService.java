@@ -1,5 +1,7 @@
 package edu.uclm.esi.iso.ISO2023.services;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import edu.uclm.esi.iso.ISO2023.dao.ParametrosDAO;
 import edu.uclm.esi.iso.ISO2023.dao.ReservaDAO;
 import edu.uclm.esi.iso.ISO2023.dao.TokenDAO;
 import edu.uclm.esi.iso.ISO2023.entities.Administrador;
+import edu.uclm.esi.iso.ISO2023.entities.Cliente;
 import edu.uclm.esi.iso.ISO2023.entities.Mantenimiento;
 import edu.uclm.esi.iso.ISO2023.entities.Parametros;
 import edu.uclm.esi.iso.ISO2023.entities.Reserva;
@@ -134,17 +137,27 @@ public class AdminService {
 		}
 	}
 
-	public double obtenerFacturacion(String emailAdmin, String passwordAdmin, String emailCliente, String primerDia,
-			String ultimoDia) {
-		Optional<Parametros> par = this.parametrosDAO.findById(ID_BBDD);
-		double facturacion = 0;
-		if (userService.checkUser(emailAdmin, passwordAdmin).equals(ADMIN) && par.isPresent()) {
-			for (Reserva reserva : this.reservaDAO.findByUsuarioEmailAndFechaBetweenAndEstado(emailCliente, primerDia,
-					ultimoDia, "finalizada")) {
-					facturacion += par.get().getPrecioViaje();
-			}
-		}
-		return facturacion;
+	public List<String> obtenerFacturacion(String emailAdmin, String passwordAdmin, String primerDia, String ultimoDia) {
+	    Optional<Parametros> par = this.parametrosDAO.findById(ID_BBDD);
+	    List<String> lista = new ArrayList<>();
+	    if (userService.checkUser(emailAdmin, passwordAdmin).equals(ADMIN) && par.isPresent()) {
+      
+	        for(Cliente i : this.clienteDAO.findAll()) {
+	        	double facturacion=0;
+	        	String email = i.getEmail();
+	        	for(Reserva j : this.reservaDAO.findByUsuarioEmailAndFechaBetweenAndEstado(email, primerDia, ultimoDia,"finalizada")) {
+	        		facturacion += par.get().getPrecioViaje();}
+	        	if (facturacion > 0) {
+	                lista.add(email + ": " + facturacion);
+	            }
+	        }
+	    }
+	    
+	    return lista;
 	}
 
+
 }
+
+
+
