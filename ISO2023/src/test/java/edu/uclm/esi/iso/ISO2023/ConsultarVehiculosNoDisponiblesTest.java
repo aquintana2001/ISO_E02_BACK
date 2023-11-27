@@ -1,6 +1,5 @@
 package edu.uclm.esi.iso.ISO2023;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -10,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.ResultActions;
@@ -26,17 +24,19 @@ import org.json.JSONObject;
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 
-public class ConsultarVehiculosNoDisponiblesTest {
+class ConsultarVehiculosNoDisponiblesTest {
 	@Autowired
 	private MockMvc server;
-	
+	private static final String CONTRASENA = "Hola123*";
+	private static final String RUTA = "application/json";
+
 	@Test
 	@Order(1)
 	void testConsultarVehiculosNoDisponiblesComoMantenimiento () throws Exception {
-		ResultActions result = this.sendMantenimiento("prueba20@gmail.com", "Hola123*");
+		ResultActions result = this.sendMantenimiento("prueba20@gmail.com", CONTRASENA);
 	    result
             .andExpect(status().isOk()) // Verificar que el código de estado es 200 OK
-            .andExpect(content().contentType("application/json"));
+            .andExpect(content().contentType(RUTA));
             // Puedes agregar más aserciones para verificar el contenido de la respuesta si es necesario
    
 	}
@@ -44,10 +44,10 @@ public class ConsultarVehiculosNoDisponiblesTest {
 	@Test
 	@Order(2)
 	void testConsultarVehiculosNoDisponiblesComoAdmin () throws Exception {
-		ResultActions result = this.sendMantenimiento("guillermo.santos2@alu.uclm.es", "Hola123*");
+		ResultActions result = this.sendMantenimiento("guillermo.santos2@alu.uclm.es", CONTRASENA);
 	    result
             .andExpect(status().isOk()) // Verificar que el código de estado es 200 OK
-            .andExpect(content().contentType("application/json"));
+            .andExpect(content().contentType(RUTA));
             // Puedes agregar más aserciones para verificar el contenido de la respuesta si es necesario
    
 	}
@@ -55,7 +55,7 @@ public class ConsultarVehiculosNoDisponiblesTest {
 	@Test
 	@Order(3)
 	void testConsultarVehiculosNoDisponiblesComoCliente () throws Exception {
-		ResultActions result = this.sendMantenimiento("guillermo.423@alu.uclm.es", "Hola123*");
+		ResultActions result = this.sendMantenimiento("guillermo.423@alu.uclm.es", CONTRASENA);
 	    result
 	        .andExpect(status().is4xxClientError());
 	        // Debería devolver un error 4xx ya que un usuario no tiene permiso para consultar vehículos
@@ -73,11 +73,12 @@ public class ConsultarVehiculosNoDisponiblesTest {
 	}
 	
 	public ResultActions sendMantenimiento(String name,String pwd) throws Exception {
+		ResultActions resultActions = null;
 		JSONObject jsoUser = new JSONObject()
 				.put("emailUser", name)
 				.put("passwordUser",pwd);
-		RequestBuilder request = MockMvcRequestBuilders.post("/users/vehiculo").contentType("application/json").content(jsoUser.toString());
-		ResultActions resultActions = this.server.perform(request);
+		RequestBuilder request = MockMvcRequestBuilders.post("/users/vehiculo").contentType(RUTA).content(jsoUser.toString());
+		resultActions = this.server.perform(request);
 		return resultActions;
 	}
 }
