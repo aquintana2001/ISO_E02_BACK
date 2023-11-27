@@ -9,14 +9,16 @@ public class Cliente extends User {
 	private String carnet;
 	private String telefono;
 	private String dni;
+	private String secretKey;
 
 	public Cliente(String nombre, String apellidos, String email, String password, boolean activo, int intentos,
-			String fechaNacimiento, String carnet, String telefono, String dni) {
+			String fechaNacimiento, String carnet, String telefono, String dni, String secretKey) {
 		super(nombre, apellidos, email, password, activo, intentos);
 		this.fechaNacimiento = fechaNacimiento;
 		this.carnet = carnet;
 		this.telefono = telefono;
 		this.dni = dni;
+		this.secretKey = secretKey;
 	}
 
 	public String getFechaNacimiento() {
@@ -51,10 +53,18 @@ public class Cliente extends User {
 	public void setDni(String dni) {
 		this.dni = dni;
 	}
+	public String getsecretKey() {
+		return secretKey;
+	}
+
+	public void setsecretKey(String secretKey) {
+		this.secretKey = secretKey;
+	}
+
 
 	@Override
 	public String toString() {
-		return "Cliente [dni=" + dni + ", fechs nacimiento=" + fechaNacimiento + ", telefono=" + telefono + "]";
+		return "Cliente [dni=" + dni + ", fechs nacimiento=" + fechaNacimiento + ", telefono=" + telefono + ", secretKey=" + secretKey + "]";
 	}
 
 	// Comprobar longitud telefono

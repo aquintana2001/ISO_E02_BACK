@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,7 +39,7 @@ public class UserController {
 	private static final String EMAIL = "email";
 
 	@PostMapping("/register")
-	public ResponseEntity<String> registrarse(@RequestBody Map<String, Object> info) {
+	public ResponseEntity<byte[]> registrarse(@RequestBody Map<String, Object> info) {
 		String password1;
 		String password2;
 		String nombre;
@@ -48,6 +49,7 @@ public class UserController {
 		String carnet;
 		String telefono;
 		String dni;
+		byte[] QR ;
 		try {
 			password1 = info.get("password1").toString();
 			password2 = info.get("password2").toString();
@@ -66,7 +68,22 @@ public class UserController {
 		}
 
 		try {
-			this.userService.registrarse(nombre, apellidos, email, password1, fechaNacimiento, carnet, telefono, dni);
+			QR=this.userService.registrarse(nombre, apellidos, email, password1, fechaNacimiento, carnet, telefono, dni);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+		}
+		return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG) // Ajusta según el tipo de imagen
+                .body(QR);
+	}
+	
+	@PostMapping("/confirmarRegister")
+	public ResponseEntity<String> confirmarRegister(@RequestBody Map<String, Object> info) {
+		int mfaKey = Integer.parseInt(info.get("codigo").toString());
+		String email = info.get("email").toString();
+
+		try {
+			this.userService.confirmarRegister(email,mfaKey);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
@@ -78,27 +95,23 @@ public class UserController {
 		String usuario;
 		String email;
 		String password;
+		int mfaKey;
 		try {
 			email = info.get(EMAIL).toString();
 			password = info.get("password").toString();
+			mfaKey = (int) info.get("mfaKey");
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
 		}
 		try {
-			usuario = this.userService.loginUser(email, password);
+			usuario = this.userService.loginUser(email, password, mfaKey);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
 		}
 		return usuario;
 	}
 	
-	
-	
-	
-	
-	
 
-	
 	@PostMapping("/reserva")
 	public ResponseEntity<String> realizarReserva(@RequestBody Map<String, Object> info) {
 		String email;
@@ -205,4 +218,6 @@ public class UserController {
 	        return ResponseEntity.badRequest().body("No se ha podido modificar la contraseña, inténtalo de nuevo: " + e.getMessage());
 	    }
 	}
+
 }
+
