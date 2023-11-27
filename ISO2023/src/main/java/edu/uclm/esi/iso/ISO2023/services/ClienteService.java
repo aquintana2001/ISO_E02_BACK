@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import edu.uclm.esi.iso.ISO2023.dao.ClienteDAO;
+import edu.uclm.esi.iso.ISO2023.dao.TokenDAO;
+import edu.uclm.esi.iso.ISO2023.entities.Token;
 import edu.uclm.esi.iso.ISO2023.entities.Cliente;
 import edu.uclm.esi.iso.ISO2023.exceptions.*;
 
@@ -18,6 +20,8 @@ public class ClienteService {
 	private UserService userService;
 	@Autowired
 	private ClienteDAO clienteDAO;
+	@Autowired
+	private TokenDAO tokenDAO;
 	@Autowired
 	private SeguridadService comprobarSeguridad;
 	
@@ -67,9 +71,9 @@ public class ClienteService {
 		}
 	}
 
-	public void eliminarCliente(String email, String emailAdmin, String passwordAdmin) {
+	public void anularCliente(String email, String emailAdmin, String passwordAdmin) {
 		if (userService.checkUser(emailAdmin, passwordAdmin).equals(ADMIN)) {
-			Optional<Cliente> clienteExiste = clienteDAO.findByEmail(email);
+			Optional<Cliente> clienteExiste = this.clienteDAO.findByEmail(email);
 			if (clienteExiste.isPresent()) {
 				clienteExiste.get().setActivo(false);
 				clienteDAO.save(clienteExiste.get());
@@ -81,6 +85,7 @@ public class ClienteService {
 
 	public void darDeBaja(String email, String password) {
 		if (userService.checkUser(email, password).equals("cliente")) {
+			this.tokenDAO.deleteAllByUserEmail(email);
 			clienteDAO.deleteById(email);
 		} else {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Error al eliminar la cuenta");

@@ -175,7 +175,7 @@ public class AdminController {
 	}
 
 	@DeleteMapping("/eliminarCliente")
-	public ResponseEntity<String> eliminarCliente(@RequestBody Map<String, Object> info) {
+	public ResponseEntity<String> anularCliente(@RequestBody Map<String, Object> info) {
 		String email;
 		String emailAdmin;
 		String passwordAdmin;
@@ -187,7 +187,7 @@ public class AdminController {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
 		}
 		try {
-			this.clienteService.eliminarCliente(email, emailAdmin, passwordAdmin);
+			this.clienteService.anularCliente(email, emailAdmin, passwordAdmin);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
@@ -493,23 +493,21 @@ public class AdminController {
 	}
 
 	@PostMapping("/obtenerFacturacion")
-	public double obtenerFacturacion(@RequestBody Map<String, Object> info) {
+	public List<String> obtenerFacturacion(@RequestBody Map<String, Object> info) {
 		String emailAdmin;
 		String passwordAdmin;
-		String emailCliente;
 		String primerDia;
 		String ultimoDia;
 		try {
 			emailAdmin = info.get(EMAILUSER).toString();
 			passwordAdmin = info.get(PASSWORDUSER).toString();
-			emailCliente = info.get("emailCliente").toString();
 			primerDia = info.get("primerDia").toString();
 			ultimoDia = info.get("ultimoDia").toString();
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
 		}
 		try {
-			return this.adminService.obtenerFacturacion(emailAdmin, passwordAdmin, emailCliente, primerDia, ultimoDia);
+			return this.adminService.obtenerFacturacion(emailAdmin, passwordAdmin, primerDia, ultimoDia);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
