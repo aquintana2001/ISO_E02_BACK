@@ -38,7 +38,7 @@ public class ClienteService {
 	// METODO PARA EL ADMIN
 	public void actualizarCliente(String nombre, String apellidos, String email, String password, boolean activo,
 			int intentos, String fechaNacimiento, String carnet, String telefono, String dni, String emailAdmin,
-			String passwordAdmin) throws contraseñaIncorrecta, numeroInvalido {
+			String passwordAdmin) throws contrasenaIncorrecta, numeroInvalido {
 		if (userService.checkUser(emailAdmin, passwordAdmin).equals(ADMIN)) {
 			Cliente cliente = new Cliente(nombre, apellidos, email, password, activo, intentos, fechaNacimiento, carnet,
 					telefono, dni);
@@ -103,7 +103,7 @@ public class ClienteService {
 	
 	// METODO PARA EL CLIENTE
 	public void actualizarDatos(String nombre, String apellidos, String email, String password, String fechaNacimiento,
-			String carnet, String telefono, String dni) throws contraseñaIncorrecta,  numeroInvalido{
+			String carnet, String telefono, String dni) throws contrasenaIncorrecta,  numeroInvalido{
 		Optional<Cliente> cliente = this.clienteDAO.findByEmail(email);
 		if (userService.checkUser(email, password).equals("cliente") && cliente.isPresent()) {
 

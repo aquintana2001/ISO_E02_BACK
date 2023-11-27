@@ -1,8 +1,7 @@
 package edu.uclm.esi.iso.ISO2023.controllers;
 
-import java.util.List;
+import java.util.List;   
 import java.util.Map;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import edu.uclm.esi.iso.ISO2023.entities.User;
 import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
+import edu.uclm.esi.iso.ISO2023.exceptions.contrasenaIncorrecta;
 import edu.uclm.esi.iso.ISO2023.services.ReservaService;
 import edu.uclm.esi.iso.ISO2023.services.UserService;
 import edu.uclm.esi.iso.ISO2023.services.VehiculoService;
@@ -36,6 +35,7 @@ public class UserController {
 	private static final String EMAILUSER = "emailUser";
 	private static final String PASSWORDUSER = "passwordUser";
 	private static final String GET_PAR_ERR = "No se han podido capturar los parámetros de la petición, revíselos.";
+	private static final String EMAIL = "email";
 
 	@PostMapping("/register")
 	public ResponseEntity<String> registrarse(@RequestBody Map<String, Object> info) {
@@ -56,7 +56,7 @@ public class UserController {
 
 			nombre = info.get("nombre").toString();
 			apellidos = info.get("apellidos").toString();
-			email = info.get("email").toString();
+			email = info.get(EMAIL).toString();
 			fechaNacimiento = info.get("fechaNacimiento").toString();
 			carnet = info.get("carnet").toString();
 			telefono = info.get("telefono").toString();
@@ -79,7 +79,7 @@ public class UserController {
 		String email;
 		String password;
 		try {
-			email = info.get("email").toString();
+			email = info.get(EMAIL).toString();
 			password = info.get("password").toString();
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
@@ -91,17 +91,6 @@ public class UserController {
 		}
 		return usuario;
 	}
-	
-	@PostMapping("/reset-password")
-    public ResponseEntity<String> restablecerContraseña(@RequestBody Map<String, Object> info) {
-		String email = info.get("email").toString();
-        try {
-            this.userService.olvidarContrasena(email);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
-        }
-        return ResponseEntity.ok("Se ha enviado un correo electrónico para restablecer la contraseña.");
-    }
 	
 	
 	
@@ -185,28 +174,35 @@ public class UserController {
 		return vehiculoService.listaVehiculo(email, password);
 	}
 	
-//	@PostMapping("/olvidarContrasena")
-//	 public ResponseEntity<String> olvidarContrasena(@RequestBody Map<String, Object> info) {
-//		String email = info.get("email").toString();
-//        try {
-//            userService.olvidarContrasena(email);
-//            return ResponseEntity.ok("Correo de restablecimiento enviado con éxito.");
-//        } catch (Exception e) {
-//            return ResponseEntity.badRequest().body("Error al enviar el correo de restablecimiento: " + e.getMessage());
-//        }
-//    }
-//	@PostMapping("/restablecerContrasena")
-//	 public ResponseEntity<String> restablecerContrasena(@RequestBody Map<String, Object> info) {
-//		
-//		String token = info.get("token").toString();
-//		String pwd = info.get("password").toString();
-//	
-//      try {
-//   	   userService.restablecerContrasena(token, pwd);
-//	        return ResponseEntity.ok("Contraseña restablecida con éxito");
-//      } catch (Exception e) {
-//          return ResponseEntity.badRequest().body("Error al enviar el correo de restablecimiento: " + e.getMessage());
-//      }
-//  }
-
+	
+	@PostMapping("/reset-password")
+    public ResponseEntity<String> restablecerContrasena(@RequestBody Map<String, Object> info) {
+		String email = info.get(EMAIL).toString();
+        try {
+            this.userService.olvidarContrasena(email);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+        }
+        return ResponseEntity.ok("Se ha enviado un correo electrónico para restablecer la contraseña.");
+    }
+	
+	
+	
+	@PostMapping("/modificarContrasena")
+	public ResponseEntity<String> modificarContrasena(@RequestBody Map<String, Object> info) {
+		String token = info.get("token").toString();
+		String email = info.get(EMAIL).toString();
+		String pwd1 = info.get("pwd1").toString();
+		String pwd2 = info.get("pwd2").toString();
+		
+		
+		try {
+	        userService.restablecerContrasena(token, email, pwd1, pwd2);
+	        return ResponseEntity.ok("Contraseña restablecida con éxito");
+	    } catch (contrasenaIncorrecta e) {
+	        return ResponseEntity.badRequest().body("Las contraseñas no coinciden o no cumplen con los requisitos.");
+	    } catch (Exception e) {
+	        return ResponseEntity.badRequest().body("No se ha podido modificar la contraseña, inténtalo de nuevo: " + e.getMessage());
+	    }
+	}
 }
