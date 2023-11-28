@@ -33,7 +33,7 @@ class ConsultarVehiculoTest {
     @Test
     @Order(1)
     void testConsultarVehiculosComoAdmin() throws Exception {
-        ResultActions result = this.sendAdmin("pepe@pepe.com", CONTRASENA);
+        ResultActions result = this.sendAdmin("guillermo.santos11@alu.uclm.es", CONTRASENA);
         result
             .andExpect(status().isOk()) // Verificar que el código de estado es 200 OK
             .andExpect(content().contentType(RUTA));

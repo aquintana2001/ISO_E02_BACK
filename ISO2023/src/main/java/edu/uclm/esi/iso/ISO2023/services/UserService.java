@@ -102,7 +102,7 @@ public class UserService {
 		clienteDAO.save(clienteExist.get());
 	}
 
-	public String loginUser(String email, String password) throws formatoIncompleto, contrasenaIncorrecta {
+	public String loginUser(String email, String password, String mfaKey) throws formatoIncompleto, numeroInvalido {
 		String tipoUsuario = checkUser(email, password);
 		User usuario = findUser(tipoUsuario, email);
 		boolean passwordUser = comprobarSeguridad.decodificador(password, usuario.getPassword());
@@ -113,14 +113,18 @@ public class UserService {
 		if (usuario.getIntentos() <= 0 || Boolean.FALSE.equals(usuario.getActivo())) {
 			usuario.setActivo(false);
 			saveUser(usuario, tipoUsuario);
-			throw new formatoIncompleto(ERRMSG);
 		}
 		if (!passwordUser) {
 			usuario.setIntentos(usuario.getIntentos() - 1);
 			saveUser(usuario, tipoUsuario);
-			throw new contrasenaIncorrecta(ERRMSG);
-		} else {
+		}else {
 			usuario.setIntentos(5);
+			saveUser(usuario, tipoUsuario);
+			if (tipoUsuario.equals(CLIENTE) ) {
+				if (!checkmfaKey(usuario.getEmail(), Integer.parseInt(mfaKey))) {
+					throw new numeroInvalido("No coinciden los codigos");
+				}
+			}
 		}
 		return tipoUsuario;
 	}

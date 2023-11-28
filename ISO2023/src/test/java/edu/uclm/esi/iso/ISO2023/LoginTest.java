@@ -31,37 +31,40 @@ class LoginTest {
 
 	@Test @Order(1)
 	void testLoginCliente() throws Exception {
-	    ResultActions result = this.sendLogin("prueba@gmail.com", CONTRASENA);
+	    ResultActions result = this.sendLogin("pruebaba@gmail.com", CONTRASENA, "861212");
 	    result
 	        .andExpect(status().isOk()) // Verificar que el código de estado es 200 OK
 	        .andExpect(content().string("cliente"));
 	}
 	@Test @Order(2)
 	void testLoginAdmin() throws Exception {
-	    ResultActions result = this.sendLogin("guillermo.santos2@alu.uclm.es", CONTRASENA);
+	    ResultActions result = this.sendLogin("guillermo.santos2@alu.uclm.es", CONTRASENA, "123456");
 	    result
 	        .andExpect(status().isOk()) // Verificar que el código de estado es 200 OK
 	        .andExpect(content().string("admin"));
 	}
 	@Test @Order(3)
 	void testEmailNotFound() throws Exception {
-	    ResultActions result = this.sendLogin("guillermo.423@alu.uclm.es", CONTRASENA);
+	    ResultActions result = this.sendLogin("guillermo.423@alu.uclm.es", CONTRASENA, "123456");
 	    result
 	        .andExpect(status().is4xxClientError());
 	}
 	@Test @Order(4)
 	void testLoginPasswordFail() throws Exception {
-	    ResultActions result = this.sendLogin("guillermo.3@alu.uclm.es", CONTRASENA);
+	    ResultActions result = this.sendLogin("guillermo.3@alu.uclm.es", CONTRASENA, "123456");
 	    result
 	        .andExpect(status().is4xxClientError());
 	}
-	public ResultActions sendLogin(String name,String pwd) throws Exception {
+	
+	public ResultActions sendLogin(String name,String pwd, String mfaKey) throws Exception {
 		ResultActions resultActions = null;
 		JSONObject jsoUser = new JSONObject()
 				.put("email", name)
-				.put("password",pwd);
+				.put("password",pwd)
+				.put("codigo",mfaKey);
 		RequestBuilder request = MockMvcRequestBuilders.put("/users/login").contentType(RUTA).content(jsoUser.toString());
 		resultActions = this.server.perform(request);
 		return resultActions;
 	}
+	
 }

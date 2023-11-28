@@ -146,19 +146,6 @@ public class SeguridadService {
 
 		}
 
-		String letrasValidas = "TRWAGMYFPDXBNJZSQVHLCKE";
-
-		// Calcula el valor esperado de la letra
-		char valorEsperado = letrasValidas.charAt(Integer.parseInt(dni) % 23);
-
-		// Obtiene la letra del DNI
-		char letraDNI = Character.toUpperCase(dni.charAt(8));
-
-		if (letraDNI != valorEsperado) {
-			throw new numeroInvalido(
-					"Letra incorrecta del DNI");
-		}
-
 		return true;
 	}
 
