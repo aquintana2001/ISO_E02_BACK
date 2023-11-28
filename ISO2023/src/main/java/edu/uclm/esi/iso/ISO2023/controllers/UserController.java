@@ -100,16 +100,14 @@ public class UserController {
 		String usuario;
 		String email;
 		String password;
-		String mfaKey;
 		try {
 			email = info.get(EMAIL).toString();
 			password = info.get("password").toString();
-			mfaKey = info.get("codigo").toString();
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
 		}
 		try {
-			usuario = this.userService.loginUser(email, password, mfaKey);
+			usuario = this.userService.loginUser(email, password);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
 		}
@@ -118,13 +116,13 @@ public class UserController {
 	
 	@PostMapping("/confirmarLoginCliente")
 	public ResponseEntity<String> confirmarLoginCliente(@RequestBody Map<String, Object> info) {
-		int mfaKey;
+		String mfaKey;
 		String password;
 		String email;
 		try {
 			email = info.get(EMAIL).toString();
 			password = info.get("password").toString();
-			mfaKey = Integer.parseInt(info.get("codigo").toString());
+			mfaKey = info.get("codigo").toString();
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
 		}

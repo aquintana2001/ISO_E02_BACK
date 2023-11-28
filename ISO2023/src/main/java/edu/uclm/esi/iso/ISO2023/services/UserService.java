@@ -102,7 +102,7 @@ public class UserService {
 		clienteDAO.save(clienteExist.get());
 	}
 
-	public String loginUser(String email, String password, String mfaKey) throws formatoIncompleto, numeroInvalido {
+	public String loginUser(String email, String password) throws formatoIncompleto{
 		String tipoUsuario = checkUser(email, password);
 		User usuario = findUser(tipoUsuario, email);
 		boolean passwordUser = comprobarSeguridad.decodificador(password, usuario.getPassword());
@@ -117,45 +117,45 @@ public class UserService {
 		if (!passwordUser) {
 			usuario.setIntentos(usuario.getIntentos() - 1);
 			saveUser(usuario, tipoUsuario);
-		}else {
+		} else {
 			usuario.setIntentos(5);
 			saveUser(usuario, tipoUsuario);
-			if (tipoUsuario.equals(CLIENTE) ) {
-				if (!checkmfaKey(usuario.getEmail(), Integer.parseInt(mfaKey))) {
-					throw new numeroInvalido("No coinciden los codigos");
-				}
-			}
 		}
 		return tipoUsuario;
 	}
 
-	public void confirmarLoginCliente(String email, String password, int mfaKey)
-			throws formatoIncompleto, contrasenaIncorrecta {
+	public void confirmarLoginCliente(String email, String password, String mfaKey)
+			throws formatoIncompleto, contrasenaIncorrecta, numeroInvalido {
 		Optional<Cliente> clienteExist = this.clienteDAO.findByEmail(email);
-		if(clienteExist.isPresent()) {
+		if (clienteExist.isPresent()) {
 			boolean passwordUser = comprobarSeguridad.decodificador(password, clienteExist.get().getPassword());
-			
+
 			if (!passwordUser) {
 				clienteExist.get().setIntentos(clienteExist.get().getIntentos() - 1);
 				clienteDAO.save(clienteExist.get());
 				throw new contrasenaIncorrecta(ERRMSG);
 			} else {
 				clienteExist.get().setIntentos(5);
-				boolean mfa = comprobarSeguridad.verifyCode(clienteExist.get().getsecretKey(), mfaKey);
+				boolean mfa = comprobarSeguridad.verifyCode(clienteExist.get().getsecretKey(),
+						Integer.parseInt(mfaKey));
 				if (!mfa) {
 					throw new formatoIncompleto(ERRMSG);
 				}
 			}
-		}else {
+			if (!checkmfaKey(clienteExist.get().getEmail(), Integer.parseInt(mfaKey))) {
+				throw new numeroInvalido("No coinciden los codigos");
+			}
+
+		} else {
 			throw new formatoIncompleto("Error.No puedes usar esos credenciales.");
 		}
 	}
 
 	public boolean checkmfaKey(String email, int mfaKey) {
 		Optional<Cliente> clienteExist = clienteDAO.findByEmail(email);
-		if(clienteExist.isPresent()) {
+		if (clienteExist.isPresent()) {
 			return comprobarSeguridad.verifyCode(clienteExist.get().getsecretKey(), mfaKey);
-		}else {
+		} else {
 			return false;
 		}
 	}
