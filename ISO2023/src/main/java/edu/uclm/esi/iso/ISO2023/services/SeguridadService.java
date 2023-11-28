@@ -1,9 +1,8 @@
 package edu.uclm.esi.iso.ISO2023.services;
 
-import java.io.IOException; 
+import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 
 import java.io.ByteArrayOutputStream;
 
@@ -26,8 +25,6 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
-
-
 
 @Service
 

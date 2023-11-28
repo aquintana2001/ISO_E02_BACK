@@ -33,7 +33,7 @@ class CancelarReservaTest {
     @Test
     @Order(1)
     void testCancelarReservaComoUsuario() throws Exception {
-        ResultActions result = this.sendCliente("guillermo.santos10@alu.uclm.es", CONTRASENA, "72412942-6773-4a0a-bc5f-353fe8e1e417");
+        ResultActions result = this.sendCliente("pruebaba@gmail.com", CONTRASENA, "9ac4e263-6042-47ae-aa4f-99425b037af6");
         result
         .andExpect(status().isOk()); // Verificar que el código de estado es 200 OK
     
