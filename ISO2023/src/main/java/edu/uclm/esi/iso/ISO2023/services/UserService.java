@@ -52,16 +52,17 @@ public class UserService {
 		Cliente cliente = new Cliente(nombre, apellidos, email, password, true, 5, fechaNacimiento, carnet, telefono,
 				dni);
 
-		Optional<Cliente> userExist = this.clienteDAO.findByEmail(email);
+		Optional<Cliente> clientExist = clienteDAO.findByEmail(email);
 		Optional<Administrador> adminExist = this.adminDAO.findByEmail(email);
+		Optional<Mantenimiento> mantExist = this.mantenimientoDAO.findByEmail(email);
 
 		if (!comprobarSeguridad.restriccionesPassword(cliente))
 			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "La contraseña no es segura");
 
-		if (userExist.isPresent() || adminExist.isPresent())
+		if (clientExist.isPresent() || adminExist.isPresent() || mantExist.isPresent())
 			throw new formatoIncompleto("Error.No puedes usar esos credenciales.");
-		userExist = this.clienteDAO.findByDni(dni);
-		if (userExist.isPresent()) {
+		clientExist = this.clienteDAO.findByDni(dni);
+		if (clientExist.isPresent()) {
 			throw new formatoIncompleto("Error.No puedes usar esos credenciales.");
 
 		} else {

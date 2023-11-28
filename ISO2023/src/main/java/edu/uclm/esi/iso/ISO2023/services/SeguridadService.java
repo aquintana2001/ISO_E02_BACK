@@ -1,9 +1,8 @@
 package edu.uclm.esi.iso.ISO2023.services;
 
-import java.io.IOException; 
+import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 
 import java.io.ByteArrayOutputStream;
 
@@ -26,8 +25,6 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
-
-
 
 @Service
 
@@ -114,6 +111,19 @@ public class SeguridadService {
 			throw new numeroInvalido(
 					"El nÃºmero de dni introducido no es vÃ¡lido. El ultimo caracter debe ser una letra.");
 
+		}
+
+		String letrasValidas = "TRWAGMYFPDXBNJZSQVHLCKE";
+
+		// Calcula el valor esperado de la letra
+		char valorEsperado = letrasValidas.charAt(Integer.parseInt(dni) % 23);
+
+		// Obtiene la letra del DNI
+		char letraDNI = Character.toUpperCase(dni.charAt(8));
+
+		if (letraDNI != valorEsperado) {
+			throw new numeroInvalido(
+					"Letra incorrecta del DNI");
 		}
 
 		return true;

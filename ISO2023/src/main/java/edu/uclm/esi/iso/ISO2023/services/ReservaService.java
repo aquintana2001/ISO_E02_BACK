@@ -111,24 +111,26 @@ public class ReservaService {
 	public void cancelarReserva(String email, String password, String idReserva) {
 		Optional<Reserva> reserva = this.reservaDAO.findById(idReserva);
 		Optional<Mantenimiento> mant = this.mantenimientoDAO.findByEmail(email);
-		if (reserva.isPresent()) {
-			if ((userService.checkUser(email, password).equals(CLIENTE)
-					|| userService.checkUser(email, password).equals(MANTENIMIENTO))
-					&& reserva.get().getEstado().equals(ACTIVA)
-					&& reserva.get().getUsuario().getEmail().equals(email)) {
-				reserva.get().setEstado("cancelada");
+		String tipoUser = userService.checkUser(email, password);
+		if (reserva.isPresent() && reserva.get().getEstado().equals(ACTIVA)
+				&& reserva.get().getUsuario().getEmail().equals(email)) {
+			if (tipoUser.equals(CLIENTE)) {
 				reserva.get().getVehiculo().setEstado(DISPONIBLE);
-				if (userService.checkUser(email, password).equals(MANTENIMIENTO) && mant.isPresent()) {
-					mant.get().setReservasActivas(mant.get().getReservasActivas() - 1);
-					this.mantenimientoDAO.save(mant.get());
-				}
-				this.vehiculoDAO.save(reserva.get().getVehiculo());
-				this.reservaDAO.save(reserva.get());
-			} else {
-				throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Error al cancelar la reserva.");
 			}
+			if (tipoUser.equals(MANTENIMIENTO) && mant.isPresent()) {
+				mant.get().setReservasActivas(mant.get().getReservasActivas() - 1);
+				reserva.get().getVehiculo().setEstado(DESCARGADO);
+				this.mantenimientoDAO.save(mant.get());
+			}
+			reserva.get().setEstado("cancelada");
+			this.vehiculoDAO.save(reserva.get().getVehiculo());
+			this.reservaDAO.save(reserva.get());
+		} else {
+			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Error al cancelar la reserva.");
 		}
 	}
+
+	
 
 	public void finalizarReserva(String email, String password, String idReserva) {
 		Optional<Reserva> reserva = this.reservaDAO.findById(idReserva);
@@ -154,7 +156,7 @@ public class ReservaService {
 		reserva.getVehiculo().setBateria(reserva.getVehiculo().getBateria() - parametros.getBateriaViaje());
 		if (reserva.getVehiculo().getBateria() < parametros.getMinimoBateria())
 			reserva.getVehiculo().setEstado(DESCARGADO);
-		
+
 	}
 
 	public void finalizarMantenimiento(Reserva reserva, String email) {
