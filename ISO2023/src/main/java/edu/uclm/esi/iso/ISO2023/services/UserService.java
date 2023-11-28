@@ -93,7 +93,7 @@ public class UserService {
 		return comprobarSeguridad.generateQRCodeImage(cliente.getsecretKey(), cliente.getEmail());
 	}
 
-	public void confirmarRegister(String email, int mfaKey) throws formatoIncompleto, WriterException, IOException {
+	public void confirmarRegister(String email, int mfaKey) throws formatoIncompleto, numeroInvalido {
 		Optional<Cliente> clienteExist = this.clienteDAO.findByEmail(email);
 		String errMsg = "Credenciales incorrectos";
 		if (!clienteExist.isPresent()) {
@@ -108,9 +108,10 @@ public class UserService {
 		clienteDAO.save(clienteExist.get());
 	}
 	
-	public String loginUser(String email, String password, int mfaKey) throws formatoIncompleto, numeroInvalido {
+	public String loginUser(String email, String password) throws formatoIncompleto, contrasenaIncorrecta {
 		String tipoUsuario = checkUser(email, password);
 		User usuario = findUser(tipoUsuario, email);
+		String errMsg = "Credenciales incorrectos";
 		boolean passwordUser = comprobarSeguridad.decodificador(password, usuario.getPassword());
 
 		if (Boolean.FALSE.equals(comprobarSeguridad.validarEmail(email)))
@@ -119,22 +120,38 @@ public class UserService {
 		if (usuario.getIntentos() <= 0 || Boolean.FALSE.equals(usuario.getActivo())) {
 			usuario.setActivo(false);
 			saveUser(usuario, tipoUsuario);
+			throw new formatoIncompleto(errMsg);
 		}
 		if (!passwordUser) {
 			usuario.setIntentos(usuario.getIntentos() - 1);
 			saveUser(usuario, tipoUsuario);
+			throw new contrasenaIncorrecta(errMsg);
 		}else {
 			usuario.setIntentos(5);
-			saveUser(usuario, tipoUsuario);
-			if (tipoUsuario.equals(CLIENTE) ) {
-				if (!checkmfaKey(usuario.getEmail(), mfaKey)) {
-					throw new numeroInvalido("No coinciden los codigos");
-				}
-			}
 		}
 		return tipoUsuario;
 	}
 
+	public void confirmarLoginCliente(String email, String password, int mfaKey) throws formatoIncompleto,contrasenaIncorrecta, WriterException, IOException {
+		Optional<Cliente> clienteExist = this.clienteDAO.findByEmail(email);
+		boolean passwordUser = comprobarSeguridad.decodificador(password, clienteExist.get().getPassword());
+		String errMsg = "Credenciales incorrectos";
+		if (!clienteExist.isPresent()) {
+			throw new formatoIncompleto("Error.No puedes usar esos credenciales.");
+		}
+		if (!passwordUser) {
+			clienteExist.get().setIntentos(clienteExist.get().getIntentos() - 1);
+			clienteDAO.save(clienteExist.get());
+			throw new contrasenaIncorrecta(errMsg);
+		}else {
+			clienteExist.get().setIntentos(5);
+			boolean mfa = comprobarSeguridad.verifyCode(clienteExist.get().getsecretKey(), mfaKey);
+			if (!mfa) {
+				throw new formatoIncompleto(errMsg);
+			}	
+		}
+	}
+	
 	public boolean checkmfaKey(String email, int mfaKey) {
 		Optional<Cliente> clienteExist = clienteDAO.findByEmail(email);
 		boolean comprobar = comprobarSeguridad.verifyCode(clienteExist.get().getsecretKey(), mfaKey);

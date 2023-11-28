@@ -79,9 +79,14 @@ public class UserController {
 	
 	@PostMapping("/confirmarRegister")
 	public ResponseEntity<String> confirmarRegister(@RequestBody Map<String, Object> info) {
-		int mfaKey = Integer.parseInt(info.get("codigo").toString());
-		String email = info.get("email").toString();
-
+		int mfaKey ;
+		String email;
+		try {
+			email = info.get(EMAIL).toString();
+			mfaKey = Integer.parseInt(info.get("codigo").toString());
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
+		}
 		try {
 			this.userService.confirmarRegister(email,mfaKey);
 		} catch (Exception e) {
@@ -95,20 +100,38 @@ public class UserController {
 		String usuario;
 		String email;
 		String password;
-		int mfaKey;
 		try {
 			email = info.get(EMAIL).toString();
 			password = info.get("password").toString();
-			mfaKey = (int) info.get("mfaKey");
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
 		}
 		try {
-			usuario = this.userService.loginUser(email, password, mfaKey);
+			usuario = this.userService.loginUser(email, password);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
 		}
 		return usuario;
+	}
+	
+	@PostMapping("/confirmarLoginCliente")
+	public ResponseEntity<String> confirmarLoginCliente(@RequestBody Map<String, Object> info) {
+		int mfaKey;
+		String password;
+		String email;
+		try {
+			email = info.get(EMAIL).toString();
+			password = info.get("password").toString();
+			mfaKey = Integer.parseInt(info.get("codigo").toString());
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
+		}
+		try {
+			this.userService.confirmarLoginCliente(email,password,mfaKey);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
+		}
+		return ResponseEntity.ok("Login realizado con éxito.");
 	}
 	
 
