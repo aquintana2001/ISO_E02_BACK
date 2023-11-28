@@ -65,6 +65,39 @@ public class SeguridadService {
 			seguro = true;
 		return seguro;
 	}
+	
+	public boolean passwordSecure(String pwd) throws contrasenaIncorrecta {
+		if (pwd.length() < 8)
+			throw new contrasenaIncorrecta("Error. La contrasena tiene que tener un minimo de 8 caracteres");
+
+		boolean seguro = false;
+		boolean contieneMayus = false;
+		boolean contieneMinus = false;
+		boolean contieneNumero = false;
+		boolean contieneCaracterRaro = false;
+
+		for (int i = 0; i < pwd.length()
+				|| (!contieneMayus && !contieneNumero && !contieneCaracterRaro && !contieneMinus); i++) {
+			if (Character.isUpperCase(pwd.charAt(i)))
+				contieneMayus = true;
+
+			if (Character.isLowerCase(pwd.charAt(i)))
+				contieneMinus = true;
+
+			if (Character.isDigit(pwd.charAt(i)))
+				contieneNumero = true;
+
+			if (esCaracterRaro(pwd.charAt(i)))
+				contieneCaracterRaro = true;
+		}
+
+		lanzamientoErrores(contieneMayus, contieneMinus, contieneNumero, contieneCaracterRaro);
+
+		if (contieneMayus && contieneMinus && contieneNumero && contieneCaracterRaro && pwd.length() >= 8)
+			seguro = true;
+		return seguro;
+	}
+
 
 	public void lanzamientoErrores(boolean may, boolean min, boolean num, boolean car) throws contrasenaIncorrecta {
 		if (!may)
@@ -191,38 +224,6 @@ public class SeguridadService {
 
 	public boolean verifyCode(String secretKey, int code) {
 		return gAuth.authorize(secretKey, code);
-	}
-
-	public boolean passwordSecure(String pwd) throws contrasenaIncorrecta {
-		if (pwd.length() < 8)
-			throw new contrasenaIncorrecta("Error. La contrasena tiene que tener un minimo de 8 caracteres");
-
-		boolean seguro = false;
-		boolean contieneMayus = false;
-		boolean contieneMinus = false;
-		boolean contieneNumero = false;
-		boolean contieneCaracterRaro = false;
-
-		for (int i = 0; i < pwd.length()
-				|| (!contieneMayus && !contieneNumero && !contieneCaracterRaro && !contieneMinus); i++) {
-			if (Character.isUpperCase(pwd.charAt(i)))
-				contieneMayus = true;
-
-			if (Character.isLowerCase(pwd.charAt(i)))
-				contieneMinus = true;
-
-			if (Character.isDigit(pwd.charAt(i)))
-				contieneNumero = true;
-
-			if (esCaracterRaro(pwd.charAt(i)))
-				contieneCaracterRaro = true;
-		}
-
-		lanzamientoErrores(contieneMayus, contieneMinus, contieneNumero, contieneCaracterRaro);
-
-		if (contieneMayus && contieneMinus && contieneNumero && contieneCaracterRaro && pwd.length() >= 8)
-			seguro = true;
-		return seguro;
 	}
 
 }
