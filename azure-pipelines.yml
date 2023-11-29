@@ -12,6 +12,7 @@ pool:
 steps:
 - task: Maven@3
   inputs:
+
     mavenPomFile: 'ISO_E02_BACK/ISO2023/pom.xml'
     mavenOptions: '-Xmx3072m'
     javaHomeOption: 'JDKVersion'
@@ -20,3 +21,4 @@ steps:
     publishJUnitResults: true
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
     goals: 'package'
+

@@ -1,10 +1,7 @@
 package edu.uclm.esi.iso.ISO2023.services;
 
-
 import java.io.IOException;
-import java.util.Optional;   
-
-
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -40,35 +37,33 @@ public class UserService {
 	private SeguridadService comprobarSeguridad;
 	@Autowired
 	private EmailService emailService;
-	
 
 	private static final String ADMIN = "admin";
 	private static final String CLIENTE = "cliente";
 	private static final String MANTENIMIENTO = "mantenimiento";
 
 	private static final String MENSAJE = "No se ha podido cambiar la contraseña";
-
-
+	private static final String ERRMSG = "Credenciales incorrectos";
 
 	public byte[] registrarse(String nombre, String apellidos, String email, String password, String fechaNacimiento,
-			String carnet, String telefono, String dni) throws contrasenaIncorrecta, formatoIncompleto, numeroInvalido, WriterException, IOException {
-
-
+			String carnet, String telefono, String dni)
+			throws contrasenaIncorrecta, formatoIncompleto, numeroInvalido, WriterException, IOException {
 
 		Cliente cliente = new Cliente(nombre, apellidos, email, password, false, 5, fechaNacimiento, carnet, telefono,
-				dni,"");
+				dni, "");
 
-		Optional<Cliente> userExist = this.clienteDAO.findByEmail(email);
+		Optional<Cliente> clientExist = clienteDAO.findByEmail(email);
 		Optional<Administrador> adminExist = this.adminDAO.findByEmail(email);
+		Optional<Mantenimiento> mantExist = this.mantenimientoDAO.findByEmail(email);
 
 		if (!comprobarSeguridad.restriccionesPassword(cliente))
 			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "La contraseña no es segura");
 
-		if (userExist.isPresent() || adminExist.isPresent())
-			throw new formatoIncompleto("Error.No puedes usar esos credenciales.");
-		userExist = this.clienteDAO.findByDni(dni);
-		if (userExist.isPresent()) {
-			throw new formatoIncompleto("Error.No puedes usar esos credenciales.");
+		if (clientExist.isPresent() || adminExist.isPresent() || mantExist.isPresent())
+			throw new formatoIncompleto(ERRMSG);
+		clientExist = this.clienteDAO.findByDni(dni);
+		if (clientExist.isPresent()) {
+			throw new formatoIncompleto(ERRMSG);
 
 		} else {
 			Token token = new Token();
@@ -85,7 +80,7 @@ public class UserService {
 			if (cliente.getPassword().length() != 60) {
 				cliente.setPassword(comprobarSeguridad.cifrarPassword(cliente.getPassword()));
 			}
-			
+
 			cliente.setsecretKey(comprobarSeguridad.generateSecretKey());
 			this.clienteDAO.save(cliente);
 			this.tokenDAO.save(token);
@@ -93,22 +88,21 @@ public class UserService {
 		return comprobarSeguridad.generateQRCodeImage(cliente.getsecretKey(), cliente.getEmail());
 	}
 
-	public void confirmarRegister(String email, int mfaKey) throws formatoIncompleto, WriterException, IOException {
+	public void confirmarRegister(String email, int mfaKey) throws formatoIncompleto {
 		Optional<Cliente> clienteExist = this.clienteDAO.findByEmail(email);
-		String errMsg = "Credenciales incorrectos";
 		if (!clienteExist.isPresent()) {
 			throw new formatoIncompleto("Error.No puedes usar esos credenciales.");
 		}
-		
+
 		boolean mfa = comprobarSeguridad.verifyCode(clienteExist.get().getsecretKey(), mfaKey);
 		if (!mfa) {
-			throw new formatoIncompleto(errMsg);	
+			throw new formatoIncompleto(ERRMSG);
 		}
 		clienteExist.get().setActivo(true);
 		clienteDAO.save(clienteExist.get());
 	}
-	
-	public String loginUser(String email, String password, int mfaKey) throws formatoIncompleto, numeroInvalido {
+
+	public String loginUser(String email, String password) throws formatoIncompleto{
 		String tipoUsuario = checkUser(email, password);
 		User usuario = findUser(tipoUsuario, email);
 		boolean passwordUser = comprobarSeguridad.decodificador(password, usuario.getPassword());
@@ -123,24 +117,35 @@ public class UserService {
 		if (!passwordUser) {
 			usuario.setIntentos(usuario.getIntentos() - 1);
 			saveUser(usuario, tipoUsuario);
-		}else {
+		} else {
 			usuario.setIntentos(5);
 			saveUser(usuario, tipoUsuario);
-			if (tipoUsuario.equals(CLIENTE) ) {
-				if (!checkmfaKey(usuario.getEmail(), mfaKey)) {
-					throw new numeroInvalido("No coinciden los codigos");
-				}
-			}
 		}
 		return tipoUsuario;
 	}
 
-	public boolean checkmfaKey(String email, int mfaKey) {
-		Optional<Cliente> clienteExist = clienteDAO.findByEmail(email);
-		boolean comprobar = comprobarSeguridad.verifyCode(clienteExist.get().getsecretKey(), mfaKey);
-		return comprobar;
+	public void confirmarLoginCliente(String email, String password, int mfaKey)
+			throws formatoIncompleto, contrasenaIncorrecta, numeroInvalido {
+		Optional<Cliente> clienteExist = this.clienteDAO.findByEmail(email);
+		if (clienteExist.isPresent()) {
+			boolean passwordUser = comprobarSeguridad.decodificador(password, clienteExist.get().getPassword());
+
+			if (!passwordUser) {
+				clienteExist.get().setIntentos(clienteExist.get().getIntentos() - 1);
+				clienteDAO.save(clienteExist.get());
+				throw new contrasenaIncorrecta(ERRMSG);
+			} else {
+				clienteExist.get().setIntentos(5);
+				boolean mfa = comprobarSeguridad.verifyCode(clienteExist.get().getsecretKey(),mfaKey);
+				if (!mfa) {
+					throw new numeroInvalido("No coinciden los codigos");
+				}
+			}
+		} else {
+			throw new formatoIncompleto("Error.No puedes usar esos credenciales.");
+		}
 	}
-	
+
 	public String checkUser(String email, String password) {
 		String usuario = "";
 		Optional<Administrador> adminExist = adminDAO.findByEmail(email);
@@ -148,7 +153,8 @@ public class UserService {
 		Optional<Mantenimiento> mantExist = mantenimientoDAO.findByEmail(email);
 		if (adminExist.isPresent() && comprobarSeguridad.decodificador(password, adminExist.get().getPassword())) {
 			usuario = ADMIN;
-		} else if (clienteExist.isPresent() && comprobarSeguridad.decodificador(password, clienteExist.get().getPassword())) {
+		} else if (clienteExist.isPresent()
+				&& comprobarSeguridad.decodificador(password, clienteExist.get().getPassword())) {
 			usuario = CLIENTE;
 		} else if (mantExist.isPresent() && comprobarSeguridad.decodificador(password, mantExist.get().getPassword())) {
 			usuario = MANTENIMIENTO;
@@ -158,11 +164,6 @@ public class UserService {
 		return usuario;
 	}
 
-
-
-
-
-
 	public User findUser(String tipoUsuario, String email) {
 		User usuario = null;
 		Optional<Administrador> admin = this.adminDAO.findByEmail(email);
@@ -171,15 +172,15 @@ public class UserService {
 
 		switch (tipoUsuario) {
 		case ADMIN:
-			if(admin.isPresent())
+			if (admin.isPresent())
 				usuario = admin.get();
 			break;
 		case CLIENTE:
-			if(cliente.isPresent())
+			if (cliente.isPresent())
 				usuario = cliente.get();
 			break;
 		case MANTENIMIENTO:
-			if(mantenimiento.isPresent())
+			if (mantenimiento.isPresent())
 				usuario = mantenimiento.get();
 			break;
 		default:
@@ -205,47 +206,46 @@ public class UserService {
 		}
 	}
 
-	public void olvidarContrasena(String email){
+	public void olvidarContrasena(String email) {
 
 		Optional<Cliente> possibleCliente = this.clienteDAO.findByEmail(email);
 		Optional<Token> tokenAux = Optional.ofNullable(this.tokenDAO.findByUserEmail(email).get(0));
-		
-		if (possibleCliente.isPresent()&& tokenAux.isPresent()) {
-			String resetUrl1 = "http://localhost:4200/restablecerContrasena?token=" + comprobarSeguridad.cifrarPassword(tokenAux.get().getId());
-			this.emailService.sendCorreoConfirmacion(possibleCliente.get(),resetUrl1);
+
+		if (possibleCliente.isPresent() && tokenAux.isPresent()) {
+			String resetUrl1 = "http://localhost:4200/restablecerContrasena?token="
+					+ comprobarSeguridad.cifrarPassword(tokenAux.get().getId());
+			this.emailService.sendCorreoConfirmacion(possibleCliente.get(), resetUrl1);
 		}
 
 	}
-	public void restablecerContrasena(String token, String email, String pwd1, String pwd2) throws formatoIncompleto, contrasenaIncorrecta {
+
+	public void restablecerContrasena(String token, String email, String pwd1, String pwd2)
+			throws formatoIncompleto, contrasenaIncorrecta {
 		boolean segura = true;
 
-
-		if(pwd1.equals(pwd2)) {
-			if(comprobarSeguridad.passwordSecure(pwd1) == segura) {
+		if (pwd1.equals(pwd2)) {
+			if (comprobarSeguridad.passwordSecure(pwd1) == segura) {
 				Optional<Token> tokenAux = Optional.ofNullable(this.tokenDAO.findByUserEmail(email).get(0));
-				//Comprobar que haya un user con ese email
+				// Comprobar que haya un user con ese email
 				if (!tokenAux.isPresent())
 					throw new formatoIncompleto(MENSAJE);
-				//Comprobar que el token sea correcto
-				if (!comprobarSeguridad.decodificador(tokenAux.get().getId(), token) ) 
+				// Comprobar que el token sea correcto
+				if (!comprobarSeguridad.decodificador(tokenAux.get().getId(), token))
 					throw new formatoIncompleto(MENSAJE);
-				//Comprobar que el mail pertenece a un cliente
+				// Comprobar que el mail pertenece a un cliente
 				Cliente cliente = clienteDAO.findByEmail(email).orElse(null);
-				if(cliente == null)
+				if (cliente == null)
 					throw new formatoIncompleto(MENSAJE);
-				//Cambiar contraseña
+				// Cambiar contraseña
 				cliente.setPassword(comprobarSeguridad.cifrarPassword(pwd1));
 				comprobarSeguridad.restriccionesPassword(cliente);
 				this.clienteDAO.save(cliente);
 			}
 
-		}else {
+		} else {
 			throw new contrasenaIncorrecta("Las contraseñas no coinciden");
-
 
 		}
 	}
 
 }
-
-
