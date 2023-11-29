@@ -36,7 +36,7 @@ public class VehiculoService {
 			if (userService.checkUser(email, password).equals(ADMIN)) {
 				return this.vehiculoDAO.findAll();
 			} else if (userService.checkUser(email, password).equals("cliente")) {
-				return this.vehiculoDAO.findByBateriaGreaterThanAndEstadoEquals(parametros.get().getMinimoBateria(),
+				return this.vehiculoDAO.findByBateriaGreaterThanEqualAndEstadoEquals(parametros.get().getMinimoBateria(),
 						"disponible");
 			} else if (userService.checkUser(email, password).equals("mantenimiento")) {
 				return this.vehiculoDAO.findByBateriaLessThanAndEstadoEquals(parametros.get().getMinimoBateria(),
