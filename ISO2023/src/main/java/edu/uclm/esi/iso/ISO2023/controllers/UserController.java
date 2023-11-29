@@ -117,13 +117,13 @@ public class UserController {
 	
 	@PostMapping("/confirmarLoginCliente")
 	public ResponseEntity<String> confirmarLoginCliente(@RequestBody Map<String, Object> info) {
-		String mfaKey;
+		int mfaKey;
 		String password;
 		String email;
 		try {
 			email = info.get(EMAIL).toString();
 			password = info.get("password").toString();
-			mfaKey = info.get("codigo").toString();
+			mfaKey = Integer.parseInt(info.get("codigo").toString());
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
 		}
