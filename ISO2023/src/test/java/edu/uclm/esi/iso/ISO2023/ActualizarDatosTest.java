@@ -29,10 +29,11 @@ class ActualizarDatosTest {
 	private static final String CONTRASENA = "Hola123*";
 	private static final String RUTA = "application/json";
 
+	private static final String EMAIL = "pruebaba@gmail.com";
 	@Test
 	@Order(1)
 	void ActualizarDatosCliente() throws Exception {
-		ResultActions result = this.sendUser("pruebaba@gmail.com", CONTRASENA, "prueba", "tests", "01/01/2000", "B",
+		ResultActions result = this.sendUser(EMAIL, CONTRASENA, "prueba", "tests1", "01/09/2000", "B",
 				"612345678", "16125580G");
 		result.andExpect(status().isOk());// Verificar que el código de estado es 200 OK
 	}
@@ -40,7 +41,7 @@ class ActualizarDatosTest {
 	@Test
 	@Order(2)
 	void ActualizarDatosInvalidDNI() throws Exception {
-		ResultActions result = this.sendUser("pruebaba@gmail.com", CONTRASENA, "prueba", "tests", "01/01/2000", "B",
+		ResultActions result = this.sendUser(EMAIL, CONTRASENA, "pruebaaa", "tests2", "01/02/2000", "B",
 				"612345678", "16125580");
 		result.andExpect(status().is4xxClientError());
 	}
@@ -48,7 +49,7 @@ class ActualizarDatosTest {
 	@Test
 	@Order(3)
 	void ActualizarDatosInvalidPhone() throws Exception {
-		ResultActions result = this.sendUser("pruebaba@gmail.com", CONTRASENA, "prueba", "tests", "01/01/2000", "B",
+		ResultActions result = this.sendUser(EMAIL, CONTRASENA, "pruebaccdt", "tests3", "01/01/2000", "B",
 				"612345", "16125580G");
 		result.andExpect(status().is4xxClientError());
 	}
