@@ -121,20 +121,4 @@ public class ClienteController {
 		}
 	}
 	
-	@PostMapping("/listarReservas")
-	public List<Reserva> listarReservas(@RequestBody Map<String, Object> info) {
-		String email;
-		String password;
-		try {
-			email = info.get(EMAILUSER).toString();
-			password = info.get(PASSWORDUSER).toString();
-		} catch (Exception e) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
-		}
-		try {
-			return this.reservaService.listarReservas(email,password);
-		} catch (Exception e) {
-			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
-		}
-	}
 }
