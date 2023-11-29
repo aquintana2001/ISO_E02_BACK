@@ -186,7 +186,7 @@ public class ReservaService {
 
 	public List<Reserva> listarReservas(String email, String password) {
 		List<Reserva> reservas = this.reservaDAO.findByUsuarioEmail(email);
-		if (userService.checkUser(email, password).equals(CLIENTE)) {
+		if (userService.checkUser(email, password).equals(CLIENTE) || userService.checkUser(email, password).equals(MANTENIMIENTO)) {
 			return reservas;
 		} else {
 			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "Error al listar las reservas.");

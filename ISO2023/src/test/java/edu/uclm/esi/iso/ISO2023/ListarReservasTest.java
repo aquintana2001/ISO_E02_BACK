@@ -23,7 +23,7 @@ import org.json.JSONObject;
 @ExtendWith(SpringExtension.class)
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class ConsultarVehiculoTest {
+class ListarReservasTest {
 	@Autowired
 	private MockMvc server;
 	private static final String CONTRASENA = "Hola123*";
@@ -31,41 +31,43 @@ class ConsultarVehiculoTest {
 
 	@Test
 	@Order(1)
-	void testConsultarVehiculosComoAdmin() throws Exception {
-		ResultActions result = this.sendAdmin("prueba10@gmail.com", CONTRASENA);
+	void ListarReservasComoCliente() throws Exception {
+		ResultActions result = this.sendUser("pruebaba@gmail.com", CONTRASENA);
 		result.andExpect(status().isOk()) // Verificar que el código de estado es 200 OK
 				.andExpect(content().contentType(RUTA));
-		// Puedes agregar más aserciones para verificar el contenido de la respuesta si
-		// es necesario
 	}
 
 	@Test
 	@Order(2)
-	void testConsultarVehiculosComoUsuario() throws Exception {
-		ResultActions result = this.sendAdmin("pruebaba@gmail.com", CONTRASENA);
+	void ListarReservasComoMantenimiento() throws Exception {
+		ResultActions result = this.sendUser("prueba20@gmail.com", CONTRASENA);
 		result.andExpect(status().isOk()) // Verificar que el código de estado es 200 OK
 				.andExpect(content().contentType(RUTA));
 	}
 
 	@Test
 	@Order(3)
-	void testConsultarVehiculosUnexist() throws Exception {
-		ResultActions result = this.sendAdmin("aaaaaaa", "aaaaaaa");
+	void ListarReservasComoAdministrador() throws Exception {
+		ResultActions result = this.sendUser("prueba10@gmail.com", "");
 		result.andExpect(status().is4xxClientError());
+		// Debería devolver un error 4xx ya que un usuario no tiene permiso para
+				// consultar vehículos
 	}
 
 	@Test
 	@Order(4)
-	void testConsultarVehiculosSinAutenticación() throws Exception {
-		ResultActions result = this.sendAdmin("", "");
+	void ListarReservasSinAutentificación() throws Exception {
+		ResultActions result = this.sendUser("", "");
 		result.andExpect(status().is4xxClientError());
+		
 		// Debería devolver un error 4xx ya que no se proporcionó autenticación
+
 	}
 
-	public ResultActions sendAdmin(String name, String pwd) throws Exception {
+	public ResultActions sendUser(String name, String pwd) throws Exception {
 		ResultActions resultActions = null;
 		JSONObject jsoUser = new JSONObject().put("emailUser", name).put("passwordUser", pwd);
-		RequestBuilder request = MockMvcRequestBuilders.post("/admin/vehiculo").contentType(RUTA)
+		RequestBuilder request = MockMvcRequestBuilders.post("/users/listarReservas").contentType(RUTA)
 				.content(jsoUser.toString());
 		resultActions = this.server.perform(request);
 		return resultActions;
