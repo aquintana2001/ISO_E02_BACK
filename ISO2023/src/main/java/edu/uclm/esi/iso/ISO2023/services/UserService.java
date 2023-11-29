@@ -114,6 +114,10 @@ public class UserService {
 			usuario.setActivo(false);
 			saveUser(usuario, tipoUsuario);
 		}
+		if(usuario.getActivo().equals(false)) {
+			throw new formatoIncompleto("No ha sido posible iniciar sesión");		
+		}
+		
 		if (!passwordUser) {
 			usuario.setIntentos(usuario.getIntentos() - 1);
 			saveUser(usuario, tipoUsuario);
