@@ -111,8 +111,9 @@ public class ClienteService {
 		Optional<Cliente> cliente = this.clienteDAO.findByEmail(email);
 		if (cliente.isPresent() && comprobarSeguridad.decodificador(password, cliente.get().getPassword())) {
 			return cliente.get();
+		} else {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No puedes obtener los datos.");
 		}
-		return null;
 	}
 
 	// METODO PARA EL CLIENTE
@@ -141,6 +142,8 @@ public class ClienteService {
 				cliente.get().setDni(dni);
 				clienteDAO.save(cliente.get());
 			}
+		}else {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No se ha podido modificar los datos.");
 		}
 	}
 }

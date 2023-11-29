@@ -23,49 +23,51 @@ import org.json.JSONObject;
 @ExtendWith(SpringExtension.class)
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class ConsultarVehiculoTest {
+class ActualizarDatosTest {
 	@Autowired
 	private MockMvc server;
 	private static final String CONTRASENA = "Hola123*";
 	private static final String RUTA = "application/json";
 
+	private static final String EMAIL = "pruebaba@gmail.com";
 	@Test
 	@Order(1)
-	void testConsultarVehiculosComoAdmin() throws Exception {
-		ResultActions result = this.sendAdmin("prueba10@gmail.com", CONTRASENA);
-		result.andExpect(status().isOk()) // Verificar que el código de estado es 200 OK
-				.andExpect(content().contentType(RUTA));
-		// Puedes agregar más aserciones para verificar el contenido de la respuesta si
-		// es necesario
+	void ActualizarDatosCliente() throws Exception {
+		ResultActions result = this.sendUser(EMAIL, CONTRASENA, "prueba", "tests1", "01/09/2000", "B",
+				"612345678", "16125580G");
+		result.andExpect(status().isOk());// Verificar que el código de estado es 200 OK
 	}
 
 	@Test
 	@Order(2)
-	void testConsultarVehiculosComoUsuario() throws Exception {
-		ResultActions result = this.sendAdmin("pruebaba@gmail.com", CONTRASENA);
-		result.andExpect(status().isOk()) // Verificar que el código de estado es 200 OK
-				.andExpect(content().contentType(RUTA));
+	void ActualizarDatosInvalidDNI() throws Exception {
+		ResultActions result = this.sendUser(EMAIL, CONTRASENA, "pruebaaa", "tests2", "01/02/2000", "B",
+				"612345678", "16125580");
+		result.andExpect(status().is4xxClientError());
 	}
 
 	@Test
 	@Order(3)
-	void testConsultarVehiculosUnexist() throws Exception {
-		ResultActions result = this.sendAdmin("aaaaaaa", "aaaaaaa");
+	void ActualizarDatosInvalidPhone() throws Exception {
+		ResultActions result = this.sendUser(EMAIL, CONTRASENA, "pruebaccdt", "tests3", "01/01/2000", "B",
+				"612345", "16125580G");
 		result.andExpect(status().is4xxClientError());
 	}
 
 	@Test
 	@Order(4)
-	void testConsultarVehiculosSinAutenticación() throws Exception {
-		ResultActions result = this.sendAdmin("", "");
+	void ActualizarDatosMantenimiento() throws Exception {
+		ResultActions result = this.sendUser("", "", "", "", "", "", "", "");
 		result.andExpect(status().is4xxClientError());
-		// Debería devolver un error 4xx ya que no se proporcionó autenticación
 	}
 
-	public ResultActions sendAdmin(String name, String pwd) throws Exception {
+	public ResultActions sendUser(String email, String pwd, String nombre, String apellidos, String fechaNacimiento,
+			String carnet, String telefono, String dni) throws Exception {
 		ResultActions resultActions = null;
-		JSONObject jsoUser = new JSONObject().put("emailUser", name).put("passwordUser", pwd);
-		RequestBuilder request = MockMvcRequestBuilders.post("/admin/vehiculo").contentType(RUTA)
+		JSONObject jsoUser = new JSONObject().put("email", email).put("password", pwd).put("nombre", nombre)
+				.put("apellidos", apellidos).put("fechaNacimiento", fechaNacimiento).put("carnet", carnet)
+				.put("telefono", telefono).put("dni", dni);
+		RequestBuilder request = MockMvcRequestBuilders.put("/cliente/actualizarDatos").contentType(RUTA)
 				.content(jsoUser.toString());
 		resultActions = this.server.perform(request);
 		return resultActions;
