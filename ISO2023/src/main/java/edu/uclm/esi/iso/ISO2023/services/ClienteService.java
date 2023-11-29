@@ -30,7 +30,6 @@ public class ClienteService {
 	@Autowired
 	private ReservaDAO reservaDAO;
 
-	
 	private static final String ADMIN = "admin";
 
 	public List<Cliente> listaClientes(String emailAdmin, String passwordAdmin) {
@@ -93,8 +92,8 @@ public class ClienteService {
 
 	public void darDeBaja(String email, String password) {
 		Optional<Cliente> deudas = this.clienteDAO.findByEmail("Deudas");
-		if (userService.checkUser(email, password).equals("cliente")&&deudas.isPresent()) {
-			for(Reserva r:this.reservaDAO.findByUsuarioEmail(email)) {
+		if (userService.checkUser(email, password).equals("cliente") && deudas.isPresent()) {
+			for (Reserva r : this.reservaDAO.findByUsuarioEmail(email)) {
 				r.setUsuario(deudas.get());
 				this.reservaDAO.save(r);
 			}
@@ -110,39 +109,38 @@ public class ClienteService {
 
 	public Cliente getDatos(String email, String password) {
 		Optional<Cliente> cliente = this.clienteDAO.findByEmail(email);
-		if(cliente.isPresent() && comprobarSeguridad.decodificador(password, cliente.get().getPassword())){
-			return cliente.get();	
+		if (cliente.isPresent() && comprobarSeguridad.decodificador(password, cliente.get().getPassword())) {
+			return cliente.get();
 		}
 		return null;
 	}
-	
+
 	// METODO PARA EL CLIENTE
 	public void actualizarDatos(String nombre, String apellidos, String email, String password, String fechaNacimiento,
-			String carnet, String telefono, String dni) throws contrasenaIncorrecta,  numeroInvalido{
+			String carnet, String telefono, String dni) throws numeroInvalido, formatoIncompleto {
 		Optional<Cliente> cliente = this.clienteDAO.findByEmail(email);
 		if (userService.checkUser(email, password).equals("cliente") && cliente.isPresent()) {
 
-			comprobarSeguridad.restriccionesPassword(cliente.get());
-			comprobarSeguridad.validarEmail(cliente.get().getEmail());
-			comprobarSeguridad.comprobarNumero(cliente.get().getTelefono());
+			comprobarSeguridad.validarEmail(email);
+			comprobarSeguridad.comprobarNumero(telefono);
 
-			if (Boolean.FALSE.equals(comprobarSeguridad.comprobarDni(cliente.get().getDni())))
+			if (Boolean.FALSE.equals((comprobarSeguridad.comprobarDni(dni))))
 				throw new numeroInvalido(
 						"El NIF introducido no es un NIF valido. Tiene que contener 8 numeros y un caracter");
 
-			if (cliente.get().getPassword().length() != 60) {
-				cliente.get().setPassword(comprobarSeguridad.cifrarPassword(cliente.get().getPassword()));
+			cliente = this.clienteDAO.findByDni(dni);
+			if (cliente.isPresent() && !dni.equals(cliente.get().getDni())) {
+				throw new formatoIncompleto("Error.No puedes usar ese DNI.");
 			}
-			cliente.get().setNombre(nombre);
-			cliente.get().setApellidos(apellidos);
-			cliente.get().setPassword(password);
-			cliente.get().setFechaNacimiento(fechaNacimiento);
-			cliente.get().setCarnet(carnet);
-			cliente.get().setTelefono(telefono);
-			cliente.get().setDni(dni);
-			clienteDAO.save(cliente.get());
+			if (cliente.isPresent()) {
+				cliente.get().setNombre(nombre);
+				cliente.get().setApellidos(apellidos);
+				cliente.get().setFechaNacimiento(fechaNacimiento);
+				cliente.get().setCarnet(carnet);
+				cliente.get().setTelefono(telefono);
+				cliente.get().setDni(dni);
+				clienteDAO.save(cliente.get());
+			}
 		}
-
 	}
-
 }

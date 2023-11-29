@@ -31,7 +31,7 @@ class LoginTest {
 
 	@Test @Order(1)
 	void testLoginCliente() throws Exception {
-	    ResultActions result = this.sendLogin("prueba@gmail.com", CONTRASENA);
+	    ResultActions result = this.sendLogin("pruebaba@gmail.com", CONTRASENA);
 	    result
 	        .andExpect(status().isOk()) // Verificar que el código de estado es 200 OK
 	        .andExpect(content().string("cliente"));
@@ -55,6 +55,7 @@ class LoginTest {
 	    result
 	        .andExpect(status().is4xxClientError());
 	}
+	
 	public ResultActions sendLogin(String name,String pwd) throws Exception {
 		ResultActions resultActions = null;
 		JSONObject jsoUser = new JSONObject()
@@ -64,4 +65,5 @@ class LoginTest {
 		resultActions = this.server.perform(request);
 		return resultActions;
 	}
+	
 }
