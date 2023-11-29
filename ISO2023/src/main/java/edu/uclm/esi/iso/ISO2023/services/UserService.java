@@ -128,7 +128,7 @@ public class UserService {
 		return tipoUsuario;
 	}
 
-	public void confirmarLoginCliente(String email, String password, String mfaKey)
+	public void confirmarLoginCliente(String email, String password, int mfaKey)
 			throws formatoIncompleto, contrasenaIncorrecta, numeroInvalido {
 		Optional<Cliente> clienteExist = this.clienteDAO.findByEmail(email);
 		if (clienteExist.isPresent()) {
@@ -140,27 +140,13 @@ public class UserService {
 				throw new contrasenaIncorrecta(ERRMSG);
 			} else {
 				clienteExist.get().setIntentos(5);
-				boolean mfa = comprobarSeguridad.verifyCode(clienteExist.get().getsecretKey(),
-						Integer.parseInt(mfaKey));
+				boolean mfa = comprobarSeguridad.verifyCode(clienteExist.get().getsecretKey(),mfaKey);
 				if (!mfa) {
-					throw new formatoIncompleto(ERRMSG);
+					throw new numeroInvalido("No coinciden los codigos");
 				}
 			}
-			if (!checkmfaKey(clienteExist.get().getEmail(), Integer.parseInt(mfaKey))) {
-				throw new numeroInvalido("No coinciden los codigos");
-			}
-
 		} else {
 			throw new formatoIncompleto("Error.No puedes usar esos credenciales.");
-		}
-	}
-
-	public boolean checkmfaKey(String email, int mfaKey) {
-		Optional<Cliente> clienteExist = clienteDAO.findByEmail(email);
-		if (clienteExist.isPresent()) {
-			return comprobarSeguridad.verifyCode(clienteExist.get().getsecretKey(), mfaKey);
-		} else {
-			return false;
 		}
 	}
 
