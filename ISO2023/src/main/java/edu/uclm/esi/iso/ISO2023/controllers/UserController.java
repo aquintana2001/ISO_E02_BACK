@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import edu.uclm.esi.iso.ISO2023.entities.Reserva;
 import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
 import edu.uclm.esi.iso.ISO2023.exceptions.contrasenaIncorrecta;
 import edu.uclm.esi.iso.ISO2023.services.ReservaService;
@@ -236,6 +237,23 @@ public class UserController {
 		} catch (Exception e) {
 			return ResponseEntity.badRequest()
 					.body("No se ha podido modificar la contraseña, inténtalo de nuevo: " + e.getMessage());
+		}
+	}
+	
+	@PostMapping("/listarReservas")
+	public List<Reserva> listarReservas(@RequestBody Map<String, Object> info) {
+		String email;
+		String password;
+		try {
+			email = info.get(EMAILUSER).toString();
+			password = info.get(PASSWORDUSER).toString();
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);
+		}
+		try {
+			return this.reservaService.listarReservas(email,password);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
 		}
 	}
 
