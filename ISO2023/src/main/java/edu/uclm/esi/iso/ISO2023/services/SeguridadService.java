@@ -166,7 +166,8 @@ public class SeguridadService {
 		String regex = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$";
 		return email.toLowerCase().matches(regex.toLowerCase());
 	}
-
+	//BCrypt utiliza un hash adaptativo de 60 carácteres, lo que significa que puede ajustar su costo computacional a 
+	//lo largo del tiempo, lo que lo hace resistente a los ataques de fuerza bruta y de diccionario. 
 	public String cifrarPassword(String password) {
 		PasswordEncoder ncoder = codificador();
 		return ncoder.encode(password);
@@ -181,7 +182,7 @@ public class SeguridadService {
 		return ncoder.matches(password, passwordMongo);
 	}
 
-	// metodos encargados del doble factor de autentificación
+	//Metodos encargados del doble factor de autentificación
 	private final GoogleAuthenticator gAuth = new GoogleAuthenticator();
 
 	public String generateSecretKey() {
@@ -189,6 +190,7 @@ public class SeguridadService {
 		return key.getKey();
 	}
 
+	//Metodo utilizado para generar QR
 	public byte[] generateQRCodeImage(String secretKey, String username) throws WriterException, IOException {
 		String otpAuthURL = getOtpAuthURL("YourIssuer", username, secretKey);
 		return generateQRCode(otpAuthURL, 200);
