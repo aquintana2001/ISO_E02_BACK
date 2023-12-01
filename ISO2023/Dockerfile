@@ -1,8 +1,8 @@
-FROM maven:3.8.5-openjdk-17 AS build
-COPY ISO2023/pom.xml ISO2023/pom.xml
-COPY ISO2023/src ISO2023/src
-RUN mvn -f ISO2023/pom.xml clean package -DskipTests
-FROM openjdk:17.0.1-jdk-slim
-COPY --from=build /ISO2023/target/ISO2023-0.0.1-SNAPSHOT.jar ISO2023.jar
+FROM openjdk:17-jre-slim
+WORKDIR /ISO2023
+COPY ./pom.xml .
+COPY . .
+RUN apt-get update && apt-get install -y maven
+RUN mvn clean install
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "ISO2023.jar"]
+CMD ["java", "-jar", "target/ISO2023.jar"]
