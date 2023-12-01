@@ -124,12 +124,12 @@ import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
 	public Boolean comprobarDni(String dni) throws numeroInvalido {
 
 		// El DNI debe tener 9 caracteres
-<span class="nc bnc" id="L127" title="All 2 branches missed.">		if (dni.length() != 9)</span>
-<span class="nc" id="L128">			throw new numeroInvalido(&quot;El numero de dni introducido no es valido. Introduzca nueve digitos&quot;);</span>
+<span class="fc bfc" id="L127" title="All 2 branches covered.">		if (dni.length() != 9)</span>
+<span class="fc" id="L128">			throw new numeroInvalido(&quot;El numero de dni introducido no es valido. Introduzca nueve digitos&quot;);</span>
 
 		// Comprobar que los primeros 8 caracteres son dígitos
-<span class="nc bnc" id="L131" title="All 2 branches missed.">		for (int i = 0; i &lt; 8; i++) {</span>
-<span class="nc bnc" id="L132" title="All 2 branches missed.">			if (!Character.isDigit(dni.charAt(i))) {</span>
+<span class="fc bfc" id="L131" title="All 2 branches covered.">		for (int i = 0; i &lt; 8; i++) {</span>
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">			if (!Character.isDigit(dni.charAt(i))) {</span>
 
 <span class="nc" id="L134">				throw new numeroInvalido(</span>
 						&quot;El numero de dni introducido no es valido. Los 8 primeros digitos deben ser numeros&quot;);
@@ -138,79 +138,81 @@ import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
 		}
 
 		// Comprobar que el último carácter es una letra
-<span class="nc" id="L141">		char letra = dni.charAt(8);</span>
-<span class="nc bnc" id="L142" title="All 2 branches missed.">		if (!Character.isLetter(letra)) {</span>
+<span class="fc" id="L141">		char letra = dni.charAt(8);</span>
+<span class="pc bpc" id="L142" title="1 of 2 branches missed.">		if (!Character.isLetter(letra)) {</span>
 
 <span class="nc" id="L144">			throw new numeroInvalido(</span>
 					&quot;El nÃºmero de dni introducido no es vÃ¡lido. El ultimo caracter debe ser una letra.&quot;);
 
 		}
 
-<span class="nc" id="L149">		return true;</span>
+<span class="fc" id="L149">		return true;</span>
 	}
 
 	public Boolean comprobarNumero(String telefono) throws numeroInvalido {
-<span class="nc bnc" id="L153" title="All 2 branches missed.">		if (telefono.length() != 9)</span>
-<span class="nc" id="L154">			throw new numeroInvalido(&quot;El numero de telefono introducido no es valido. Introduzca nueve digitos&quot;);</span>
+<span class="fc bfc" id="L153" title="All 2 branches covered.">		if (telefono.length() != 9)</span>
+<span class="fc" id="L154">			throw new numeroInvalido(&quot;El numero de telefono introducido no es valido. Introduzca nueve digitos&quot;);</span>
 
 		// Evitar letras en el numero
-<span class="nc bnc" id="L157" title="All 2 branches missed.">		for (int i = 0; i &lt; telefono.length(); i++) {</span>
-<span class="nc bnc" id="L158" title="All 2 branches missed.">			if (!Character.isDigit(telefono.charAt(i)))</span>
+<span class="fc bfc" id="L157" title="All 2 branches covered.">		for (int i = 0; i &lt; telefono.length(); i++) {</span>
+<span class="pc bpc" id="L158" title="1 of 2 branches missed.">			if (!Character.isDigit(telefono.charAt(i)))</span>
 <span class="nc" id="L159">				throw new numeroInvalido(&quot;El numero de telefono introducido no es valido. Introduzca nueve digitos&quot;);</span>
 
 		}
-<span class="nc" id="L162">		return true;</span>
+<span class="fc" id="L162">		return true;</span>
 	}
 
 	public boolean validarEmail(String email) {
 <span class="fc" id="L166">		String regex = &quot;^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$&quot;;</span>
 <span class="fc" id="L167">		return email.toLowerCase().matches(regex.toLowerCase());</span>
 	}
-
+	//BCrypt utiliza un hash adaptativo de 60 carácteres, lo que significa que puede ajustar su costo computacional a 
+	//lo largo del tiempo, lo que lo hace resistente a los ataques de fuerza bruta y de diccionario. 
 	public String cifrarPassword(String password) {
-<span class="nc" id="L171">		PasswordEncoder ncoder = codificador();</span>
-<span class="nc" id="L172">		return ncoder.encode(password);</span>
+<span class="nc" id="L172">		PasswordEncoder ncoder = codificador();</span>
+<span class="nc" id="L173">		return ncoder.encode(password);</span>
 	}
 
 	public PasswordEncoder codificador() {
-<span class="fc" id="L176">		return new BCryptPasswordEncoder();</span>
+<span class="fc" id="L177">		return new BCryptPasswordEncoder();</span>
 	}
 
 	public boolean decodificador(String password, String passwordMongo) {
-<span class="fc" id="L180">		PasswordEncoder ncoder = codificador();</span>
-<span class="fc" id="L181">		return ncoder.matches(password, passwordMongo);</span>
+<span class="fc" id="L181">		PasswordEncoder ncoder = codificador();</span>
+<span class="fc" id="L182">		return ncoder.matches(password, passwordMongo);</span>
 	}
 
-	// metodos encargados del doble factor de autentificación
-<span class="fc" id="L185">	private final GoogleAuthenticator gAuth = new GoogleAuthenticator();</span>
+	//Metodos encargados del doble factor de autentificación
+<span class="fc" id="L186">	private final GoogleAuthenticator gAuth = new GoogleAuthenticator();</span>
 
 	public String generateSecretKey() {
-<span class="nc" id="L188">		final GoogleAuthenticatorKey key = gAuth.createCredentials();</span>
-<span class="nc" id="L189">		return key.getKey();</span>
+<span class="nc" id="L189">		final GoogleAuthenticatorKey key = gAuth.createCredentials();</span>
+<span class="nc" id="L190">		return key.getKey();</span>
 	}
 
+	//Metodo utilizado para generar QR
 	public byte[] generateQRCodeImage(String secretKey, String username) throws WriterException, IOException {
-<span class="nc" id="L193">		String otpAuthURL = getOtpAuthURL(&quot;YourIssuer&quot;, username, secretKey);</span>
-<span class="nc" id="L194">		return generateQRCode(otpAuthURL, 200);</span>
+<span class="nc" id="L195">		String otpAuthURL = getOtpAuthURL(&quot;YourIssuer&quot;, username, secretKey);</span>
+<span class="nc" id="L196">		return generateQRCode(otpAuthURL, 200);</span>
 	}
 
 	private String getOtpAuthURL(String issuer, String accountName, String secretKey) {
-<span class="nc" id="L198">		return String.format(&quot;otpauth://totp/%s:%s?secret=%s&amp;issuer=%s&quot;, issuer, accountName, secretKey, issuer);</span>
+<span class="nc" id="L200">		return String.format(&quot;otpauth://totp/%s:%s?secret=%s&amp;issuer=%s&quot;, issuer, accountName, secretKey, issuer);</span>
 	}
 
 	private byte[] generateQRCode(String text, int height) throws WriterException, IOException {
-<span class="nc" id="L202">		Map&lt;EncodeHintType, ErrorCorrectionLevel&gt; hintMap = new HashMap&lt;&gt;();</span>
-<span class="nc" id="L203">		hintMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.L);</span>
+<span class="nc" id="L204">		Map&lt;EncodeHintType, ErrorCorrectionLevel&gt; hintMap = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L205">		hintMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.L);</span>
 
-<span class="nc" id="L205">		BitMatrix bitMatrix = new MultiFormatWriter().encode(text, BarcodeFormat.QR_CODE, 200, 200, hintMap);</span>
+<span class="nc" id="L207">		BitMatrix bitMatrix = new MultiFormatWriter().encode(text, BarcodeFormat.QR_CODE, 200, 200, hintMap);</span>
 
-<span class="nc" id="L207">		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();</span>
-<span class="nc" id="L208">		MatrixToImageWriter.writeToStream(bitMatrix, &quot;PNG&quot;, outputStream);</span>
-<span class="nc" id="L209">		return outputStream.toByteArray();</span>
+<span class="nc" id="L209">		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();</span>
+<span class="nc" id="L210">		MatrixToImageWriter.writeToStream(bitMatrix, &quot;PNG&quot;, outputStream);</span>
+<span class="nc" id="L211">		return outputStream.toByteArray();</span>
 	}
 
 	public boolean verifyCode(String secretKey, int code) {
-<span class="nc" id="L213">		return gAuth.authorize(secretKey, code);</span>
+<span class="nc" id="L215">		return gAuth.authorize(secretKey, code);</span>
 	}
 
 }
