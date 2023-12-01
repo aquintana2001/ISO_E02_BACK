@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ISO2023</a> &gt; <a href="index.source.html" class="el_package">edu.uclm.esi.iso.ISO2023.controllers</a> &gt; <span class="el_source">UserController.java</span></div><h1>UserController.java</h1><pre class="source lang-java linenums">package edu.uclm.esi.iso.ISO2023.controllers;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+
+import edu.uclm.esi.iso.ISO2023.entities.Reserva;
+import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
+import edu.uclm.esi.iso.ISO2023.exceptions.contrasenaIncorrecta;
+import edu.uclm.esi.iso.ISO2023.services.ReservaService;
+import edu.uclm.esi.iso.ISO2023.services.UserService;
+import edu.uclm.esi.iso.ISO2023.services.VehiculoService;
+
+@RestController
+@RequestMapping(&quot;users&quot;)
+@CrossOrigin(&quot;*&quot;)
+<span class="fc" id="L28">public class UserController {</span>
+
+	@Autowired
+	private UserService userService;
+	@Autowired
+	private ReservaService reservaService;
+	@Autowired
+	private VehiculoService vehiculoService;
+
+	private static final String EMAILUSER = &quot;emailUser&quot;;
+	private static final String PASSWORDUSER = &quot;passwordUser&quot;;
+	private static final String GET_PAR_ERR = &quot;No se han podido capturar los parámetros de la petición, revíselos.&quot;;
+	private static final String EMAIL = &quot;email&quot;;
+
+	@PostMapping(&quot;/register&quot;)
+	public ResponseEntity&lt;byte[]&gt; registrarse(@RequestBody Map&lt;String, Object&gt; info) {
+		String password1;
+		String password2;
+		String nombre;
+		String apellidos;
+		String email;
+		String fechaNacimiento;
+		String carnet;
+		String telefono;
+		String dni;
+		byte[] QR ;
+		try {
+<span class="nc" id="L55">			password1 = info.get(&quot;password1&quot;).toString();</span>
+<span class="nc" id="L56">			password2 = info.get(&quot;password2&quot;).toString();</span>
+<span class="nc bnc" id="L57" title="All 2 branches missed.">			if (!password1.equals(password2))</span>
+<span class="nc" id="L58">				throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, &quot;Las contraseñas no coinciden&quot;);</span>
+
+<span class="nc" id="L60">			nombre = info.get(&quot;nombre&quot;).toString();</span>
+<span class="nc" id="L61">			apellidos = info.get(&quot;apellidos&quot;).toString();</span>
+<span class="nc" id="L62">			email = info.get(EMAIL).toString();</span>
+<span class="nc" id="L63">			fechaNacimiento = info.get(&quot;fechaNacimiento&quot;).toString();</span>
+<span class="nc" id="L64">			carnet = info.get(&quot;carnet&quot;).toString();</span>
+<span class="nc" id="L65">			telefono = info.get(&quot;telefono&quot;).toString();</span>
+<span class="nc" id="L66">			dni = info.get(&quot;dni&quot;).toString();</span>
+<span class="nc" id="L67">		} catch (Exception e) {</span>
+<span class="nc" id="L68">			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);</span>
+<span class="nc" id="L69">		}</span>
+
+		try {
+<span class="nc" id="L72">			QR=this.userService.registrarse(nombre, apellidos, email, password1, fechaNacimiento, carnet, telefono, dni);</span>
+<span class="nc" id="L73">		} catch (Exception e) {</span>
+<span class="nc" id="L74">			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());</span>
+<span class="nc" id="L75">		}</span>
+<span class="nc" id="L76">		return ResponseEntity.ok()</span>
+<span class="nc" id="L77">                .contentType(MediaType.IMAGE_JPEG) // Ajusta según el tipo de imagen</span>
+<span class="nc" id="L78">                .body(QR);</span>
+	}
+	
+	@PostMapping(&quot;/confirmarRegister&quot;)
+	public ResponseEntity&lt;String&gt; confirmarRegister(@RequestBody Map&lt;String, Object&gt; info) {
+		int mfaKey ;
+		String email;
+		try {
+<span class="nc" id="L86">			email = info.get(EMAIL).toString();</span>
+<span class="nc" id="L87">			mfaKey = Integer.parseInt(info.get(&quot;codigo&quot;).toString());</span>
+<span class="nc" id="L88">		} catch (Exception e) {</span>
+<span class="nc" id="L89">			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);</span>
+<span class="nc" id="L90">		}</span>
+		try {
+<span class="nc" id="L92">			this.userService.confirmarRegister(email,mfaKey);</span>
+<span class="nc" id="L93">		} catch (Exception e) {</span>
+<span class="nc" id="L94">			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());</span>
+<span class="nc" id="L95">		}</span>
+<span class="nc" id="L96">		return ResponseEntity.ok(&quot;Registro realizado con éxito.&quot;);</span>
+	}
+
+	@PutMapping(&quot;/login&quot;)
+	public String loginUser(@RequestBody Map&lt;String, Object&gt; info) {
+		String usuario;
+		String email;
+		String password;
+		try {
+<span class="fc" id="L105">			email = info.get(EMAIL).toString();</span>
+<span class="fc" id="L106">			password = info.get(&quot;password&quot;).toString();</span>
+<span class="nc" id="L107">		} catch (Exception e) {</span>
+<span class="nc" id="L108">			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);</span>
+<span class="fc" id="L109">		}</span>
+		try {
+<span class="fc" id="L111">			usuario = this.userService.loginUser(email, password);</span>
+<span class="fc" id="L112">		} catch (Exception e) {</span>
+<span class="fc" id="L113">			throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());</span>
+<span class="fc" id="L114">		}</span>
+<span class="fc" id="L115">		return usuario;</span>
+	}
+	
+	@PostMapping(&quot;/confirmarLoginCliente&quot;)
+	public ResponseEntity&lt;String&gt; confirmarLoginCliente(@RequestBody Map&lt;String, Object&gt; info) {
+		int mfaKey;
+		String password;
+		String email;
+		try {
+<span class="nc" id="L124">			email = info.get(EMAIL).toString();</span>
+<span class="nc" id="L125">			password = info.get(&quot;password&quot;).toString();</span>
+<span class="nc" id="L126">			mfaKey = Integer.parseInt(info.get(&quot;codigo&quot;).toString());</span>
+<span class="nc" id="L127">		} catch (Exception e) {</span>
+<span class="nc" id="L128">			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);</span>
+<span class="nc" id="L129">		}</span>
+		try {
+<span class="nc" id="L131">			this.userService.confirmarLoginCliente(email,password,mfaKey);</span>
+<span class="nc" id="L132">		} catch (Exception e) {</span>
+<span class="nc" id="L133">			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());</span>
+<span class="nc" id="L134">		}</span>
+<span class="nc" id="L135">		return ResponseEntity.ok(&quot;Login realizado con éxito.&quot;);</span>
+	}
+	
+
+	@PostMapping(&quot;/reserva&quot;)
+	public ResponseEntity&lt;String&gt; realizarReserva(@RequestBody Map&lt;String, Object&gt; info) {
+		String email;
+		String password;
+		String idVehiculo;
+		try {
+<span class="nc" id="L145">			email = info.get(EMAILUSER).toString();</span>
+<span class="nc" id="L146">			password = info.get(PASSWORDUSER).toString();</span>
+<span class="nc" id="L147">			idVehiculo = info.get(&quot;idVehiculo&quot;).toString();</span>
+<span class="nc" id="L148">		} catch (Exception e) {</span>
+<span class="nc" id="L149">			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);</span>
+<span class="nc" id="L150">		}</span>
+		try {
+<span class="nc" id="L152">			this.reservaService.realizarReserva(email, password, idVehiculo);</span>
+<span class="nc" id="L153">		} catch (Exception e) {</span>
+<span class="nc" id="L154">			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());</span>
+<span class="nc" id="L155">		}</span>
+<span class="nc" id="L156">		return ResponseEntity.ok(&quot;Reserva realizada con éxito.&quot;);</span>
+	}
+
+	@PutMapping(&quot;/cancelarReserva&quot;)
+	public ResponseEntity&lt;String&gt; cancelarReserva(@RequestBody Map&lt;String, Object&gt; info) {
+		String email;
+		String password;
+		String idReserva;
+		try {
+<span class="nc" id="L165">			email = info.get(EMAILUSER).toString();</span>
+<span class="nc" id="L166">			password = info.get(PASSWORDUSER).toString();</span>
+<span class="nc" id="L167">			idReserva = info.get(&quot;idReserva&quot;).toString();</span>
+<span class="nc" id="L168">		} catch (Exception e) {</span>
+<span class="nc" id="L169">			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);</span>
+<span class="nc" id="L170">		}</span>
+
+		try {
+<span class="nc" id="L173">			this.reservaService.cancelarReserva(email, password, idReserva);</span>
+<span class="nc" id="L174">		} catch (Exception e) {</span>
+<span class="nc" id="L175">			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());</span>
+<span class="nc" id="L176">		}</span>
+<span class="nc" id="L177">		return ResponseEntity.ok(&quot;Reserva cancelada con éxito.&quot;);</span>
+	}
+
+	@PutMapping(&quot;/finalizarReserva&quot;)
+	public ResponseEntity&lt;String&gt; finalizarReserva(@RequestBody Map&lt;String, Object&gt; info) {
+		String email;
+		String password;
+		String idReserva;
+		try {
+<span class="nc" id="L186">			email = info.get(EMAILUSER).toString();</span>
+<span class="nc" id="L187">			password = info.get(PASSWORDUSER).toString();</span>
+<span class="nc" id="L188">			idReserva = info.get(&quot;idReserva&quot;).toString();</span>
+<span class="nc" id="L189">		} catch (Exception e) {</span>
+<span class="nc" id="L190">			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);</span>
+<span class="nc" id="L191">		}</span>
+
+		try {
+<span class="nc" id="L194">			this.reservaService.finalizarReserva(email, password, idReserva);</span>
+<span class="nc" id="L195">		} catch (Exception e) {</span>
+<span class="nc" id="L196">			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());</span>
+<span class="nc" id="L197">		}</span>
+<span class="nc" id="L198">		return ResponseEntity.ok(&quot;Reserva finalizada con éxito.&quot;);</span>
+	}
+
+	@PostMapping(&quot;/vehiculo&quot;)
+	public List&lt;Vehiculo&gt; listaVehiculos(@RequestBody Map&lt;String, Object&gt; info) {
+		String email;
+		String password;
+		try {
+<span class="fc" id="L206">			email = info.get(EMAILUSER).toString();</span>
+<span class="fc" id="L207">			password = info.get(PASSWORDUSER).toString();</span>
+<span class="nc" id="L208">		} catch (Exception e) {</span>
+<span class="nc" id="L209">			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);</span>
+<span class="fc" id="L210">		}</span>
+<span class="fc" id="L211">		return vehiculoService.listaVehiculo(email, password);</span>
+	}
+
+	@PostMapping(&quot;/reset-password&quot;)
+	public ResponseEntity&lt;String&gt; restablecerContrasena(@RequestBody Map&lt;String, Object&gt; info) {
+<span class="nc" id="L216">		String email = info.get(EMAIL).toString();</span>
+		try {
+<span class="nc" id="L218">			this.userService.olvidarContrasena(email);</span>
+<span class="nc" id="L219">		} catch (Exception e) {</span>
+<span class="nc" id="L220">			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());</span>
+<span class="nc" id="L221">		}</span>
+<span class="nc" id="L222">		return ResponseEntity.ok(&quot;Se ha enviado un correo electrónico para restablecer la contraseña.&quot;);</span>
+	}
+
+	@PostMapping(&quot;/modificarContrasena&quot;)
+	public ResponseEntity&lt;String&gt; modificarContrasena(@RequestBody Map&lt;String, Object&gt; info) {
+<span class="nc" id="L227">		String token = info.get(&quot;token&quot;).toString();</span>
+<span class="nc" id="L228">		String email = info.get(EMAIL).toString();</span>
+<span class="nc" id="L229">		String pwd1 = info.get(&quot;pwd1&quot;).toString();</span>
+<span class="nc" id="L230">		String pwd2 = info.get(&quot;pwd2&quot;).toString();</span>
+
+		try {
+<span class="nc" id="L233">			userService.restablecerContrasena(token, email, pwd1, pwd2);</span>
+<span class="nc" id="L234">			return ResponseEntity.ok(&quot;Contraseña restablecida con éxito&quot;);</span>
+<span class="nc" id="L235">		} catch (contrasenaIncorrecta e) {</span>
+<span class="nc" id="L236">			return ResponseEntity.badRequest().body(&quot;Las contraseñas no coinciden o no cumplen con los requisitos.&quot;);</span>
+<span class="nc" id="L237">		} catch (Exception e) {</span>
+<span class="nc" id="L238">			return ResponseEntity.badRequest()</span>
+<span class="nc" id="L239">					.body(&quot;No se ha podido modificar la contraseña, inténtalo de nuevo: &quot; + e.getMessage());</span>
+		}
+	}
+	
+	@PostMapping(&quot;/listarReservas&quot;)
+	public List&lt;Reserva&gt; listarReservas(@RequestBody Map&lt;String, Object&gt; info) {
+		String email;
+		String password;
+		try {
+<span class="fc" id="L248">			email = info.get(EMAILUSER).toString();</span>
+<span class="fc" id="L249">			password = info.get(PASSWORDUSER).toString();</span>
+<span class="nc" id="L250">		} catch (Exception e) {</span>
+<span class="nc" id="L251">			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, GET_PAR_ERR);</span>
+<span class="fc" id="L252">		}</span>
+		try {
+<span class="fc" id="L254">			return this.reservaService.listarReservas(email,password);</span>
+<span class="fc" id="L255">		} catch (Exception e) {</span>
+<span class="fc" id="L256">			throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());</span>
+		}
+	}
+
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

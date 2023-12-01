@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReservaService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ISO2023</a> &gt; <a href="index.source.html" class="el_package">edu.uclm.esi.iso.ISO2023.services</a> &gt; <span class="el_source">ReservaService.java</span></div><h1>ReservaService.java</h1><pre class="source lang-java linenums">package edu.uclm.esi.iso.ISO2023.services;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import edu.uclm.esi.iso.ISO2023.dao.ClienteDAO;
+import edu.uclm.esi.iso.ISO2023.dao.MantenimientoDAO;
+import edu.uclm.esi.iso.ISO2023.dao.ParametrosDAO;
+import edu.uclm.esi.iso.ISO2023.dao.ReservaDAO;
+import edu.uclm.esi.iso.ISO2023.dao.VehiculoDAO;
+import edu.uclm.esi.iso.ISO2023.entities.Cliente;
+import edu.uclm.esi.iso.ISO2023.entities.Mantenimiento;
+import edu.uclm.esi.iso.ISO2023.entities.Parametros;
+import edu.uclm.esi.iso.ISO2023.entities.Reserva;
+import edu.uclm.esi.iso.ISO2023.entities.User;
+import edu.uclm.esi.iso.ISO2023.entities.Vehiculo;
+
+@Service
+<span class="fc" id="L24">public class ReservaService {</span>
+	@Autowired
+	private UserService userService;
+	@Autowired
+	private ReservaDAO reservaDAO;
+	@Autowired
+	private VehiculoDAO vehiculoDAO;
+	@Autowired
+	private MantenimientoDAO mantenimientoDAO;
+	@Autowired
+	private ClienteDAO clienteDAO;
+	@Autowired
+	private ParametrosDAO parametrosDAO;
+
+	private static final String CLIENTE = &quot;cliente&quot;;
+	private static final String MANTENIMIENTO = &quot;mantenimiento&quot;;
+	private static final String DISPONIBLE = &quot;disponible&quot;;
+	private static final String DESCARGADO = &quot;descargado&quot;;
+	private static final String RESERVADO = &quot;reservado&quot;;
+	private static final String ACTIVA = &quot;activa&quot;;
+	private static final String FINALIZADA = &quot;finalizada&quot;;
+	private static final String ID_BBDD = &quot;655b1a3db7bb7908becebbf4&quot;;
+
+	public void realizarReserva(String email, String password, String idVehiculo) {
+<span class="nc" id="L48">		String tipoCliente = userService.checkUser(email, password);</span>
+<span class="nc" id="L49">		User usuario = userService.findUser(tipoCliente, email);</span>
+<span class="nc" id="L50">		Optional&lt;Vehiculo&gt; vehiculo = this.vehiculoDAO.findById(idVehiculo);</span>
+
+<span class="nc bnc" id="L52" title="All 2 branches missed.">		if (vehiculo.isPresent())</span>
+<span class="nc bnc" id="L53" title="All 3 branches missed.">			switch (tipoCliente) {</span>
+			case CLIENTE:
+<span class="nc" id="L55">				reservaCliente(usuario, vehiculo.get());</span>
+<span class="nc" id="L56">				break;</span>
+			case MANTENIMIENTO:
+<span class="nc" id="L58">				reservaMantenimiento(usuario, vehiculo.get());</span>
+<span class="nc" id="L59">				break;</span>
+			default:
+			}
+<span class="nc" id="L62">	}</span>
+
+	public void reservaCliente(User usuario, Vehiculo vehiculo) {
+<span class="nc" id="L65">		Optional&lt;Cliente&gt; cliente = this.clienteDAO.findByEmail(usuario.getEmail());</span>
+<span class="nc bnc" id="L66" title="All 4 branches missed.">		if (vehiculo.getEstado().equals(DISPONIBLE) &amp;&amp; cliente.isPresent()) {</span>
+<span class="nc bnc" id="L67" title="All 2 branches missed.">			if (this.reservaDAO.findByUsuarioEmailAndVehiculoEstado(usuario.getEmail(), RESERVADO).isEmpty()) {</span>
+<span class="nc" id="L68">				comprobarCarnet((Cliente) usuario, vehiculo);</span>
+<span class="nc" id="L69">				Reserva reserva = new Reserva(vehiculo, cliente.get(), 0.0);</span>
+<span class="nc" id="L70">				vehiculo.setEstado(RESERVADO);</span>
+<span class="nc" id="L71">				reserva.setEstado(ACTIVA);</span>
+<span class="nc" id="L72">				this.vehiculoDAO.save(vehiculo);</span>
+<span class="nc" id="L73">				this.reservaDAO.save(reserva);</span>
+<span class="nc" id="L74">			} else {</span>
+<span class="nc" id="L75">				throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, &quot;Ya tienes una reserva activa.&quot;);</span>
+			}
+		} else {
+<span class="nc" id="L78">			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, &quot;El vehiculo ya está reservado.&quot;);</span>
+		}
+<span class="nc" id="L80">	}</span>
+
+	public void reservaMantenimiento(User usuario, Vehiculo vehiculo) {
+<span class="nc" id="L83">		Optional&lt;Mantenimiento&gt; mant = this.mantenimientoDAO.findByEmail(usuario.getEmail());</span>
+<span class="nc" id="L84">		Optional&lt;Parametros&gt; par = this.parametrosDAO.findById(ID_BBDD);</span>
+<span class="nc bnc" id="L85" title="All 6 branches missed.">		if (vehiculo.getEstado().equals(DESCARGADO) &amp;&amp; mant.isPresent() &amp;&amp; par.isPresent()) {</span>
+<span class="nc bnc" id="L86" title="All 2 branches missed.">			if (mant.get().getReservasActivas() &lt; par.get().getMaxVehiculosMantenimiento()) {</span>
+<span class="nc" id="L87">				Reserva reserva = new Reserva(vehiculo, mant.get(), 0.0);</span>
+<span class="nc" id="L88">				vehiculo.setEstado(&quot;en mantenimiento&quot;);</span>
+<span class="nc" id="L89">				reserva.setEstado(ACTIVA);</span>
+<span class="nc" id="L90">				mant.get().setReservasActivas(mant.get().getReservasActivas() + 1);</span>
+<span class="nc" id="L91">				this.vehiculoDAO.save(vehiculo);</span>
+<span class="nc" id="L92">				this.reservaDAO.save(reserva);</span>
+<span class="nc" id="L93">				this.mantenimientoDAO.save(mant.get());</span>
+<span class="nc" id="L94">			} else {</span>
+<span class="nc" id="L95">				throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, &quot;No puedes reservar mas vehiculos.&quot;);</span>
+			}
+		} else {
+<span class="nc" id="L98">			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, &quot;El vehiculo no necesita mantenimiento.&quot;);</span>
+		}
+<span class="nc" id="L100">	}</span>
+
+	public void comprobarCarnet(Cliente cliente, Vehiculo vehiculo) {
+<span class="nc bnc" id="L103" title="All 4 branches missed.">		if (vehiculo.getTipo().equals(&quot;coche&quot;) &amp;&amp; !cliente.getCarnet().equals(&quot;B&quot;)) {</span>
+<span class="nc" id="L104">			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, &quot;Necesitas sacarte el carnet B.&quot;);</span>
+<span class="nc bnc" id="L105" title="All 2 branches missed.">		} else if (vehiculo.getTipo().equals(&quot;moto&quot;)</span>
+<span class="nc bnc" id="L106" title="All 4 branches missed.">				&amp;&amp; !(cliente.getCarnet().equals(&quot;A&quot;) || cliente.getCarnet().equals(&quot;B&quot;))) {</span>
+<span class="nc" id="L107">			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, &quot;Necesitas sacarte el carnet A o B.&quot;);</span>
+		}
+<span class="nc" id="L109">	}</span>
+
+	public void cancelarReserva(String email, String password, String idReserva) {
+<span class="nc" id="L112">		Optional&lt;Reserva&gt; reserva = this.reservaDAO.findById(idReserva);</span>
+<span class="nc" id="L113">		Optional&lt;Mantenimiento&gt; mant = this.mantenimientoDAO.findByEmail(email);</span>
+<span class="nc" id="L114">		String tipoUser = userService.checkUser(email, password);</span>
+<span class="nc bnc" id="L115" title="All 4 branches missed.">		if (reserva.isPresent() &amp;&amp; reserva.get().getEstado().equals(ACTIVA)</span>
+<span class="nc bnc" id="L116" title="All 2 branches missed.">				&amp;&amp; reserva.get().getUsuario().getEmail().equals(email)) {</span>
+<span class="nc bnc" id="L117" title="All 2 branches missed.">			if (tipoUser.equals(CLIENTE)) {</span>
+<span class="nc" id="L118">				reserva.get().getVehiculo().setEstado(DISPONIBLE);</span>
+			}
+<span class="nc bnc" id="L120" title="All 4 branches missed.">			if (tipoUser.equals(MANTENIMIENTO) &amp;&amp; mant.isPresent()) {</span>
+<span class="nc" id="L121">				mant.get().setReservasActivas(mant.get().getReservasActivas() - 1);</span>
+<span class="nc" id="L122">				reserva.get().getVehiculo().setEstado(DESCARGADO);</span>
+<span class="nc" id="L123">				this.mantenimientoDAO.save(mant.get());</span>
+			}
+<span class="nc" id="L125">			reserva.get().setEstado(&quot;cancelada&quot;);</span>
+<span class="nc" id="L126">			this.vehiculoDAO.save(reserva.get().getVehiculo());</span>
+<span class="nc" id="L127">			this.reservaDAO.save(reserva.get());</span>
+		} else {
+<span class="nc" id="L129">			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, &quot;Error al cancelar la reserva.&quot;);</span>
+		}
+<span class="nc" id="L131">	}</span>
+
+	
+
+	public void finalizarReserva(String email, String password, String idReserva) {
+<span class="nc" id="L136">		Optional&lt;Reserva&gt; reserva = this.reservaDAO.findById(idReserva);</span>
+<span class="nc" id="L137">		Optional&lt;Parametros&gt; parametros = this.parametrosDAO.findById(ID_BBDD);</span>
+<span class="nc bnc" id="L138" title="All 4 branches missed.">		if (reserva.isPresent() &amp;&amp; parametros.isPresent()) {</span>
+<span class="nc bnc" id="L139" title="All 4 branches missed.">			if (reserva.get().getEstado().equals(ACTIVA) &amp;&amp; reserva.get().getUsuario().getEmail().equals(email)) {</span>
+<span class="nc bnc" id="L140" title="All 2 branches missed.">				if (userService.checkUser(email, password).equals(CLIENTE)) {</span>
+<span class="nc" id="L141">					finalizarCliente(reserva.get(), parametros.get());</span>
+<span class="nc bnc" id="L142" title="All 2 branches missed.">				} else if (userService.checkUser(email, password).equals(MANTENIMIENTO)) {</span>
+<span class="nc" id="L143">					finalizarMantenimiento(reserva.get(), email);</span>
+				}
+<span class="nc" id="L145">				reserva.get().setEstado(FINALIZADA);</span>
+<span class="nc" id="L146">				this.vehiculoDAO.save(reserva.get().getVehiculo());</span>
+<span class="nc" id="L147">				this.reservaDAO.save(reserva.get());</span>
+			} else {
+<span class="nc" id="L149">				throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, &quot;Error al finalizar la reserva.&quot;);</span>
+			}
+		}
+<span class="nc" id="L152">	}</span>
+
+	public void finalizarCliente(Reserva reserva, Parametros parametros) {
+<span class="nc" id="L155">		reserva.getVehiculo().setEstado(DISPONIBLE);</span>
+<span class="nc" id="L156">		reserva.getVehiculo().setBateria(reserva.getVehiculo().getBateria() - parametros.getBateriaViaje());</span>
+<span class="nc bnc" id="L157" title="All 2 branches missed.">		if (reserva.getVehiculo().getBateria() &lt; parametros.getMinimoBateria())</span>
+<span class="nc" id="L158">			reserva.getVehiculo().setEstado(DESCARGADO);</span>
+
+<span class="nc" id="L160">	}</span>
+
+	public void finalizarMantenimiento(Reserva reserva, String email) {
+<span class="nc" id="L163">		Optional&lt;Mantenimiento&gt; mant = this.mantenimientoDAO.findByEmail(email);</span>
+<span class="nc bnc" id="L164" title="All 2 branches missed.">		if (mant.isPresent()) {</span>
+<span class="nc" id="L165">			reserva.setEstado(FINALIZADA);</span>
+<span class="nc" id="L166">			reserva.getVehiculo().setEstado(DISPONIBLE);</span>
+<span class="nc" id="L167">			reserva.getVehiculo().setBateria(100);</span>
+<span class="nc" id="L168">			mant.get().setReservasActivas(mant.get().getReservasActivas() - 1);</span>
+<span class="nc" id="L169">			this.mantenimientoDAO.save(mant.get());</span>
+		}
+<span class="nc" id="L171">	}</span>
+
+	public void valorarReserva(String email, String password, String idReserva, double valoracion, String comentario) {
+<span class="nc" id="L174">		Optional&lt;Reserva&gt; reserva = this.reservaDAO.findById(idReserva);</span>
+<span class="nc bnc" id="L175" title="All 2 branches missed.">		if (reserva.isPresent()) {</span>
+<span class="nc bnc" id="L176" title="All 4 branches missed.">			if (userService.checkUser(email, password).equals(CLIENTE) &amp;&amp; reserva.get().getEstado().equals(FINALIZADA)</span>
+<span class="nc bnc" id="L177" title="All 2 branches missed.">					&amp;&amp; reserva.get().getUsuario().getEmail().equals(email)) {</span>
+<span class="nc" id="L178">				reserva.get().setValoracion(valoracion);</span>
+<span class="nc" id="L179">				reserva.get().setComentario(comentario);</span>
+<span class="nc" id="L180">				this.reservaDAO.save(reserva.get());</span>
+			} else {
+<span class="nc" id="L182">				throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, &quot;Error al valorar la reserva.&quot;);</span>
+			}
+		}
+<span class="nc" id="L185">	}</span>
+
+	public List&lt;Reserva&gt; listarReservas(String email, String password) {
+<span class="fc" id="L188">		List&lt;Reserva&gt; reservas = this.reservaDAO.findByUsuarioEmail(email);</span>
+<span class="pc bpc" id="L189" title="1 of 4 branches missed.">		if (userService.checkUser(email, password).equals(CLIENTE) || userService.checkUser(email, password).equals(MANTENIMIENTO)) {</span>
+<span class="fc" id="L190">			return reservas;</span>
+		} else {
+<span class="nc" id="L192">			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, &quot;Error al listar las reservas.&quot;);</span>
+		}
+
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

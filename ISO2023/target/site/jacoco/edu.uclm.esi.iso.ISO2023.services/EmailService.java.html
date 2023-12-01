@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EmailService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ISO2023</a> &gt; <a href="index.source.html" class="el_package">edu.uclm.esi.iso.ISO2023.services</a> &gt; <span class="el_source">EmailService.java</span></div><h1>EmailService.java</h1><pre class="source lang-java linenums">package edu.uclm.esi.iso.ISO2023.services;
+import org.json.JSONArray;  
+import org.json.JSONObject;
+import org.springframework.stereotype.Service;
+
+import edu.uclm.esi.iso.ISO2023.entities.Cliente;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.MediaType;
+
+import java.io.IOException;
+
+
+
+@Service
+<span class="fc" id="L17">public class EmailService {</span>
+	 private static final String RUTA = &quot;application/json&quot;;
+	 
+
+	public void sendCorreoConfirmacion(Cliente possibleCliente, String url) {
+<span class="nc" id="L22">		 String htmlContent = &quot;&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;p&gt;Por favor, confirma que ha olvidado la contraseña pulsando en el siguiente enlace,&lt;/p&gt;&lt;p&gt;Haz click aquí &lt;a href='&quot;+url+&quot;'&gt;restablecimiento de la contraseña MUEVE-TIC&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;&quot;;</span>
+<span class="nc" id="L23">		OkHttpClient client = new OkHttpClient().newBuilder()</span>
+<span class="nc" id="L24">				.build();</span>
+<span class="nc" id="L25">		MediaType mediaType = MediaType.parse(RUTA);</span>
+
+<span class="nc" id="L27">		JSONObject jsoSender = new JSONObject().</span>
+<span class="nc" id="L28">				put(&quot;name&quot;, &quot;MUEVETE-TIC&quot;).</span>
+<span class="nc" id="L29">				put(&quot;email&quot;, &quot;PracticaISO2324@outlook.es&quot;);</span>
+
+<span class="nc" id="L31">		JSONObject jsoTo = new JSONObject().	</span>
+<span class="nc" id="L32">				put(&quot;email&quot;, possibleCliente.getEmail()).</span>
+<span class="nc" id="L33">				put(&quot;name&quot;,possibleCliente.getNombre());</span>
+
+<span class="nc" id="L35">		JSONArray jsaTo = new JSONArray().</span>
+<span class="nc" id="L36">				put(jsoTo);</span>
+
+<span class="nc" id="L38">		JSONObject jsoBody = new JSONObject();</span>
+<span class="nc" id="L39">		jsoBody.put(&quot;sender&quot;, jsoSender);</span>
+<span class="nc" id="L40">		jsoBody.put(&quot;to&quot;,jsaTo);</span>
+<span class="nc" id="L41">		jsoBody.put(&quot;subject&quot;, &quot;Bienvenido al servicio de Soporte de MUEVE-Tic&quot;);</span>
+
+<span class="nc" id="L43">		jsoBody.put(&quot;hmtlContent&quot;, htmlContent);</span>
+<span class="nc" id="L44">		jsoBody.put(&quot;textContent&quot;, htmlContent);	</span>
+		@SuppressWarnings(&quot;deprecation&quot;)
+<span class="nc" id="L46">		RequestBody body = RequestBody.create(mediaType, jsoBody.toString());</span>
+<span class="nc" id="L47">		Request request = new Request.Builder()</span>
+<span class="nc" id="L48">				.url(&quot;https://api.brevo.com/v3/smtp/email&quot;)</span>
+<span class="nc" id="L49">				.post(body)</span>
+<span class="nc" id="L50">				.addHeader(&quot;accept&quot;, RUTA)</span>
+<span class="nc" id="L51">				.addHeader(&quot;api-key&quot;, &quot;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&quot;)</span>
+<span class="nc" id="L52">				.addHeader(&quot;content-type&quot;, RUTA)</span>
+<span class="nc" id="L53">				.build();</span>
+		try {
+<span class="nc" id="L55">			client.newCall(request).execute();</span>
+<span class="nc" id="L56">		} catch (IOException e) {</span>
+<span class="nc" id="L57">			e.printStackTrace();</span>
+<span class="nc" id="L58">		}</span>
+<span class="nc" id="L59">	}</span>
+
+
+}
+
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

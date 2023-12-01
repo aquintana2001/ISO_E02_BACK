@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Vehiculo.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ISO2023</a> &gt; <a href="index.source.html" class="el_package">edu.uclm.esi.iso.ISO2023.entities</a> &gt; <span class="el_source">Vehiculo.java</span></div><h1>Vehiculo.java</h1><pre class="source lang-java linenums">package edu.uclm.esi.iso.ISO2023.entities;
+
+import java.util.UUID;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document
+public class Vehiculo {
+	@Id
+	private String id;
+	private String matricula;
+	private String tipo;
+	private int bateria;
+	private String modelo;
+	private String estado;
+	private String direccion;
+
+<span class="fc" id="L19">	public Vehiculo(String tipo, String matricula, int bateria, String modelo, String estado, String direccion) {</span>
+<span class="fc" id="L20">		this.id = UUID.randomUUID().toString();</span>
+<span class="fc" id="L21">		this.tipo = tipo;</span>
+<span class="fc" id="L22">		this.matricula = matricula;</span>
+<span class="fc" id="L23">		this.bateria = bateria;</span>
+<span class="fc" id="L24">		this.modelo = modelo;</span>
+<span class="fc" id="L25">		this.estado = estado;</span>
+<span class="fc" id="L26">		this.direccion = direccion;</span>
+<span class="fc" id="L27">	}</span>
+
+	public String getId() {
+<span class="fc" id="L30">		return id;</span>
+	}
+
+	public void setId(String id) {
+<span class="nc" id="L34">		this.id = id;</span>
+<span class="nc" id="L35">	}</span>
+
+	public String getTipo() {
+<span class="fc" id="L38">		return tipo;</span>
+	}
+
+	public void setTipo(String tipo) {
+<span class="nc" id="L42">		this.tipo = tipo;</span>
+<span class="nc" id="L43">	}</span>
+
+	public String getMatricula() {
+<span class="fc" id="L46">		return matricula;</span>
+	}
+
+	public void setMatricula(String matricula) {
+<span class="nc" id="L50">		this.matricula = matricula;</span>
+<span class="nc" id="L51">	}</span>
+
+	public int getBateria() {
+<span class="fc" id="L54">		return bateria;</span>
+	}
+
+	public void setBateria(int bateria) {
+<span class="nc" id="L58">		this.bateria = bateria;</span>
+<span class="nc" id="L59">	}</span>
+
+	public String getModelo() {
+<span class="fc" id="L62">		return modelo;</span>
+	}
+
+	public void setModelo(String modelo) {
+<span class="nc" id="L66">		this.modelo = modelo;</span>
+<span class="nc" id="L67">	}</span>
+
+	public String getEstado() {
+<span class="fc" id="L70">		return estado;</span>
+	}
+
+	public void setEstado(String estado) {
+<span class="nc" id="L74">		this.estado = estado;</span>
+<span class="nc" id="L75">	}</span>
+
+	public String getDireccion() {
+<span class="fc" id="L78">		return direccion;</span>
+	}
+
+	public void setDireccion(String direccion) {
+<span class="nc" id="L82">		this.direccion = direccion;</span>
+<span class="nc" id="L83">	}</span>
+
+	public String toString() {
+<span class="nc" id="L86">		return &quot;Vehiculo [tipo=&quot; + tipo + &quot;,matricula=&quot; + matricula + &quot;,bateria=&quot; + bateria + &quot;,modelo=&quot; + modelo</span>
+				+ &quot;,estado=&quot; + estado + &quot;,direccion=&quot; + direccion + &quot;]&quot;;
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

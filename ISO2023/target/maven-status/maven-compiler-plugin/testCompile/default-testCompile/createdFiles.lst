@@ -1,0 +1,5 @@
+edu\uclm\esi\iso\ISO2023\ConsultarVehiculoTest.class
+edu\uclm\esi\iso\ISO2023\ListarReservasTest.class
+edu\uclm\esi\iso\ISO2023\GetDatosTest.class
+edu\uclm\esi\iso\ISO2023\ConsultarVehiculosNoDisponiblesTest.class
+edu\uclm\esi\iso\ISO2023\LoginTest.class

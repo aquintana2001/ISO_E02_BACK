@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ClienteService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ISO2023</a> &gt; <a href="index.source.html" class="el_package">edu.uclm.esi.iso.ISO2023.services</a> &gt; <span class="el_source">ClienteService.java</span></div><h1>ClienteService.java</h1><pre class="source lang-java linenums">package edu.uclm.esi.iso.ISO2023.services;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import edu.uclm.esi.iso.ISO2023.dao.ClienteDAO;
+import edu.uclm.esi.iso.ISO2023.dao.ReservaDAO;
+
+import edu.uclm.esi.iso.ISO2023.dao.TokenDAO;
+import edu.uclm.esi.iso.ISO2023.entities.Cliente;
+import edu.uclm.esi.iso.ISO2023.entities.Reserva;
+import edu.uclm.esi.iso.ISO2023.exceptions.*;
+
+@Service
+<span class="fc" id="L20">public class ClienteService {</span>
+	@Autowired
+	private UserService userService;
+	@Autowired
+	private ClienteDAO clienteDAO;
+	@Autowired
+	private TokenDAO tokenDAO;
+
+	@Autowired
+	private SeguridadService comprobarSeguridad;
+	@Autowired
+	private ReservaDAO reservaDAO;
+
+	private static final String ADMIN = &quot;admin&quot;;
+
+	public List&lt;Cliente&gt; listaClientes(String emailAdmin, String passwordAdmin) {
+<span class="nc bnc" id="L36" title="All 2 branches missed.">		if (userService.checkUser(emailAdmin, passwordAdmin).equals(ADMIN))</span>
+<span class="nc" id="L37">			return this.clienteDAO.findAll();</span>
+		else {
+<span class="nc" id="L39">			throw new ResponseStatusException(HttpStatus.FORBIDDEN, &quot;No tienes permisos para realizar esta accion.&quot;);</span>
+		}
+	}
+
+	// METODO PARA EL ADMIN
+	public void actualizarCliente(String nombre, String apellidos, String email, String password, boolean activo,
+			int intentos, String fechaNacimiento, String carnet, String telefono, String dni, String emailAdmin,
+			String passwordAdmin) throws contrasenaIncorrecta, numeroInvalido {
+<span class="nc bnc" id="L47" title="All 2 branches missed.">		if (userService.checkUser(emailAdmin, passwordAdmin).equals(ADMIN)) {</span>
+<span class="nc" id="L48">			Cliente cliente = new Cliente(nombre, apellidos, email, password, activo, intentos, fechaNacimiento, carnet,</span>
+					telefono, dni, &quot;&quot;);
+
+<span class="nc" id="L51">			Optional&lt;Cliente&gt; clienteExiste = clienteDAO.findByEmail(email);</span>
+<span class="nc bnc" id="L52" title="All 2 branches missed.">			if (clienteExiste.isPresent()) {</span>
+<span class="nc" id="L53">				comprobarSeguridad.restriccionesPassword(cliente);</span>
+<span class="nc" id="L54">				comprobarSeguridad.validarEmail(cliente.getEmail());</span>
+<span class="nc" id="L55">				comprobarSeguridad.comprobarNumero(cliente.getTelefono());</span>
+
+<span class="nc bnc" id="L57" title="All 2 branches missed.">				if (Boolean.FALSE.equals(comprobarSeguridad.comprobarDni(cliente.getDni())))</span>
+<span class="nc" id="L58">					throw new numeroInvalido(</span>
+							&quot;El NIF introducido no es un NIF valido. Tiene que contener 8 numeros y un caracter&quot;);
+
+<span class="nc bnc" id="L61" title="All 2 branches missed.">				if (cliente.getPassword().length() != 60) {</span>
+<span class="nc" id="L62">					cliente.setPassword(comprobarSeguridad.cifrarPassword(cliente.getPassword()));</span>
+				}
+<span class="nc" id="L64">				cliente.setNombre(nombre);</span>
+<span class="nc" id="L65">				cliente.setApellidos(apellidos);</span>
+<span class="nc" id="L66">				cliente.setEmail(email);</span>
+<span class="nc" id="L67">				cliente.setPassword(password);</span>
+<span class="nc" id="L68">				cliente.setActivo(activo);</span>
+<span class="nc" id="L69">				cliente.setIntentos(intentos);</span>
+<span class="nc" id="L70">				cliente.setFechaNacimiento(fechaNacimiento);</span>
+<span class="nc" id="L71">				cliente.setCarnet(carnet);</span>
+<span class="nc" id="L72">				cliente.setTelefono(telefono);</span>
+<span class="nc" id="L73">				cliente.setDni(dni);</span>
+<span class="nc" id="L74">				cliente.setsecretKey(clienteExiste.get().getsecretKey());</span>
+<span class="nc" id="L75">				clienteDAO.save(cliente);</span>
+			}
+		}
+<span class="nc" id="L78">	}</span>
+
+
+	public void anularCliente(String email, String emailAdmin, String passwordAdmin) {
+<span class="nc bnc" id="L82" title="All 2 branches missed.">		if (userService.checkUser(emailAdmin, passwordAdmin).equals(ADMIN)) {</span>
+<span class="nc" id="L83">			Optional&lt;Cliente&gt; clienteExiste = this.clienteDAO.findByEmail(email);</span>
+<span class="nc bnc" id="L84" title="All 2 branches missed.">			if (clienteExiste.isPresent()) {</span>
+<span class="nc" id="L85">				clienteExiste.get().setActivo(false);</span>
+<span class="nc" id="L86">				clienteDAO.save(clienteExiste.get());</span>
+			} else {
+<span class="nc" id="L88">				throw new ResponseStatusException(HttpStatus.FORBIDDEN, &quot;Ese cliente no existe&quot;);</span>
+			}
+		}
+<span class="nc" id="L91">	}</span>
+
+	public void darDeBaja(String email, String password) {
+<span class="nc" id="L94">		Optional&lt;Cliente&gt; deudas = this.clienteDAO.findByEmail(&quot;Deudas&quot;);</span>
+<span class="nc bnc" id="L95" title="All 4 branches missed.">		if (userService.checkUser(email, password).equals(&quot;cliente&quot;) &amp;&amp; deudas.isPresent()) {</span>
+<span class="nc bnc" id="L96" title="All 2 branches missed.">			for (Reserva r : this.reservaDAO.findByUsuarioEmail(email)) {</span>
+<span class="nc" id="L97">				r.setUsuario(deudas.get());</span>
+<span class="nc" id="L98">				this.reservaDAO.save(r);</span>
+<span class="nc" id="L99">			}</span>
+<span class="nc" id="L100">			this.tokenDAO.deleteAllByUserEmail(email);</span>
+<span class="nc" id="L101">			clienteDAO.deleteById(email);</span>
+
+<span class="nc" id="L103">			tokenDAO.deleteById(email);</span>
+		} else {
+<span class="nc" id="L105">			throw new ResponseStatusException(HttpStatus.FORBIDDEN, &quot;Error al eliminar la cuenta&quot;);</span>
+		}
+
+<span class="nc" id="L108">	}</span>
+
+	public Cliente getDatos(String email, String password) {
+<span class="fc" id="L111">		Optional&lt;Cliente&gt; cliente = this.clienteDAO.findByEmail(email);</span>
+<span class="pc bpc" id="L112" title="1 of 4 branches missed.">		if (cliente.isPresent() &amp;&amp; comprobarSeguridad.decodificador(password, cliente.get().getPassword())) {</span>
+<span class="fc" id="L113">			return cliente.get();</span>
+		} else {
+<span class="fc" id="L115">			throw new ResponseStatusException(HttpStatus.FORBIDDEN, &quot;No puedes obtener los datos.&quot;);</span>
+		}
+	}
+
+	// METODO PARA EL CLIENTE
+	public void actualizarDatos(String nombre, String apellidos, String email, String password, String fechaNacimiento,
+			String carnet, String telefono, String dni) throws numeroInvalido, formatoIncompleto {
+<span class="nc" id="L122">		Optional&lt;Cliente&gt; cliente = this.clienteDAO.findByEmail(email);</span>
+<span class="nc bnc" id="L123" title="All 4 branches missed.">		if (userService.checkUser(email, password).equals(&quot;cliente&quot;) &amp;&amp; cliente.isPresent()) {</span>
+
+<span class="nc" id="L125">			comprobarSeguridad.validarEmail(email);</span>
+<span class="nc" id="L126">			comprobarSeguridad.comprobarNumero(telefono);</span>
+
+<span class="nc bnc" id="L128" title="All 2 branches missed.">			if (Boolean.FALSE.equals((comprobarSeguridad.comprobarDni(dni))))</span>
+<span class="nc" id="L129">				throw new numeroInvalido(</span>
+						&quot;El NIF introducido no es un NIF valido. Tiene que contener 8 numeros y un caracter&quot;);
+
+<span class="nc" id="L132">			cliente = this.clienteDAO.findByDni(dni);</span>
+<span class="nc bnc" id="L133" title="All 4 branches missed.">			if (cliente.isPresent() &amp;&amp; !dni.equals(cliente.get().getDni())) {</span>
+<span class="nc" id="L134">				throw new formatoIncompleto(&quot;Error.No puedes usar ese DNI.&quot;);</span>
+			}
+<span class="nc bnc" id="L136" title="All 2 branches missed.">			if (cliente.isPresent()) {</span>
+<span class="nc" id="L137">				cliente.get().setNombre(nombre);</span>
+<span class="nc" id="L138">				cliente.get().setApellidos(apellidos);</span>
+<span class="nc" id="L139">				cliente.get().setFechaNacimiento(fechaNacimiento);</span>
+<span class="nc" id="L140">				cliente.get().setCarnet(carnet);</span>
+<span class="nc" id="L141">				cliente.get().setTelefono(telefono);</span>
+<span class="nc" id="L142">				cliente.get().setDni(dni);</span>
+<span class="nc" id="L143">				clienteDAO.save(cliente.get());</span>
+			}
+		}else {
+<span class="nc" id="L146">			throw new ResponseStatusException(HttpStatus.FORBIDDEN, &quot;No se ha podido modificar los datos.&quot;);</span>
+		}
+<span class="nc" id="L148">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
