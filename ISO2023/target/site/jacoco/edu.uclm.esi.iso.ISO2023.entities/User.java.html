@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>User.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ISO2023</a> &gt; <a href="index.source.html" class="el_package">edu.uclm.esi.iso.ISO2023.entities</a> &gt; <span class="el_source">User.java</span></div><h1>User.java</h1><pre class="source lang-java linenums">package edu.uclm.esi.iso.ISO2023.entities;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document
+public class User {
+	@Id
+	private String email;
+	private String nombre;
+	private String apellidos;
+	private String password;
+	private boolean activo;
+	private int intentos;
+
+<span class="fc" id="L16">	public User(String nombre, String apellidos, String email, String password, boolean activo, int intentos) {</span>
+
+<span class="fc" id="L18">		this.nombre = nombre;</span>
+<span class="fc" id="L19">		this.apellidos = apellidos;</span>
+<span class="fc" id="L20">		this.email = email;</span>
+<span class="fc" id="L21">		this.password = password;</span>
+<span class="fc" id="L22">		this.activo = activo;</span>
+<span class="fc" id="L23">		this.intentos = intentos;</span>
+<span class="fc" id="L24">	}</span>
+
+	public String getNombre() {
+<span class="fc" id="L27">		return nombre;</span>
+	}
+
+	public void setNombre(String nombre) {
+<span class="nc" id="L31">		this.nombre = nombre;</span>
+<span class="nc" id="L32">	}</span>
+
+	public String getApellidos() {
+<span class="fc" id="L35">		return apellidos;</span>
+	}
+
+	public void setApellidos(String apellidos) {
+<span class="nc" id="L39">		this.apellidos = apellidos;</span>
+<span class="nc" id="L40">	}</span>
+
+	public String getEmail() {
+<span class="fc" id="L43">		return email;</span>
+	}
+
+	public void setEmail(String email) {
+<span class="nc" id="L47">		this.email = email;</span>
+<span class="nc" id="L48">	}</span>
+
+	public String getPassword() {
+<span class="fc" id="L51">		return password;</span>
+	}
+
+	public void setPassword(String password) {
+<span class="nc" id="L55">		this.password = password;</span>
+<span class="nc" id="L56">	}</span>
+
+	public Boolean getActivo() {
+<span class="fc" id="L59">		return activo;</span>
+	}
+
+	public void setActivo(Boolean activo) {
+<span class="nc" id="L63">		this.activo = activo;</span>
+<span class="nc" id="L64">	}</span>
+
+	public int getIntentos() {
+<span class="fc" id="L67">		return intentos;</span>
+	}
+
+	public void setIntentos(int intentos) {
+<span class="fc" id="L71">		this.intentos = intentos;</span>
+<span class="fc" id="L72">	}</span>
+
+	public String toString() {
+<span class="nc" id="L75">		return &quot;User [nombre=&quot; + nombre + &quot;,apellidos=&quot; + apellidos + &quot;,email=&quot; + email + &quot;,password=&quot; + password</span>
+				+ &quot;,activo=&quot; + activo + &quot;,intentos=&quot; + intentos + &quot;]&quot;;
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

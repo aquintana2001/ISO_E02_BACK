@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Reserva.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ISO2023</a> &gt; <a href="index.source.html" class="el_package">edu.uclm.esi.iso.ISO2023.entities</a> &gt; <span class="el_source">Reserva.java</span></div><h1>Reserva.java</h1><pre class="source lang-java linenums">package edu.uclm.esi.iso.ISO2023.entities;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.UUID;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document
+public class Reserva {
+	@Id
+	private String id;
+	private Vehiculo vehiculo;
+	private User usuario;
+	private double valoracion;
+	private String estado;
+	private String comentario;
+	private String fecha;
+	
+<span class="fc" id="L21">	public Reserva(Vehiculo vehiculo, User usuario, double valoracion) {</span>
+<span class="fc" id="L22">		this.id = UUID.randomUUID().toString();</span>
+<span class="fc" id="L23">		this.vehiculo = vehiculo;</span>
+<span class="fc" id="L24">		this.usuario=usuario;</span>
+<span class="fc" id="L25">		this.valoracion=valoracion;</span>
+<span class="fc" id="L26">		LocalDateTime fechaHoraActual = LocalDateTime.now();</span>
+<span class="fc" id="L27">        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd HH:mm:ss&quot;);</span>
+<span class="fc" id="L28">        this.fecha = fechaHoraActual.format(formatter);</span>
+<span class="fc" id="L29">	}</span>
+
+	public String getId() {
+<span class="fc" id="L32">		return id;</span>
+	}
+
+	public void setId(String id) {
+<span class="nc" id="L36">		this.id = id;</span>
+<span class="nc" id="L37">	}</span>
+
+	public Vehiculo getVehiculo() {
+<span class="fc" id="L40">		return vehiculo;</span>
+	}
+
+	public void setVehiculo(Vehiculo vehiculo) {
+<span class="nc" id="L44">		this.vehiculo = vehiculo;</span>
+<span class="nc" id="L45">	}</span>
+
+	public User getUsuario() {
+<span class="fc" id="L48">		return usuario;</span>
+	}
+
+	public void setUsuario(User usuario) {
+<span class="nc" id="L52">		this.usuario = usuario;</span>
+<span class="nc" id="L53">	}</span>
+
+	public double getValoracion() {
+<span class="fc" id="L56">		return valoracion;</span>
+	}
+
+	public void setValoracion(double valoracion) {
+<span class="nc" id="L60">		this.valoracion = valoracion;</span>
+<span class="nc" id="L61">	}</span>
+	
+	public String getEstado() {
+<span class="fc" id="L64">		return estado;</span>
+	}
+
+	public void setEstado(String estado) {
+<span class="nc" id="L68">		this.estado = estado;</span>
+<span class="nc" id="L69">	}</span>
+	
+	public String getComentario() {
+<span class="fc" id="L72">		return comentario;</span>
+	}
+
+	public void setComentario(String comentario) {
+<span class="nc" id="L76">		this.comentario = comentario;</span>
+<span class="nc" id="L77">	}</span>
+	
+	public String getFecha() {
+<span class="fc" id="L80">		return fecha;</span>
+	}
+
+	public void setFecha(String fecha) {
+<span class="nc" id="L84">		this.fecha = fecha;</span>
+<span class="nc" id="L85">	}</span>
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

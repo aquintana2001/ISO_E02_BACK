@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Parametros.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ISO2023</a> &gt; <a href="index.source.html" class="el_package">edu.uclm.esi.iso.ISO2023.entities</a> &gt; <span class="el_source">Parametros.java</span></div><h1>Parametros.java</h1><pre class="source lang-java linenums">package edu.uclm.esi.iso.ISO2023.entities;
+
+import java.util.UUID;
+
+import org.springframework.data.annotation.Id;
+
+public class Parametros {
+	@Id
+	private String id;
+	private double precioViaje;
+	private int minimoBateria;
+	private int bateriaViaje;
+	private int maxVehiculosMantenimiento;
+	
+<span class="fc" id="L15">	public Parametros(double precioViaje, int minimoBateria, int bateriaViaje, int maxVehiculosMantenimiento) {</span>
+<span class="fc" id="L16">		this.id = UUID.randomUUID().toString();</span>
+<span class="fc" id="L17">		this.precioViaje = precioViaje;</span>
+<span class="fc" id="L18">		this.minimoBateria = minimoBateria;</span>
+<span class="fc" id="L19">		this.bateriaViaje = bateriaViaje;</span>
+<span class="fc" id="L20">		this.maxVehiculosMantenimiento = maxVehiculosMantenimiento;</span>
+<span class="fc" id="L21">	}</span>
+	
+	public String getId() {
+<span class="nc" id="L24">		return id;</span>
+	}
+
+	public void setId(String id) {
+<span class="nc" id="L28">		this.id = id;</span>
+<span class="nc" id="L29">	}</span>
+	
+	public double getPrecioViaje() {
+<span class="nc" id="L32">		return precioViaje;</span>
+	}
+	public void setPrecioViaje(double precioViaje) {
+<span class="nc" id="L35">		this.precioViaje = precioViaje;</span>
+<span class="nc" id="L36">	}</span>
+	public int getMinimoBateria() {
+<span class="fc" id="L38">		return minimoBateria;</span>
+	}
+	public void setMinimoBateria(int minimoBateria) {
+<span class="nc" id="L41">		this.minimoBateria = minimoBateria;</span>
+<span class="nc" id="L42">	}</span>
+	public int getBateriaViaje() {
+<span class="nc" id="L44">		return bateriaViaje;</span>
+	}
+	public void setBateriaViaje(int bateriaViaje) {
+<span class="nc" id="L47">		this.bateriaViaje = bateriaViaje;</span>
+<span class="nc" id="L48">	}</span>
+	public int getMaxVehiculosMantenimiento() {
+<span class="nc" id="L50">		return maxVehiculosMantenimiento;</span>
+	}
+	public void setMaxVehiculosMantenimiento(int maxVehiculosMantenimiento) {
+<span class="nc" id="L53">		this.maxVehiculosMantenimiento = maxVehiculosMantenimiento;</span>
+<span class="nc" id="L54">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

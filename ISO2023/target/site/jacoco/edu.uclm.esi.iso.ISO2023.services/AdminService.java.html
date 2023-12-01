@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AdminService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ISO2023</a> &gt; <a href="index.source.html" class="el_package">edu.uclm.esi.iso.ISO2023.services</a> &gt; <span class="el_source">AdminService.java</span></div><h1>AdminService.java</h1><pre class="source lang-java linenums">package edu.uclm.esi.iso.ISO2023.services;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import edu.uclm.esi.iso.ISO2023.dao.AdminDAO;
+import edu.uclm.esi.iso.ISO2023.dao.ClienteDAO;
+import edu.uclm.esi.iso.ISO2023.dao.MantenimientoDAO;
+import edu.uclm.esi.iso.ISO2023.dao.ParametrosDAO;
+import edu.uclm.esi.iso.ISO2023.dao.ReservaDAO;
+import edu.uclm.esi.iso.ISO2023.dao.TokenDAO;
+import edu.uclm.esi.iso.ISO2023.entities.Administrador;
+import edu.uclm.esi.iso.ISO2023.entities.Cliente;
+import edu.uclm.esi.iso.ISO2023.entities.Mantenimiento;
+import edu.uclm.esi.iso.ISO2023.entities.Parametros;
+import edu.uclm.esi.iso.ISO2023.entities.Reserva;
+import edu.uclm.esi.iso.ISO2023.entities.Token;
+import edu.uclm.esi.iso.ISO2023.entities.User;
+import edu.uclm.esi.iso.ISO2023.exceptions.*;
+
+@Service
+<span class="fc" id="L28">public class AdminService {</span>
+	@Autowired
+	private UserService userService;
+	@Autowired
+	private AdminDAO adminDAO;
+	@Autowired
+	private TokenDAO tokenDAO;
+	@Autowired
+	private ClienteDAO clienteDAO;
+	@Autowired
+	private MantenimientoDAO mantenimientoDAO;
+	@Autowired
+	private SeguridadService comprobarSeguridad;
+	@Autowired
+	private ParametrosDAO parametrosDAO;
+	@Autowired
+	private ReservaDAO reservaDAO;
+
+	private static final String ADMIN = &quot;admin&quot;;
+	private static final String MANTENIMIENTO = &quot;mantenimiento&quot;;
+	private static final String ID_BBDD = &quot;655b1a3db7bb7908becebbf4&quot;;
+	public static final String ERROR_CL = &quot;Ese cliente no existe.&quot;;
+
+	public void registrar(String nombre, String apellidos, String email, String password, String emailAdmin,
+			String passwordAdmin, String tipoUsuario) throws contrasenaIncorrecta, formatoIncompleto {
+<span class="nc bnc" id="L53" title="All 2 branches missed.">		if (userService.checkUser(emailAdmin, passwordAdmin).equals(ADMIN)) {</span>
+<span class="nc" id="L54">			User usuario = null;</span>
+<span class="nc bnc" id="L55" title="All 3 branches missed.">			switch (tipoUsuario) {</span>
+			case ADMIN:
+<span class="nc" id="L57">				usuario = new Administrador(nombre, apellidos, email, password, true, 5);</span>
+<span class="nc" id="L58">				break;</span>
+			case MANTENIMIENTO:
+<span class="nc" id="L60">				usuario = new Mantenimiento(nombre, apellidos, email, password, true, 5);</span>
+<span class="nc" id="L61">				break;</span>
+			default:
+<span class="nc" id="L63">				throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, &quot;Error al crear el usuario.&quot;);</span>
+			}
+<span class="nc" id="L65">			seguridadRegistrar(usuario, tipoUsuario);</span>
+		}
+<span class="nc" id="L67">	}</span>
+
+	public void seguridadRegistrar(User usuario, String tipoUsuario) throws contrasenaIncorrecta, formatoIncompleto {
+<span class="nc bnc" id="L70" title="All 2 branches missed.">		if (!comprobarSeguridad.restriccionesPassword(usuario))</span>
+<span class="nc" id="L71">			throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, &quot;La contraseña no es segura&quot;);</span>
+<span class="nc bnc" id="L72" title="All 2 branches missed.">		if (this.clienteDAO.findByEmail(usuario.getEmail()).isPresent()</span>
+<span class="nc bnc" id="L73" title="All 2 branches missed.">				|| this.adminDAO.findByEmail(usuario.getEmail()).isPresent()</span>
+<span class="nc bnc" id="L74" title="All 2 branches missed.">				|| this.mantenimientoDAO.findByEmail(usuario.getEmail()).isPresent()) {</span>
+<span class="nc" id="L75">			throw new formatoIncompleto(&quot;Error. No puedes usar esos credenciales.&quot;);</span>
+		} else {
+<span class="nc" id="L77">			Token token = new Token();</span>
+<span class="nc" id="L78">			token.setUser(usuario);</span>
+<span class="nc" id="L79">			comprobarSeguridad.restriccionesPassword(usuario);</span>
+<span class="nc" id="L80">			comprobarSeguridad.validarEmail(usuario.getEmail());</span>
+
+<span class="nc bnc" id="L82" title="All 2 branches missed.">			if (usuario.getPassword().length() != 60) {</span>
+<span class="nc" id="L83">				usuario.setPassword(comprobarSeguridad.cifrarPassword(usuario.getPassword()));</span>
+			}
+
+<span class="nc" id="L86">			userService.saveUser(usuario, tipoUsuario);</span>
+
+<span class="nc" id="L88">			this.tokenDAO.save(token);</span>
+
+		}
+<span class="nc" id="L91">	}</span>
+
+	public void actualizarAdmin(String nombre, String apellidos, String email, String password, boolean activo,
+			int intentos, String emailAdmin, String passwordAdmin) {
+<span class="nc bnc" id="L95" title="All 2 branches missed.">		if (userService.checkUser(emailAdmin, passwordAdmin).equals(ADMIN)) {</span>
+<span class="nc" id="L96">			Optional&lt;Administrador&gt; adminExiste = adminDAO.findByEmail(email);</span>
+<span class="nc bnc" id="L97" title="All 2 branches missed.">			if (adminExiste.isPresent()) {</span>
+<span class="nc" id="L98">				Administrador admin = adminExiste.get();</span>
+<span class="nc" id="L99">				admin.setNombre(nombre);</span>
+<span class="nc" id="L100">				admin.setApellidos(apellidos);</span>
+<span class="nc" id="L101">				admin.setEmail(email);</span>
+<span class="nc" id="L102">				admin.setPassword(password);</span>
+<span class="nc" id="L103">				admin.setActivo(activo);</span>
+<span class="nc" id="L104">				admin.setIntentos(intentos);</span>
+<span class="nc" id="L105">				this.adminDAO.save(admin);</span>
+<span class="nc" id="L106">			} else {</span>
+<span class="nc" id="L107">				throw new ResponseStatusException(HttpStatus.FORBIDDEN, ERROR_CL);</span>
+			}
+		}
+<span class="nc" id="L110">	}</span>
+
+	public void eliminarAdmin(String email, String emailAdmin, String passwordAdmin) {
+<span class="nc bnc" id="L113" title="All 2 branches missed.">		if (userService.checkUser(emailAdmin, passwordAdmin).equals(ADMIN))</span>
+<span class="nc" id="L114">			adminDAO.deleteById(email);</span>
+<span class="nc" id="L115">	}</span>
+
+	public Parametros getParametros(String email, String password) {
+<span class="nc" id="L118">		Optional&lt;Parametros&gt; par = this.parametrosDAO.findById(ID_BBDD);</span>
+<span class="nc bnc" id="L119" title="All 2 branches missed.">		if (userService.checkUser(email, password).equals(ADMIN)) {</span>
+<span class="nc bnc" id="L120" title="All 2 branches missed.">			if (par.isPresent())</span>
+<span class="nc" id="L121">				return par.get();</span>
+		} else {
+<span class="nc" id="L123">			throw new ResponseStatusException(HttpStatus.FORBIDDEN, &quot;No puedes consultar los parametros.&quot;);</span>
+		}
+<span class="nc" id="L125">		return null;</span>
+	}
+
+	public void actualizarParametros(double precioViaje, int minimoBateria, int bateriaViaje,
+			int maxVehiculosMantenimiento, String emailAdmin, String passwordAdmin) {
+<span class="nc bnc" id="L130" title="All 2 branches missed.">		if (userService.checkUser(emailAdmin, passwordAdmin).equals(ADMIN)) {</span>
+<span class="nc" id="L131">			Parametros par = getParametros(emailAdmin, passwordAdmin);</span>
+<span class="nc" id="L132">			par.setPrecioViaje(precioViaje);</span>
+<span class="nc" id="L133">			par.setMinimoBateria(minimoBateria);</span>
+<span class="nc" id="L134">			par.setBateriaViaje(bateriaViaje);</span>
+<span class="nc" id="L135">			par.setMaxVehiculosMantenimiento(maxVehiculosMantenimiento);</span>
+<span class="nc" id="L136">			this.parametrosDAO.save(par);</span>
+		}
+<span class="nc" id="L138">	}</span>
+
+	public List&lt;String&gt; obtenerFacturacion(String emailAdmin, String passwordAdmin, String primerDia, String ultimoDia) {
+<span class="nc" id="L141">	    Optional&lt;Parametros&gt; par = this.parametrosDAO.findById(ID_BBDD);</span>
+<span class="nc" id="L142">	    List&lt;String&gt; lista = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L143" title="All 4 branches missed.">	    if (userService.checkUser(emailAdmin, passwordAdmin).equals(ADMIN) &amp;&amp; par.isPresent()) {</span>
+      
+<span class="nc bnc" id="L145" title="All 2 branches missed.">	        for(Cliente i : this.clienteDAO.findAll()) {</span>
+<span class="nc" id="L146">	        	double facturacion=0;</span>
+<span class="nc" id="L147">	        	String email = i.getEmail();</span>
+<span class="nc bnc" id="L148" title="All 2 branches missed.">	        	for(Reserva j : this.reservaDAO.findByUsuarioEmailAndFechaBetweenAndEstado(email, primerDia, ultimoDia,&quot;finalizada&quot;)) {</span>
+<span class="nc" id="L149">	        		facturacion += par.get().getPrecioViaje();}</span>
+<span class="nc bnc" id="L150" title="All 2 branches missed.">	        	if (facturacion &gt; 0) {</span>
+<span class="nc" id="L151">	                lista.add(email + &quot;: &quot; + facturacion);</span>
+	            }
+<span class="nc" id="L153">	        }</span>
+	    }
+	    
+<span class="nc" id="L156">	    return lista;</span>
+	}
+
+
+}
+
+
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
