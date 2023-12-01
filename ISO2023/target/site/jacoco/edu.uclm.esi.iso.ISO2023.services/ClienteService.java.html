@@ -119,21 +119,21 @@ import edu.uclm.esi.iso.ISO2023.exceptions.*;
 	// METODO PARA EL CLIENTE
 	public void actualizarDatos(String nombre, String apellidos, String email, String password, String fechaNacimiento,
 			String carnet, String telefono, String dni) throws numeroInvalido, formatoIncompleto {
-<span class="nc" id="L122">		Optional&lt;Cliente&gt; cliente = this.clienteDAO.findByEmail(email);</span>
-<span class="nc bnc" id="L123" title="All 4 branches missed.">		if (userService.checkUser(email, password).equals(&quot;cliente&quot;) &amp;&amp; cliente.isPresent()) {</span>
+<span class="fc" id="L122">		Optional&lt;Cliente&gt; cliente = this.clienteDAO.findByEmail(email);</span>
+<span class="pc bpc" id="L123" title="2 of 4 branches missed.">		if (userService.checkUser(email, password).equals(&quot;cliente&quot;) &amp;&amp; cliente.isPresent()) {</span>
 
-<span class="nc" id="L125">			comprobarSeguridad.validarEmail(email);</span>
-<span class="nc" id="L126">			comprobarSeguridad.comprobarNumero(telefono);</span>
+<span class="fc" id="L125">			comprobarSeguridad.validarEmail(email);</span>
+<span class="fc" id="L126">			comprobarSeguridad.comprobarNumero(telefono);</span>
 
-<span class="nc bnc" id="L128" title="All 2 branches missed.">			if (Boolean.FALSE.equals((comprobarSeguridad.comprobarDni(dni))))</span>
+<span class="pc bpc" id="L128" title="1 of 2 branches missed.">			if (Boolean.FALSE.equals((comprobarSeguridad.comprobarDni(dni))))</span>
 <span class="nc" id="L129">				throw new numeroInvalido(</span>
 						&quot;El NIF introducido no es un NIF valido. Tiene que contener 8 numeros y un caracter&quot;);
 
-<span class="nc" id="L132">			cliente = this.clienteDAO.findByDni(dni);</span>
-<span class="nc bnc" id="L133" title="All 4 branches missed.">			if (cliente.isPresent() &amp;&amp; !dni.equals(cliente.get().getDni())) {</span>
+<span class="fc" id="L132">			cliente = this.clienteDAO.findByDni(dni);</span>
+<span class="pc bpc" id="L133" title="3 of 4 branches missed.">			if (cliente.isPresent() &amp;&amp; !dni.equals(cliente.get().getDni())) {</span>
 <span class="nc" id="L134">				throw new formatoIncompleto(&quot;Error.No puedes usar ese DNI.&quot;);</span>
 			}
-<span class="nc bnc" id="L136" title="All 2 branches missed.">			if (cliente.isPresent()) {</span>
+<span class="pc bpc" id="L136" title="1 of 2 branches missed.">			if (cliente.isPresent()) {</span>
 <span class="nc" id="L137">				cliente.get().setNombre(nombre);</span>
 <span class="nc" id="L138">				cliente.get().setApellidos(apellidos);</span>
 <span class="nc" id="L139">				cliente.get().setFechaNacimiento(fechaNacimiento);</span>
@@ -145,6 +145,6 @@ import edu.uclm.esi.iso.ISO2023.exceptions.*;
 		}else {
 <span class="nc" id="L146">			throw new ResponseStatusException(HttpStatus.FORBIDDEN, &quot;No se ha podido modificar los datos.&quot;);</span>
 		}
-<span class="nc" id="L148">	}</span>
+<span class="fc" id="L148">	}</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
