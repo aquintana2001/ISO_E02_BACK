@@ -1,8 +1,4 @@
-FROM openjdk:17-jre-slim
-WORKDIR /ISO2023
-COPY ./pom.xml .
-COPY . .
-RUN apt-get update && apt-get install -y maven
-RUN mvn clean install
-EXPOSE 8080
-CMD ["java", "-jar", "target/ISO2023.jar"]
+FROM amazoncorreto:11-alpine-jdk
+MAINTAINER ISO2023
+COPY target\ISO2023-0.0.1-SNAPSHOT-jar ISO2023-app.jar
+ENTRYPOINT ["java","-jar","/ISO2023-app.jar"]
