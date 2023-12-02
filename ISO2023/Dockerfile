@@ -1,4 +1,8 @@
-FROM amazoncorreto:11-alpine-jdk
-MAINTAINER ISO2023
-COPY target\ISO2023-0.0.1-SNAPSHOT-jar ISO2023-app.jar
-ENTRYPOINT ["java","-jar","/ISO2023-app.jar"]
+FROM maven:3.8.5-openjdk-17 AS build
+COPY . .
+RUN mvn clean package -DskipTests
+
+FROM openjdk:17.0.1-jdk-slim
+COPY --from=build /target/ISO2023-0.0.1-SNAPSHOT.jar ISO2023.jar
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","/ISO2023.jar"]
